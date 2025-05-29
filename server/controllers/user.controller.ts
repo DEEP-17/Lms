@@ -1,18 +1,19 @@
-import { Request, Response, NextFunction } from "express";
-import userModel, { IUser } from "../models/user.model";
-import ErrorHandler from "../utils/ErrorHandler";
-import { CatchAsyncError } from "../middleware/catchAsyncErrors";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-require("dotenv").config();
 import ejs from "ejs";
-import path from "path";
-import sendMail from "../utils/sendMail";
-import { send } from "process";
-import { refreshTokenOptions, sendToken } from "../utils/jwt";
-import { redis } from "../utils/redis";
-import { accessTokenOptions } from "../utils/jwt";
+import { NextFunction, Request, Response } from "express";
 import { get } from "http";
-import { getUserById } from "../services/user.service";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import path from "path";
+import { send } from "process";
+import { CatchAsyncError } from "../middleware/catchAsyncErrors";
+import userModel, { IUser } from "../models/user.model";
+import { getAllUsersService, getUserById } from "../services/user.service";
+import ErrorHandler from "../utils/ErrorHandler";
+import { accessTokenOptions, refreshTokenOptions, sendToken } from "../utils/jwt";
+import { redis } from "../utils/redis";
+import sendMail from "../utils/sendMail";
+import cloudinary from 'cloudinary';
+
+require("dotenv").config();
 //register user
 interface IregistrationBody {
   name: string;
@@ -274,6 +275,109 @@ export const updateUserInfo = CatchAsyncError(
         success: true,
         user,
       });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+//update user password
+
+interface IUpdatePassword{
+  oldPassword: string;
+  newPassword: string;
+}
+
+
+export const updatePassword = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { oldPassword, newPassword } = req.body as IUpdatePassword;
+    if (!oldPassword || !newPassword) {
+      return next(new ErrorHandler("Please enter old and new password", 400));
+    }
+    const user = await userModel.findById(req.user?._id).select("+password");
+    
+    if (user?.password == undefined) {
+      return next(new ErrorHandler("Invalid user", 400));
+    }
+
+    const isPasswordMatched = await user?.comparePassword(oldPassword);
+    
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Invalid old password", 400));
+    }
+    user.password = newPassword;
+
+    await user.save();
+
+    //Temp
+    await redis.set(JSON.stringify(req.user?._id), JSON.stringify(user));
+
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400));
+  }
+});
+
+interface IUpdateProfilePicture{
+  avatar: string;
+}
+//update profile picture
+
+export const updateProfilePicture = CatchAsyncError(async (req: Request, resizeBy: Response, next: NextFunction) => {
+  {
+    try {
+      const { avatar } = req.body;
+      const userId = req.user?._id;
+      const user = await userModel.findById(userId);
+
+      if (avatar && user) {
+        if (user?.avatar?.public_id) {
+          await cloudinary.v2.uploader.destroy(user.avatar?.public_id);
+
+          const myCloud =await cloudinary.v2.uploader.upload(avatar, {
+            folder: "avatars",
+            width:150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url:myCloud.secure_url,
+          }
+        }
+        else {
+          const myCloud =await cloudinary.v2.uploader.upload(avatar, {
+            folder: "avatars",
+            width:150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url:myCloud.secure_url,
+          }
+        }
+      }
+
+      await user?.save();
+
+      await redis.set(JSON.stringify(userId), JSON.stringify(user));
+
+      resizeBy.status(200).json({
+        succes: true,
+        user
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+});
+
+//get all users
+export const getAllUsers = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAllUsersService(res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
