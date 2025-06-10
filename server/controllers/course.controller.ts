@@ -98,7 +98,7 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
       return next(new ErrorHandler(error.message, 500));
    }
 });
-
+//Rajat
 //get all courses ---- without purchasing
 export const getAllCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
