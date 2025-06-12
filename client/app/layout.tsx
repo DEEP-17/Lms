@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Poppins,Josefin_Sans} from "next/font/google";
+import { Poppins, Josefin_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "./utils/theme-provider"; 
-import { ThemeSwitcher } from "./utils/ThemeSwitcher";
+import { ThemeProvider } from "./utils/theme-provider";
+
 const poppins = Poppins({
   variable: "--font-Poppins",
   subsets: ["latin"],
-  weight:["400","500","600","700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const josefin = Josefin_Sans({
@@ -15,6 +15,10 @@ const josefin = Josefin_Sans({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  title: "Elearning",
+  description: "Elearning is a platform for students to learning and get help from teachers",
+};
 
 export default function RootLayout({
   children,
@@ -22,18 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning  className={`${poppins.variable} ${josefin.variable} !bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300`}>
-      <body
-       
-      >
-       
+    <html lang="en" suppressHydrationWarning className={`${poppins.variable} ${josefin.variable}`}>
+      <body className="!bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem>
-
-        {children}
-          </ThemeProvider>
+          enableSystem
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

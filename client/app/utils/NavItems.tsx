@@ -20,16 +20,16 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
   return (
     <>
       {/* Desktop nav */}
-     <div className=" 800px:flex">
+     <div className=" 800px:flex mt-5">
         {
         navItemsData&&navItemsData.map((i, index) => (
           <Link href={`${i.url}`} key={index} passHref>
              <span
                 className={`${
                   activeItem === index
-                    ? " dark:text-[#37a39a] text-[crimson]"
-                    : " dark:text-white text-black"
-                } text-[18px] px-6 font-Poppins font-[400]`}
+                    ? "dark:text-[#37a39a] text-[crimson]"
+                    : "dark:text-white text-black"
+                } text-[18px] px-6  font-Poppins font-[400]`}
               >
               {i.name}
             </span>
@@ -41,12 +41,13 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
       {isMobile && (
         <div className="800px:hidden mt-5 ">
             <div className="w-full text-center py-6">
-          {navItemsData&&navItemsData.map((i, index) => (
+          {
+          navItemsData&&navItemsData.map((i, index) => (
             <Link href={`${i.url}`} key={index} passHref>
               <span
                 className={`${
                   activeItem === index
-                    ? " dark:text-[#37a39a ] text-[crimson]"
+                    ? " dark:text-[#37a39a] text-[crimson]"
                     : " dark:text-white text-black"
                 } block py-5 text-[18px]  px-6 font-Poppins font-[400]`}
               >

@@ -20,7 +20,7 @@ const Page: FC<Props>=(props)=>{
       setOpen={setOpen}
       activeItem={activeItem}
       />
-      <NavItems activeItem={0} isMobile={false}></NavItems>
+      
     </div>
   );
 };
