@@ -40,7 +40,7 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
       {/* Mobile nav */}
       {isMobile && (
         <div className="800px:hidden mt-5 ">
-            <div className="w-full text-center py-6">
+          
           {
           navItemsData&&navItemsData.map((i, index) => (
             <Link href={`${i.url}`} key={index} passHref>
@@ -56,7 +56,6 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
             </Link>
           ))}
           </div>
-        </div>
       )}
     </>
   );
