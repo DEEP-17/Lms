@@ -8,13 +8,15 @@ type Props = {
     setRoute?: (route: string) => void;
 }
 const schema = Yup.object().shape({
+    name:Yup.string().required('Please Enter Your Name!'),
   email: Yup.string().email('Invalid email address').required('Please enter your email'),
   password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 });
-const Login:FC<Props> = ({setRoute}) => {
+const SignUp:FC<Props> = ({setRoute}) => {
     const [show,setShow]=   useState(false);
   const formik = useFormik({
     initialValues:{
+        name:"",
         email:"",
         password:""
     },
@@ -93,10 +95,10 @@ Login With Elearning
                     <AiFillGithub size={30} className="cursor-pointer ml-2"/>
                 </div>
             <h5 className="text-center pt-4 font-Poppins text-[14px]">
-                Not have an account?{" "}
+                Already have an account?{" "}
                 <span className="text-[#2190ff] p1-1 cursor pointer"
                 onClick={() => setRoute && setRoute("Sign-Up")}>
-                    Sign up
+                    Sign in
                 </span>
             
             </h5>
@@ -106,4 +108,4 @@ Login With Elearning
   );
 }
 
-export default Login
+export default SignUp ;
