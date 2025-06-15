@@ -1,9 +1,11 @@
 'use client'
-import { Poppins, Josefin_Sans } from "next/font/google";
+import { Josefin_Sans, Poppins } from "next/font/google";
+import React from "react";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import { Providers } from "./Providers"; // This should wrap your Redux context
 import { ThemeProvider } from "./utils/theme-provider";
-import {Toaster} from "react-hot-toast"
-import {Providers} from "./Providers"
+
 const poppins = Poppins({
   variable: "--font-Poppins",
   subsets: ["latin"],
@@ -16,8 +18,6 @@ const josefin = Josefin_Sans({
   subsets: ["latin"],
 });
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,13 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${poppins.variable} ${josefin.variable}`}>
       <body className="!bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
-          <Toaster position='top-center' reverseOrder={false}/>
-          {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Providers>
+            <Toaster position='top-center' reverseOrder={false} />
+            {children}
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

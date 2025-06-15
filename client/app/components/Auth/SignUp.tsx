@@ -22,7 +22,9 @@ if(isSuccess)
 {
     const message=data?.message||"Registration Successfull";
     toast.success(message);
-    setRoute&&setRoute("Verification");
+    if (setRoute) {
+        setRoute("Verification")
+    }
 }
 if(error)
 {
