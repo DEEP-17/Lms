@@ -1,9 +1,11 @@
-import React,{FC,useState} from "react"
+import React,{FC,useState,useEffect} from "react"
 import {useFormik} from "formik";
 import * as Yup from 'yup'
 import {AiOutlineEye, AiOutlineEyeInvisible,AiFillGithub} from 'react-icons/ai'
 import {FcGoogle} from 'react-icons/fc'
 import {styles} from '../../../app/styles/style'
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import {toast} from "react-hot-toast";
 type Props = {
     setRoute?: (route: string) => void;
 }
@@ -14,15 +16,37 @@ const schema = Yup.object().shape({
 });
 const SignUp:FC<Props> = ({setRoute}) => {
     const [show,setShow]=   useState(false);
-  const formik = useFormik({
+    const [register,{data,error,isSuccess}]=useRegisterMutation();
+  useEffect(()=>{
+if(isSuccess)
+{
+    const message=data?.message||"Registration Successfull";
+    toast.success(message);
+    setRoute&&setRoute("Verification");
+}
+if(error)
+{
+    if(error)
+        {
+        if("data" in error)
+        {
+            const errorData=error as any;
+            toast.error(errorData.data.message);
+        }
+}
+  }},[isSuccess,error])
+    const formik = useFormik({
     initialValues:{
         name:"",
         email:"",
         password:""
     },
     validationSchema: schema,
-    onSubmit: async ({ email, password }: { email: string; password: string }) => {
-        console.log(email, password);
+    onSubmit: async ({ name,email, password }: {name:string; email: string; password: string }) => {
+        const data={
+            name,email,password
+        };
+        await register(data);
     }
 }
 );
@@ -30,9 +54,28 @@ const SignUp:FC<Props> = ({setRoute}) => {
   return (
     <div className="w-full">
         <h1 className={`${styles.title}`}>
-Login With Elearning  
+Join to Elearning  
         </h1>
         <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+                  <label className={`${styles.label}`} htmlFor="email">
+                Enter Your name
+            </label>
+            <input
+                type="name"
+                name=""
+                id="name"
+                value={values.name}
+                onChange={handleChange}
+                placeholder="johndoe"
+                className={`${errors.email&&touched.email&&"border-red-500"}
+               ${styles.input}`}/>
+                {
+                errors.name && touched.name && (
+                   <span className="text-red-500 pt-2 black">{errors.name}</span>
+                )
+                }
+            </div>
             <label className={`${styles.label}`} htmlFor="email">
                 Enter Your Email
             </label>
@@ -42,6 +85,7 @@ Login With Elearning
                 id="email"
                 value={values.email}
                 onChange={handleChange}
+                placeholder="example@gmail.com"
                 className={`${errors.email&&touched.email&&"border-red-500"}
                ${styles.input}`}/>
                 {
@@ -83,7 +127,7 @@ Login With Elearning
                 </div>
                 <div className="w-full mt-5">
                     <input type="submit"
-                    value="Login"
+                    value="Sign Up"
                     className={`${styles.button}`} />
                 </div>
                 <br />
@@ -97,7 +141,7 @@ Login With Elearning
             <h5 className="text-center pt-4 font-Poppins text-[14px]">
                 Already have an account?{" "}
                 <span className="text-[#2190ff] p1-1 cursor pointer"
-                onClick={() => setRoute && setRoute("Sign-Up")}>
+                onClick={() => setRoute && setRoute("Login")}>
                     Sign in
                 </span>
             
@@ -108,4 +152,4 @@ Login With Elearning
   );
 }
 
-export default SignUp ;
+export default SignUp;

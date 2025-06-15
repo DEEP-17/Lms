@@ -17,7 +17,8 @@ app.use(cookieParser());
 //testing api
 app.use(
     cors({
-      origin: process.env.ORIGIN,
+      origin: ['https://localhost:3000'],
+      credentials:true,
     })
   );
 //routes

@@ -40,6 +40,7 @@ Login With Elearning
                 id="email"
                 value={values.email}
                 onChange={handleChange}
+                placeholder="example@gmail.com"
                 className={`${errors.email&&touched.email&&"border-red-500"}
                ${styles.input}`}/>
                 {

@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+'use client'
 import { Poppins, Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./utils/theme-provider";
-
+import {Toaster} from "react-hot-toast"
+import {Providers} from "./Providers"
 const poppins = Poppins({
   variable: "--font-Poppins",
   subsets: ["latin"],
@@ -15,10 +16,7 @@ const josefin = Josefin_Sans({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Elearning",
-  description: "Elearning is a platform for students to learning and get help from teachers",
-};
+
 
 export default function RootLayout({
   children,
@@ -33,6 +31,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
         >
+          <Toaster position='top-center' reverseOrder={false}/>
           {children}
         </ThemeProvider>
       </body>
