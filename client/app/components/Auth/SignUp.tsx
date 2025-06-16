@@ -7,7 +7,7 @@ import { FcGoogle } from 'react-icons/fc';
 import * as Yup from 'yup';
 import { styles } from '../styles/style';
 type Props = {
-    setRoute?: (route: string) => void;
+    setRoute: (route: string) => void;
 }
 const schema = Yup.object().shape({
     name: Yup.string().required('Please Enter Your Name!'),
@@ -21,19 +21,20 @@ const SignUp: FC<Props> = ({ setRoute }) => {
         if (isSuccess) {
             const message = data?.message || "Registration Successfull";
             toast.success(message);
-            if (setRoute) {
-                setRoute("Verification")
-            }
+            setRoute("Verification");
         }
         if (error) {
-            if (error) {
-                if ("data" in error) {
-                    const errorData = error as any;
-                    toast.error(errorData.data.message);
+            if ("data" in error) {
+                interface ErrorResponse {
+                    data: { message: string };
                 }
+                const errorData = error as ErrorResponse;
+                toast.error(errorData.data.message);
             }
         }
-    }, [isSuccess, error])
+    }, [isSuccess, error]);
+
+
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -49,7 +50,7 @@ const SignUp: FC<Props> = ({ setRoute }) => {
         }
     }
     );
-    const { errors, touched, values, handleChange, handleBlur, handleSubmit } = formik;
+    const { errors, touched, values, handleChange, handleSubmit } = formik;
     return (
         <div className="w-full">
             <h1 className={`${styles.title}`}>
@@ -118,12 +119,13 @@ const SignUp: FC<Props> = ({ setRoute }) => {
                             />
                         )
                     }
-                    {
-                        errors.password && touched.password && (
-                            <span className="text-red-500 pt-2 black">{errors.password}</span>
-                        )
-                    }
+                    
                 </div>
+                {
+                    errors.password && touched.password && (
+                        <span className="text-red-500 pt-2 black">{errors.password}</span>
+                    )
+                }
                 <div className="w-full mt-2">
                     <input type="submit"
                         value="Sign Up"

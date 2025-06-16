@@ -1,7 +1,9 @@
-import React, { FC, useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { VscWorkspaceTrusted } from 'react-icons/vsc'
 import { styles } from '../styles/style'
+import { useSelector } from 'react-redux';
+import { useActivationMutation } from '@/redux/features/auth/authApi';
+import toast from 'react-hot-toast';
 type Props = {
     setRoute: (route: string) => void;
 }
@@ -12,7 +14,30 @@ type VerifyNumber = {
     "3": string;
 };
 const Verification: FC<Props> = ({ setRoute }) => {
+    const token = useSelector((state: any) => state.auth.token);
+    const [activation, {isSuccess,error}] = useActivationMutation();
     const [invalidError, setInvalidError] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Account activated successfully!");
+            setRoute("Login");
+        }
+        if (error) {
+            if ("data" in error) {
+                interface ErrorResponse {
+                    data: { message: string };
+                }
+                const errorData = error as ErrorResponse;
+                toast.error(errorData.data.message);
+                setInvalidError(true);
+            }
+            else {
+                toast.error("An error occurred during activation. Please try again.");
+            }
+        }
+    }, []);
+
     const inputRefs = [
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null),
@@ -26,7 +51,14 @@ const Verification: FC<Props> = ({ setRoute }) => {
         "3": ""
     });
     const verificationHandler = async () => {
-        setInvalidError(true);
+        const verificationNumber = Object.values(verifyNumber).join("");
+        if (verificationNumber.length !== 4) {
+            setInvalidError(true);
+            return;
+        }
+        await activation({ activation_token:token, activation_code:verificationNumber });
+        setRoute("Login");
+        toast.success("Account activated successfully!");
     }
     const handleInputChange = async (index: number, value: string) => {
         setInvalidError(false);
@@ -42,7 +74,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
     }
     return (
         <div>
-            <h1 className={`${styles.title}`}> verify your account</h1>
+            <h1 className={`${styles.title}`}> Verify your account</h1>
             <br />
             <div className="w-full flex items-center justify-center mt-2">
                 <div className="w-[80px] h-[80px] rounded-full bg-[#497DF2] flex items-center justify-center">
@@ -54,7 +86,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
             <div className="m-auto flex items-center justify-around">
                 {Object.keys(verifyNumber).map((key, index) => (
                     <input
-                        type="text"
+                        type="number"
                         key={key}
                         ref={inputRefs[index]}
                         value={verifyNumber[key as keyof VerifyNumber]}
@@ -77,7 +109,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
                 >Verify OTP</button>
             </div>
             <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
-                Go back to sign in?<span className="text-[#2190ff] p1-1 cursor-pointer"
+                Go back to sign in?<span className="text-[#2190ff] cursor-pointer"
                     onClick={() => setRoute("Login")}>Sign In</span>
             </h5>
 

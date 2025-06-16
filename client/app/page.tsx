@@ -2,12 +2,11 @@
 import React, { FC, useState } from "react";
 import Header from "./components/Header";
 import Heading from "./components/utils/Heading";
-// import NavItems from "./utils/NavItems";
 import Hero from "./components/Route/Hero";
-interface Props { }
+type Props = Record<string, never>;
 const Page: FC<Props> = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(0);
+  const [activeItem] = useState(0);
 
   const [route, setRoute] = useState("Login");
   return (

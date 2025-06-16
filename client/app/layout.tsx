@@ -28,16 +28,16 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${poppins.variable} ${josefin.variable}` }
+      className={`${poppins.variable} ${josefin.variable}`}
     >
       <head />
       <body className="transition-colors duration-300">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
-          <Providers>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
             <Toaster position="top-center" reverseOrder={false} />
             {children}
-          </Providers>
-        </ThemeProvider>
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -1,18 +1,22 @@
 import { useFormik } from "formik";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { AiFillGithub, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FcGoogle } from 'react-icons/fc';
 import * as Yup from 'yup';
 import { styles } from '../styles/style';
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import toast from "react-hot-toast";
 type Props = {
-    setRoute?: (route: string) => void;
+    setRoute: (route: string) => void;
+    setOpen: (open: boolean) => void;
 }
 const schema = Yup.object().shape({
     email: Yup.string().email('Invalid email address').required('Please enter your email'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 });
-const Login: FC<Props> = ({ setRoute }) => {
+const Login: FC<Props> = ({ setRoute,setOpen }) => {
     const [show, setShow] = useState(false);
+    const [login,{isSuccess,data,error} ] = useLoginMutation();
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -20,11 +24,32 @@ const Login: FC<Props> = ({ setRoute }) => {
         },
         validationSchema: schema,
         onSubmit: async ({ email, password }: { email: string; password: string }) => {
-            console.log(email, password);
+            await login({ email, password });
         }
     }
     );
-    const { errors, touched, values, handleChange, handleBlur, handleSubmit } = formik;
+
+    useEffect(() => {
+        if (isSuccess) {
+            setOpen(false);
+            const message ="Login Successful";
+            toast.success(message);
+            setRoute("");
+        }
+        if (error) {
+            if ("data" in error) {
+                interface ErrorResponse {
+                    data: { message: string };
+                }
+                const errorData = error as ErrorResponse;
+                toast.error(errorData.data.message);
+            } else {
+                toast.error("An error occurred during login. Please try again.");
+            }
+        }
+    }
+    , [isSuccess, error]);
+    const { errors, touched, values, handleChange, handleSubmit } = formik;
     return (
         <div className="w-full h-full flex flex-col justify-center">
             <h1 className={`${styles.title}`}>
@@ -41,7 +66,7 @@ const Login: FC<Props> = ({ setRoute }) => {
                     value={values.email}
                     onChange={handleChange}
                     placeholder="example@gmail.com"
-                    className={`${errors.email && touched.email && "border-red-500"}
+                    className={`${errors.email && touched.email && "border-red-500"} 
                ${styles.input}`} />
                 {
                     errors.email && touched.email && (
