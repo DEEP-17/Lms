@@ -32,6 +32,6 @@ userRouter.get(
   authorizeRoles("admin"),
   getAllUsers);
 userRouter.put("/update-user-role", isAuthenticated, authorizeRoles("admin"), updateUserRole);
-userRouter.delete("delete-user/:id", isAuthenticated, authorizeRoles("admin"), deleteUser);
+userRouter.delete("/delete-user/:id", isAuthenticated, authorizeRoles("admin"), deleteUser);
 
 export default userRouter;

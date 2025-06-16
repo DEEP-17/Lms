@@ -19,6 +19,7 @@ export const createOrder = CatchAsyncError(
          if (!courseId || !userId || !payment_info) {
             return next(new ErrorHandler("Please provide all required fields", 400));
          }
+
          const user = await userModel.findById(req.user?._id);
          if (!user) {
             return next(new ErrorHandler("User not found", 404));
@@ -74,7 +75,7 @@ export const createOrder = CatchAsyncError(
          await user?.save();
 
          await NotificationModel.create({
-            user: user?._id,
+            userId: user?._id,
             title:"New Order",
             message: `You have a new order from ${course?.name}`,
          });

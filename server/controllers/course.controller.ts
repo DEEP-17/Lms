@@ -39,11 +39,12 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
    try {
       const data = req.body;
       const thumbnail = data.thumbnail;
+      const newThumbnail = data.newThumbnail;
 
 
       if (thumbnail) {
          await cloudinary.v2.uploader.destroy(thumbnail.public_id);
-         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+         const myCloud = await cloudinary.v2.uploader.upload(newThumbnail, {
             folder: "courses",
          });
 
@@ -114,7 +115,7 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
       if (!courses || courses.length === 0) {
          return next(new ErrorHandler("No courses found", 404));
       }
-      await redis.set("allCourses", JSON.stringify(courses));
+      await redis.set("allCourses", JSON.stringify(courses), "EX", 240);
       res.status(200).json({
          success: true,
          courses
@@ -127,6 +128,9 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
 //get course content --- only for valid users
 export const getCourseByUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
+      if (!req.user) {
+         return next(new ErrorHandler("You are not logged in", 401));
+      }
       const userCourseList = req.user?.courses;
       if (!userCourseList || userCourseList.length === 0) {
          return next(new ErrorHandler("You have not purchased any course", 404));
@@ -159,6 +163,7 @@ interface IAddQustion{
 
 export const addQuestionInCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
+      await redis.del("allCourses");
       const { courseId, question, contentId }: IAddQustion = req.body;
 
       if (!courseId || !question || !contentId) {
@@ -191,7 +196,7 @@ export const addQuestionInCourse = CatchAsyncError(async (req: Request, res: Res
       courseContent.questions.push(questionObject);
 
       await NotificationModel.create({
-         user: req.user?._id,
+         userId: req.user?._id,
          title: "New Question Received",
          message: `${req.user?.name} has asked a new question on your video ${courseContent.title}`
       });
@@ -217,6 +222,7 @@ interface IAddAnswer {
 
 export const addAnswer = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
+      await redis.del("allCourses");
       const { courseId, questionId, answer, contentId }: IAddAnswer = req.body;
       //Check if all fields are provided
       if (!courseId || !questionId || !answer || !contentId) {
@@ -251,7 +257,7 @@ export const addAnswer = CatchAsyncError(async (req: Request, res: Response, nex
       if (req.user?._id === question.user._id) {
          //create a notification
          await NotificationModel.create({
-            user: req.user?._id, 
+            userId: req.user?._id, 
             title: "Your Question has been answered",
             message: `${req.user?.name} has answered your question on the video ${courseContent.title}`
          });
@@ -293,6 +299,7 @@ interface IAddReviewData {
 
 export const addReview = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
+      await redis.del("allCourses");
       const userCourseList = req.user?.courses;
       if (!userCourseList || userCourseList.length === 0) {
          return next(new ErrorHandler("You have not purchased any course", 404));
@@ -352,6 +359,7 @@ interface IAddReviewData {
 
 export const addReplyToReview = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
    try {
+      await redis.del("allCourses");
       const { courseId, reviewId, comment }: IAddReviewData = req.body;
 
       if (!courseId || !reviewId || !comment) {
@@ -392,7 +400,8 @@ export const addReplyToReview = CatchAsyncError(async (req: Request, res: Respon
 
 //delete course -- only for admin
 export const deleteCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-  try {
+   try {
+      await redis.del("allCourses");
     const { id }= req.params;
     const course = await CourseModel.findById(id);
 
@@ -403,7 +412,7 @@ export const deleteCourse = CatchAsyncError(async (req: Request, res: Response, 
     await course.deleteOne({ id });
     
     await redis.del(id);
-    
+    await redis.del("allCourses");
     res.status(200).json({
       succes: true,
       message:"Course deleted successfully"
