@@ -1,29 +1,28 @@
 'use client'
-import React,{FC,useState} from "react";
-import Heading from "./utils/Heading";
+import React, { FC, useState } from "react";
 import Header from "./components/Header";
-import NavItems from "./utils/NavItems";
+import Heading from "./components/utils/Heading";
+// import NavItems from "./utils/NavItems";
 import Hero from "./components/Route/Hero";
-interface Props{}
-const Page: FC<Props>=(props)=>{
+interface Props { }
+const Page: FC<Props> = () => {
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(0);
-  //re
+
   const [route, setRoute] = useState("Login");
   return (
-    <div>
+    <div className="h-screen">
       <Heading
-      title="Elearning"
-      description="Elearning is a platform for students to learning and get help from teachers"
-      keywords="Programming, JavaScript, React, Next.js, Elearning, Education, Online Learning"
+        title="Elearning"
+        description="Elearning is a platform for students to learning and get help from teachers"
+        keywords="Programming, JavaScript, React, Next.js, Elearning, Education, Online Learning"
       />
-      <Header 
-      open={open}
-      setOpen={setOpen}
-      activeItem={activeItem}
-      setRoute={setRoute}
-      route={route}
-      
+      <Header
+        open={open}
+        setOpen={setOpen}
+        activeItem={activeItem}
+        setRoute={setRoute}
+        route={route}
       />
       <Hero />
     </div>

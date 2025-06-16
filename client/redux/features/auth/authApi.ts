@@ -4,7 +4,7 @@ type RegistrationResponse ={
     message:string;
     activationToken:string;
 };
-type RegistrationData={};
+type RegistrationData = object;
 export const authApi=apiSlice.injectEndpoints({
     endpoints:(builder)=>({
         register:builder.mutation<RegistrationResponse,RegistrationData>({
