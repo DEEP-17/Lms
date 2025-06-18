@@ -23,6 +23,7 @@ type Props = {
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
+    console.log(activeItem);
     const [active, setActive] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
@@ -32,10 +33,10 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     const [logout, setLogout] = useState(false);
     useLogOutQuery(undefined, { skip: !logout ? true : false });
 
-
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
     useEffect(() => {
         if (!user && data) {
             socialAuth({
@@ -47,7 +48,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 }
             });
         }
-        if (data===null && isSuccess) {
+        if (data === null && isSuccess) {
             toast.success("Social login successful!");
         }
         if (data === null) {
@@ -65,21 +66,30 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             }
         }
     }, [data, user]);
+
     useEffect(() => {
+        let ticking = false;
+
         const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setActive(true);
-            } else {
-                setActive(false);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrollY = window.scrollY;
+                    setActive(scrollY > 10);
+                    ticking = false;
+                });
+                ticking = true;
             }
         };
 
         window.addEventListener("scroll", handleScroll);
 
+        handleScroll();
+
         return () => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+    
 
     const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
         if ((e.target as HTMLDivElement).id === "screen") {
@@ -89,60 +99,67 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
 
     return (
         <div>
+            {/* Main Header */}
             <header
-                className={`${active
-                    ? "fixed top-0 left-0 w-full bg-white dark:bg-slate-900 shadow-md"
-                    : "bg-white dark:bg-slate-900"
-                    }`}
+                className={`w-full top-0 z-50 fixed transition-colors duration-500 ease-in-out ${!active
+                        ? "bg-white dark:bg-slate-900 shadow-lg backdrop-blur-md"
+                    : "bg-transparent  dark:bg-slate-900/60 shadow-none backdrop-blur-0"
+                }`}
             >
-                <div className="h-[60px] flex items-center justify-between px-4 md:px-8">
-                    {/* Logo */}
-                    <Link
-                        href="/"
-                        className="text-xl md:text-2xl font-bold text-black dark:text-white hover:text-[#37a39a] dark:hover:text-[#37a39a] transition-colors"
-                    >
-                        Elearning
-                    </Link>
+                <div className="max-w-[1200px] mx-auto px-4">
+                    <div className="flex items-center justify-between h-16">
 
-                    {/* Right Side */}
-                    <div className="flex items-center gap-4">
-                        {/* Desktop Navigation */}
-                        <div className="hidden md:flex">
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">E</span>
+                            </div>
+                            <span className="text-xl font-bold text-black dark:text-white hover:text-[#37a39a] dark:hover:text-[#37a39a] transition-colors">
+                                Elearning
+                            </span>
+                        </Link>
+
+                        {/* Desktop Nav */}
+                        <nav className="hidden md:flex items-center space-x-8">
                             <NavItems activeItem={activeItem} isMobile={false} />
-                        </div>
+                        </nav>
 
-                        {/* Theme Switcher */}
-                        <ThemeSwitcher />
+                        {/* Desktop Right Side */}
+                        <div className="hidden md:flex items-center space-x-4">
+                            <ThemeSwitcher />
 
-                        {/* Mobile Menu Icon */}
-                        <div className="md:hidden">
-                            <HiOutlineMenuAlt3
-                                size={24}
-                                className="text-black dark:text-white cursor-pointer transition-colors"
-                                onClick={() => setOpenSidebar(true)}
-                            />
-                        </div>
-
-                        {/* Desktop Profile Icon */}
-                        {
-                            isMounted && user ? (
-                                <Link href="/profile">
+                            {isMounted && user ? (
+                                <Link href="/profile" className="h-[35px] w-[35px]">
                                     <Image
                                         src={user && user.avatar && user.avatar.public_id !== "default_avatar"
                                             ? user.avatar.url
                                             : "/avatar.jpg"}
                                         alt="Profile"
-                                        width={30}
-                                        height={30}
-                                        className="rounded-full cursor-pointer bg-transparent"
+                                        width={35}
+                                        height={35}
+                                        className="rounded-full border-2 border-black dark:border-black shadow-xl object-cover w-full h-full"
+                                        style={{border:(activeItem===5)?"3px solid #ffc107":"none"}}
                                     />
                                 </Link>
                             ) : (
-                                <HiOutlineUserCircle size={26} className="hidden md:block text-black dark:text-white cursor-pointer transition-colors"
+                                <HiOutlineUserCircle
+                                    size={26}
+                                    className="text-black dark:text-white cursor-pointer transition-colors"
                                     onClick={() => setOpen?.(true)}
                                 />
-                            )
-                        }
+                            )}
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        <button
+                            className="md:hidden"
+                            onClick={() => setOpenSidebar(true)}
+                        >
+                            <HiOutlineMenuAlt3
+                                size={24}
+                                className="text-black dark:text-white cursor-pointer transition-colors"
+                            />
+                        </button>
                     </div>
                 </div>
             </header>
@@ -154,19 +171,23 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                     onClick={handleClose}
                     className="fixed inset-0 z-[9999] bg-black bg-opacity-40"
                 >
-                    <aside className="fixed top-0 right-0 w-[80%] sm:w-[70%] max-w-[350px] h-full bg-white dark:bg-slate-900 p-6 space-y-4 transition-colors">
-                        <NavItems activeItem={activeItem} isMobile={true} />
-                        <HiOutlineUserCircle
-                            size={26}
-                            className="text-black dark:text-white cursor-pointer transition-colors"
-                            onClick={() => {
-                                setOpen?.(true);
-                                setOpenSidebar(false);
-                            }}
-                        />
-                        <p className="text-sm text-black dark:text-white pt-10 transition-colors">
-                            &copy; 2025 Elearning. All rights reserved.
-                        </p>
+                    <aside className="fixed top-0 right-0 w-[80%] sm:w-[70%] max-w-[350px] h-full bg-white dark:bg-slate-900 p-6 space-y-4">
+                        <nav className="flex flex-col space-y-4">
+                            <NavItems activeItem={activeItem} isMobile={true} />
+
+                            <HiOutlineUserCircle
+                                size={26}
+                                className="text-black dark:text-white cursor-pointer transition-colors"
+                                onClick={() => {
+                                    setOpen?.(true);
+                                    setOpenSidebar(false);
+                                }}
+                            />
+
+                            <p className="text-sm text-black dark:text-white pt-10">
+                                &copy; 2025 Elearning. All rights reserved.
+                            </p>
+                        </nav>
                     </aside>
                 </div>
             )}

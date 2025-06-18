@@ -4,6 +4,7 @@ import { signOut } from 'next-auth/react';
 import React, { FC, useEffect, useState } from 'react';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
+import ChangePassword from './ChangePassword';
 
 type Props = {
    user: any;
@@ -12,7 +13,7 @@ type Props = {
 const Profile: FC<Props> = ({ user }) => {
    const [scroll, setScroll] = useState(false);
    const [avatar, setAvatar] = useState((user.avatar.public_id === 'default_avatar') ? null : user.avatar.url);
-   const [active, setActive] = useState(0);
+   const [active, setActive] = useState(1);
    const [logout, setLogout] = useState(false);
    useLogOutQuery(undefined, { skip: !logout ? true : false });
 
@@ -38,11 +39,11 @@ const Profile: FC<Props> = ({ user }) => {
    }, []);
 
    return (
-      <div className='w-[90%] mx-auto flex flex-col md:flex-row gap-6 py-8 justify-center items-center'>
-
+      <div className='px-auto h-screen py-30 flex flex-col md:flex-row gap-6 justify-center items-center dark:bg-slate-800 dark:text-white'>
          <div
-            className={`flex flex-col justify-center items-center w-[100px] md:w-[310px] h-[600px] 
+            className={`flex flex-col justify-center items-center w-[100px] md:w-[310px] h-[500px] 
             bg-white dark:bg-slate-900 
+            text-black dark:text-white
             border border-slate-200 dark:border-[#ffffff1d] 
             rounded-lg shadow-lg p-4 
             transition-all duration-300 
@@ -56,7 +57,7 @@ const Profile: FC<Props> = ({ user }) => {
                logOutHandler={logOutHandler}
             />
          </div>
-         <div className={`w-[600px] md:w-[1100px] h-[600px] 
+         <div className={`flex flex-col justify-center items-center w-[600px] md:w-[1100px] h-[500px] 
                   bg-white dark:bg-slate-900 
                   border border-slate-200 dark:border-[#ffffff1d] 
                   rounded-lg shadow-lg p-4 
@@ -65,6 +66,11 @@ const Profile: FC<Props> = ({ user }) => {
             {
                active === 1 && (
                   <ProfileInfo user={user} avatar={avatar} />
+               )
+            }
+            {
+               active === 2 && (
+                  <ChangePassword/>
                )
             }
          </div>

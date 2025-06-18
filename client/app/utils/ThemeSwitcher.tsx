@@ -17,7 +17,8 @@ export const ThemeSwitcher = () => {
     return (
         <button
             aria-label="Toggle Theme"
-            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark"
+            )}
             className="flex items-center justify-center mx-4 focus:outline-none"
         >
             {currentTheme === "dark" ? (

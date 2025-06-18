@@ -1,23 +1,26 @@
 'use client';
+import { useEditProfileMutation, useUpdateAvatarMutation } from '@/redux/features/user/userApi';
 import { Pencil } from 'lucide-react';
 import Image from 'next/image';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { RiCloseCircleFill } from 'react-icons/ri';
-import avatarDefault from '../../../public/avatar.jpg';
 
 type Props = {
    user: any;
    avatar: string | null;
 };
 
-const ProfileInfo: FC<Props> = ({ user, avatar }) => {
+const ProfileInfo: FC<Props> = ({ user, avatar}) => {
    const [name, setName] = useState(user?.name || '');
    const [editingName, setEditingName] = useState(false);
-
+   const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
    const [avatarPreview, setAvatarPreview] = useState<string | null>(avatar);
    const [editingAvatar, setEditingAvatar] = useState(false);
+   const [editProfile, { isSuccess: success, error: updateError }] = useEditProfileMutation();
 
    const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+      setAvatarPreview(null);
       const file = e.target.files?.[0];
       if (file) {
          const reader = new FileReader();
@@ -29,29 +32,55 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
       }
    };
 
-   const handleNameSave = () => {
-      console.log('Saving new name:', name);
-      setEditingName(false);
-      // Call API here
+   const handleNameSave =async () => {
+      if (name) {
+         console.log('Saving new name:', name);
+         await editProfile({name});
+      }
+      else {
+         console.log("Name cannot be empty");
+         setEditingName(false);
+      }
    };
 
-   const handleAvatarSave = () => {
+   const handleAvatarSave =async () => {
       console.log('Saving new avatar:', avatarPreview);
-      setEditingAvatar(false);
-      // Call API here
+      await updateAvatar({ avatar: avatarPreview });
    };
+
+   useEffect(() => {
+      if (isSuccess) {
+         setEditingAvatar(false);
+         toast.success("Profile picture updated successfully!");
+      }
+      if (error) {
+         console.error("Error updating avatar:", error);
+      }
+      if(success) {
+         setEditingName(false);
+         toast.success("Profile updated successfully!");
+      }
+      if( updateError) {
+         console.log("Error updating profile:", updateError);
+      }
+   }, [isSuccess, error,success, updateError]);
 
    return (
-      <div className="flex flex-col items-center gap-4 sm:gap-5 w-full max-w-md mx-auto p-2 sm:p-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-lg border border-primary/10 dark:border-primary/20">
+      <div className="flex flex-col items-center justify-center content-center gap-4 sm:gap-5 w-full max-w-md mx-auto p-2 sm:p-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-lg border border-primary/10 dark:border-primary/20">
 
          {/* Avatar */}
          <div className="relative group w-24 h-24 sm:w-32 sm:h-32">
             <Image
-               src={avatarPreview ? avatarPreview : avatarDefault}
+               src={avatarPreview
+                  ? avatarPreview
+                  : user && user.avatar && user.avatar.public_id !== "default_avatar"
+                     ? user.avatar.url
+                     : "/avatar.jpg"}
                alt="Profile Avatar"
                width={128}
                height={128}
-               className="rounded-full border-4 border-blue-500 dark:border-blue-400 shadow-xl object-cover w-full h-full"
+               priority
+               className="rounded-full border-2 border-black dark:border-black shadow-xl object-cover w-full h-full"
             />
             <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 cursor-pointer rounded-full transition-all">
                <input

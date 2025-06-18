@@ -14,26 +14,22 @@ const config: Config = {
         josefin: ["var(--font-Josefin)"],
       },
       colors: {
-        primary: {
-          DEFAULT: "#6366f1", // Indigo
-        },
-        secondary: {
-          DEFAULT: "#ec4899", // Pink
-        },
-        accent: {
-          DEFAULT: "#f59e42", // Amber
-        },
-        background: {
-          light: "#f8fafc",
-          dark: "#18181b",
-        },
-        surface: {
-          light: "#fff",
-          dark: "#23272f",
-        },
-        text: {
-          DEFAULT: "#1e293b", // Slate
-          light: "#f1f5f9",
+        primary: "#1dbf73", // Soft green
+        secondary: "#0e2e2b", // Deep teal
+        accent: "#e6f4f1", // Light mint
+        muted: "#f8fafc", // Light background
+        card: "#fff", // Card background
+        heading: "#1a2e35", // Heading text
+        subtext: "#6b7280", // Subtext
+
+        // move your custom colors into a nested object to avoid conflict:
+        customColors: {
+          backgroundLight: "#f8fafc",
+          backgroundDark: "#18181b",
+          surfaceLight: "#fff",
+          surfaceDark: "#23272f",
+          textDefault: "#1e293b",
+          textLight: "#f1f5f9",
         },
       },
       backgroundImage: {

@@ -24,24 +24,22 @@ const josefin = Josefin_Sans({
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: { children: React.ReactNode; }) {
   return (
     <html
       lang="en"
-      suppressHydrationWarning={true}
+      suppressHydrationWarning
     >
-      <body className={`${poppins.variable} ${josefin.variable} !bg-white bg-no-repeat dark bg-gradient-to-b dark:from-gray-900 dark:to:black duration-300`}>
-        <SessionProvider>
-          <Providers>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <body className={`${poppins.variable} ${josefin.variable} bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to:black duration-300`}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SessionProvider>
+            <Providers>
               <Toaster position="top-center" reverseOrder={false} />
               <Custom>{children}</Custom>
-            </ThemeProvider>
-          </Providers>
-        </SessionProvider>
-      </body>
+            </Providers>
+          </SessionProvider>
+      </ThemeProvider>
+        </body>
     </html>
   );
 }
