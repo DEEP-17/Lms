@@ -1,8 +1,9 @@
 'use client'
 import React, { FC, useState } from "react";
 import Header from "./components/Header";
-import Heading from "./components/utils/Heading";
 import Hero from "./components/Route/Hero";
+import Heading from "./utils/Heading";
+import Footer from "./components/Footer";
 type Props = Record<string, never>;
 const Page: FC<Props> = () => {
   const [open, setOpen] = useState(false);
@@ -10,7 +11,7 @@ const Page: FC<Props> = () => {
 
   const [route, setRoute] = useState("Login");
   return (
-    <div className="h-screen">
+    <div>
       <Heading
         title="Elearning"
         description="Elearning is a platform for students to learning and get help from teachers"
@@ -24,6 +25,7 @@ const Page: FC<Props> = () => {
         route={route}
       />
       <Hero />
+      <Footer/>
     </div>
   );
 };

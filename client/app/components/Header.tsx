@@ -1,14 +1,18 @@
 'use client';
-
+import { useLogOutQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { HiOutlineMenuAlt3, HiOutlineUserCircle } from "react-icons/hi";
+import { useSelector } from "react-redux";
 import Login from "../components/Auth/Login";
 import SignUp from "../components/Auth/SignUp";
 import Verification from "../components/Auth/Verification";
-import CustomModal from "./utils/CustomModal";
-import NavItems from "./utils/NavItems";
-import { ThemeSwitcher } from "./utils/ThemeSwitcher";
+import CustomModal from "../utils/CustomModal";
+import NavItems from "../utils/NavItems";
+import { ThemeSwitcher } from "../utils/ThemeSwitcher";
 
 type Props = {
     activeItem: number;
@@ -21,8 +25,46 @@ type Props = {
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     const [active, setActive] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+    const { user } = useSelector((state: any) => state.auth);
+    const { data } = useSession();
+    const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+    const [logout, setLogout] = useState(false);
+    useLogOutQuery(undefined, { skip: !logout ? true : false });
 
-    
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+    useEffect(() => {
+        if (!user && data) {
+            socialAuth({
+                name: data?.user?.name,
+                email: data?.user?.email,
+                avatar: {
+                    public_id: "social_avatar",
+                    url: data?.user?.image
+                }
+            });
+        }
+        if (data===null && isSuccess) {
+            toast.success("Social login successful!");
+        }
+        if (data === null) {
+            setLogout(true);
+        }
+        if (error) {
+            if ("data" in error) {
+                interface ErrorResponse {
+                    data: { message: string };
+                }
+                const errorData = error as ErrorResponse;
+                toast.error(errorData.data.message);
+            } else {
+                toast.error("An error occurred during social login. Please try again.");
+            }
+        }
+    }, [data, user]);
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 50) {
@@ -82,11 +124,25 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                         </div>
 
                         {/* Desktop Profile Icon */}
-                        <HiOutlineUserCircle
-                            size={26}
-                            className="hidden md:block text-black dark:text-white cursor-pointer transition-colors"
-                            onClick={() => setOpen?.(true)}
-                        />
+                        {
+                            isMounted && user ? (
+                                <Link href="/profile">
+                                    <Image
+                                        src={user && user.avatar && user.avatar.public_id !== "default_avatar"
+                                            ? user.avatar.url
+                                            : "/avatar.jpg"}
+                                        alt="Profile"
+                                        width={30}
+                                        height={30}
+                                        className="rounded-full cursor-pointer bg-transparent"
+                                    />
+                                </Link>
+                            ) : (
+                                <HiOutlineUserCircle size={26} className="hidden md:block text-black dark:text-white cursor-pointer transition-colors"
+                                    onClick={() => setOpen?.(true)}
+                                />
+                            )
+                        }
                     </div>
                 </div>
             </header>

@@ -1,11 +1,14 @@
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { useFormik } from "formik";
+import { signIn } from "next-auth/react";
 import React, { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiFillGithub, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FcGoogle } from 'react-icons/fc';
 import * as Yup from 'yup';
-import { styles } from '../styles/style';
-import { useLoginMutation } from "@/redux/features/auth/authApi";
-import toast from "react-hot-toast";
+import { styles } from '../../styles/style';
+
+
 type Props = {
     setRoute: (route: string) => void;
     setOpen: (open: boolean) => void;
@@ -14,9 +17,9 @@ const schema = Yup.object().shape({
     email: Yup.string().email('Invalid email address').required('Please enter your email'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 });
-const Login: FC<Props> = ({ setRoute,setOpen }) => {
+const Login: FC<Props> = ({ setRoute, setOpen }) => {
     const [show, setShow] = useState(false);
-    const [login,{isSuccess,data,error} ] = useLoginMutation();
+    const [login, { isSuccess, error }] = useLoginMutation();
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -32,7 +35,7 @@ const Login: FC<Props> = ({ setRoute,setOpen }) => {
     useEffect(() => {
         if (isSuccess) {
             setOpen(false);
-            const message ="Login Successful";
+            const message = "Login Successful";
             toast.success(message);
             setRoute("");
         }
@@ -48,7 +51,7 @@ const Login: FC<Props> = ({ setRoute,setOpen }) => {
             }
         }
     }
-    , [isSuccess, error]);
+        , [isSuccess, error]);
     const { errors, touched, values, handleChange, handleSubmit } = formik;
     return (
         <div className="w-full h-full flex flex-col justify-center">
@@ -115,8 +118,10 @@ const Login: FC<Props> = ({ setRoute,setOpen }) => {
                     Or Join with
                 </h5>
                 <div className="flex items-center justify-center my-3">
-                    <FcGoogle size={30} className="cursor-pointer ml-2" />
-                    <AiFillGithub size={30} className="cursor-pointer ml-2" />
+                    <FcGoogle size={30} className="cursor-pointer ml-2" onClick={() => { signIn("google") }} />
+                    <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={() => {
+                        signIn("github");
+                    }} />
                 </div>
                 <h5 className="text-center pt-4 font-Poppins text-[14px]">
                     Not have an account?{" "}

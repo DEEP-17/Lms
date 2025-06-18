@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { AiFillGithub, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FcGoogle } from 'react-icons/fc';
 import * as Yup from 'yup';
-import { styles } from '../styles/style';
+import { styles } from '../../styles/style';
 type Props = {
     setRoute: (route: string) => void;
 }
@@ -119,7 +119,7 @@ const SignUp: FC<Props> = ({ setRoute }) => {
                             />
                         )
                     }
-                    
+
                 </div>
                 {
                     errors.password && touched.password && (

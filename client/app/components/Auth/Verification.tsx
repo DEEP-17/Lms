@@ -1,9 +1,9 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
-import { VscWorkspaceTrusted } from 'react-icons/vsc'
-import { styles } from '../styles/style'
-import { useSelector } from 'react-redux';
 import { useActivationMutation } from '@/redux/features/auth/authApi';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { VscWorkspaceTrusted } from 'react-icons/vsc';
+import { useSelector } from 'react-redux';
+import { styles } from '../../styles/style';
 type Props = {
     setRoute: (route: string) => void;
 }
@@ -15,7 +15,7 @@ type VerifyNumber = {
 };
 const Verification: FC<Props> = ({ setRoute }) => {
     const token = useSelector((state: any) => state.auth.token);
-    const [activation, {isSuccess,error}] = useActivationMutation();
+    const [activation, { isSuccess, error }] = useActivationMutation();
     const [invalidError, setInvalidError] = useState<boolean>(false);
 
     useEffect(() => {
@@ -56,7 +56,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
             setInvalidError(true);
             return;
         }
-        await activation({ activation_token:token, activation_code:verificationNumber });
+        await activation({ activation_token: token, activation_code: verificationNumber });
         setRoute("Login");
         toast.success("Account activated successfully!");
     }
@@ -94,7 +94,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
                         placeholder=''
                         onChange={e => handleInputChange(index, e.target.value)}
                         className={`w-[65px] h-[65px] bg-transparent border-[3px] rounded-[10px] flex items-center text-black dark:text-white justify-center text-[18px] font Poppins Outline-none text-center ${invalidError ? "shake border-red-500" :
-                                "dark:border-white vorder-[#0000004a]"
+                            "dark:border-white vorder-[#0000004a]"
                             }`}
                     />
                 ))}

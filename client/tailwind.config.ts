@@ -13,6 +13,29 @@ const config: Config = {
         poppins: ["var(--font-Poppins)"],
         josefin: ["var(--font-Josefin)"],
       },
+      colors: {
+        primary: {
+          DEFAULT: "#6366f1", // Indigo
+        },
+        secondary: {
+          DEFAULT: "#ec4899", // Pink
+        },
+        accent: {
+          DEFAULT: "#f59e42", // Amber
+        },
+        background: {
+          light: "#f8fafc",
+          dark: "#18181b",
+        },
+        surface: {
+          light: "#fff",
+          dark: "#23272f",
+        },
+        text: {
+          DEFAULT: "#1e293b", // Slate
+          light: "#f1f5f9",
+        },
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
