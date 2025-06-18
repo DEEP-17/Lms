@@ -10,9 +10,9 @@ const categories = [
 
 export default function Categories() {
    return (
-      <section className="bg-muted dark:bg-secondary py-16">
+      <section className="bg-gray-100 dark:bg-gray-900 py-16">
          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-heading dark:text-white mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-12 text-center">
                Explore by categories
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -24,7 +24,7 @@ export default function Categories() {
                      <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">
                         {cat.icon}
                      </div>
-                     <div className="font-semibold text-lg text-heading dark:text-white mb-2 text-center">
+                     <div className="font-semibold text-lg text-black dark:text-white mb-2 text-center">
                         {cat.title}
                      </div>
                      <div className="text-subtext dark:text-gray-400 text-sm text-center">

@@ -77,12 +77,12 @@ export default function Testimonials() {
 
    return (
       <section
-         className="bg-muted dark:bg-secondary py-12"
+         className="bg-gray-100 dark:dark:bg-slate-800 py-12"
          onMouseEnter={stopAutoSlide}
          onMouseLeave={startAutoSlide}
       >
          <div className="w-[1400px] mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-heading dark:text-white mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-8">
                Our customers opinions
             </h2>
 
@@ -103,7 +103,7 @@ export default function Testimonials() {
                            scrollSnapAlign: 'start',
                         }}
                      >
-                        <div className="bg-card dark:bg-slate-900 rounded-xl shadow p-6 h-full flex flex-col justify-between mx-2">
+                        <div className="text-black dark:text-white  bg-gray-200 dark:bg-slate-900 rounded-xl shadow p-6 h-full flex flex-col justify-between mx-2">
                            <div>
                               <div className="flex items-center gap-3 mb-2">
                                  <img
@@ -112,7 +112,7 @@ export default function Testimonials() {
                                     className="w-10 h-10 rounded-full object-cover"
                                  />
                                  <div>
-                                    <div className="font-semibold text-heading dark:text-white">
+                                    <div className="font-semibold text-heading dark:text-wwhite">
                                        {testimonial.name}
                                     </div>
                                     <div className="text-xs text-subtext dark:text-gray-300">
@@ -125,7 +125,7 @@ export default function Testimonials() {
                                     <span key={i} className="text-yellow-400">★</span>
                                  ))}
                               </div>
-                              <div className="text-subtext dark:text-gray-300 mb-2">
+                              <div className="text-black dark:text-gray-300 mb-2">
                                  {testimonial.text}
                               </div>
                            </div>
@@ -156,7 +156,7 @@ export default function Testimonials() {
                      className="w-8 h-8 rounded-full object-cover border-2 border-primary"
                   />
                ))}
-               <span className="text-subtext dark:text-gray-300 text-sm ml-2">
+               <span className="text-black dark:text-gray-300 text-sm ml-2">
                   +2000 visitors worldwide
                </span>
             </div>

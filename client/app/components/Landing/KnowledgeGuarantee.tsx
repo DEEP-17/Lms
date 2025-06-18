@@ -6,15 +6,16 @@ export default function KnowledgeGuarantee() {
          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-4 sm:px-6 lg:px-8">
             {/* Left */}
             <div>
-               <h2 className="text-3xl md:text-4xl font-bold text-heading dark:text-white mb-6">
+               <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-6">
                   Guarantee of Knowledge
                </h2>
-               <p className="text-subtext dark:text-gray-400 mb-8 max-w-xl leading-relaxed text-lg">
+               <p className="text-black
+               dark:text-gray-400 mb-8 max-w-xl leading-relaxed text-lg">
                   We&apos;ve trained thousands in IT, management, and business skills. Our courses are crafted by experts,
                   regularly updated, and guarantee practical knowledge and real-world skills. Join top IT professionals and
                   boost your career.
                </p>
-               <button className="px-8 py-3 bg-primary text-white rounded-lg font-semibold shadow hover:bg-primary/90 transition duration-300">
+               <button className="px-3 py-3 bg-primary dark:bg-gray-800 text-black dark:text-white rounded-lg font-semibold shadow hover:bg-primary/90 transition duration-300 cursor-pointer">
                   Explore Courses
                </button>
             </div>

@@ -6,7 +6,7 @@ import { Button } from '@mui/material';
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 overflow-hidden transition-colors duration-500 py-8">
+    <section className="relative bg-gray-100 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 overflow-hidden transition-colors duration-500 py-8">
       {/* Decorative background */}
       <div className="absolute top-20 right-20 w-32 h-32 bg-cyan-400/10 dark:bg-cyan-400/5 rounded-full blur-xl"></div>
       <div className="absolute bottom-40 left-20 w-24 h-24 bg-green-400/10 dark:bg-green-400/5 rounded-full blur-lg"></div>
