@@ -1,4 +1,5 @@
-import React, { FC } from 'react'
+import { styles } from '@/app/styles/style';
+import React, { FC, useState } from 'react'
 
 type Props = {
     course: any;
