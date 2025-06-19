@@ -5,6 +5,7 @@ import React, { FC, useEffect, useState } from 'react';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
 import ChangePassword from './ChangePassword';
+import toast from 'react-hot-toast';
 
 type Props = {
    user: any;
@@ -19,7 +20,8 @@ const Profile: FC<Props> = ({ user }) => {
 
    const logOutHandler = async () => {
       setLogout(true);
-      await signOut();
+      await signOut({callbackUrl: '/'});
+      toast.success('Logged out successfully');
    };
 
    useEffect(() => {

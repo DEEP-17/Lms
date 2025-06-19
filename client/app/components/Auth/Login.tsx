@@ -108,7 +108,7 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
                         )
                     }
                 </div>
-                <div className="w-full mt-5">
+                <div className="w-full mt-5 text-black dark:text-white flex items-center justify-between">
                     <input type="submit"
                         value="Login"
                         className={`${styles.button}`} />
@@ -117,13 +117,13 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
                 <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
                     Or Join with
                 </h5>
-                <div className="flex items-center justify-center my-3">
+                <div className="flex items-center justify-center my-3 text-black dark:text-white">
                     <FcGoogle size={30} className="cursor-pointer ml-2" onClick={() => { signIn("google") }} />
                     <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={() => {
                         signIn("github");
                     }} />
                 </div>
-                <h5 className="text-center pt-4 font-Poppins text-[14px]">
+                <h5 className="dark:text-white text-black text-center pt-4 font-Poppins text-[14px]">
                     Not have an account?{" "}
                     <span className="text-[#2190ff] cursor-pointer"
                         onClick={() => setRoute && setRoute("Sign-Up")}>
