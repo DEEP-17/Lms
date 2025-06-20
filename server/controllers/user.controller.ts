@@ -161,7 +161,8 @@ export const logoutUser = CatchAsyncError(
         maxAge: 1,
       });
       //delete refresh token from redis
-      const userId = req.user?._id  as string;
+      const userId = req.user?._id as string;
+      await redis.del(String(userId));
       res.status(200).json({
         success: true,
         message: "Logged out successfully",

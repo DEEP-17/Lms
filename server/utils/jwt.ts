@@ -32,8 +32,9 @@ import { parse } from "path";
 export const sendToken = (user: IUser, statusCode :number, res : Response ) => {
     const accessToken = user.signAccessToken();
     const refreshToken = user.signRefreshToken();
+    const userId=user._id as string
     //upload refresh token to redis
-    redis.set(String(user._id), JSON.stringify(user));
+    redis.set(userId, JSON.stringify(user),'EX',240);
     //parse environment variables to integrate with fallback values
     
     //only set cookie if in production

@@ -15,25 +15,24 @@ const CourseOptions: FC<Props> = ({ active, setActive }) => {
   ];
 
   return (
-    <div>
+    <div className="transition-colors duration-300">
       {options.map((option: string, index: number) => (
         <div key={index} className="w-full flex py-5">
           <div
-            className={`w-[35px] h-[35px] rounded-full flex items-center justify-center ${
-              active + 1 > index ? "bg-blue-500" : "bg-[#384766]"
-            } relative`}
+            className={`w-[35px] h-[35px] rounded-full flex items-center justify-center relative transition-colors duration-300
+              ${active + 1 > index ? "bg-blue-500" : "bg-gray-300 dark:bg-slate-700"}`}
           >
-            <IoMdCheckmark className="text-[25px]" />
+            <IoMdCheckmark className={`text-[25px] ${active + 1 > index ? 'text-white' : 'text-gray-500 dark:text-gray-300'} transition-colors duration-300`} />
             {index !== options.length - 1 && (
               <div
-                className={`absolute h-[30px] w-1 ${
-                  active + 1 > index ? "bg-blue-500" : "bg-[#384766]"
-                } bottom-[-100%]`}
+                className={`absolute h-[30px] w-1 bottom-[-100%] transition-colors duration-300
+                  ${active + 1 > index ? "bg-blue-500" : "bg-gray-300 dark:bg-slate-700"}`}
               />
             )}
           </div>
           <h5
-            className={`pl-3 ${active === index ? "text-blue-500" : "text-[#384766]"} text-[18px] font-semibold cursor-pointer`}
+            className={`pl-3 text-[18px] font-semibold cursor-pointer transition-colors duration-300
+              ${active === index ? "text-blue-500" : "text-gray-700 dark:text-gray-300"}`}
             onClick={() => setActive(index)}
           >
             {option}

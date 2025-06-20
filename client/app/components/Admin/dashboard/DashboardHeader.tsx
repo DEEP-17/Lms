@@ -1,5 +1,6 @@
+import { ThemeSwitcher } from '@/app/utils/ThemeSwitcher';
+import { AlertTriangle, Bell, CheckCircle, MessageSquare } from 'lucide-react';
 import React, { useState } from 'react';
-import { Sun, Moon, Bell, MessageSquare, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface Notification {
   id: string;
@@ -11,7 +12,6 @@ interface Notification {
 }
 
 const DashboardHeader: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -59,12 +59,8 @@ const DashboardHeader: React.FC = () => {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
   };
@@ -85,29 +81,19 @@ const DashboardHeader: React.FC = () => {
   };
 
   return (
-    <header className="bg-slate-900 border-b border-slate-800 px-6 py-4">
+    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 transition-colors duration-300">
       <div className="flex items-center justify-between">
         {/* Logo/Brand */}
         <div className="flex items-center space-x-4">
-          <div className="text-white text-xl font-bold">
+          <div className="text-gray-900 dark:text-white text-xl font-bold">
             Dashboard
           </div>
         </div>
 
         {/* Right Side Icons */}
         <div className="flex items-center space-x-4">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
-            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </button>
+          {/* Theme Switcher */}
+          <ThemeSwitcher />
 
           {/* Notifications */}
           <div className="relative">
@@ -127,8 +113,8 @@ const DashboardHeader: React.FC = () => {
             {/* Notifications Dropdown */}
             {showNotifications && (
               <>
-                <div 
-                  className="fixed inset-0 z-10" 
+                <div
+                  className="fixed inset-0 z-10"
                   onClick={() => setShowNotifications(false)}
                 />
                 <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-20">
@@ -147,7 +133,7 @@ const DashboardHeader: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="max-h-96 overflow-y-auto">
                     {notifications.length === 0 ? (
                       <div className="p-4 text-center text-slate-500 dark:text-slate-400">
@@ -157,9 +143,8 @@ const DashboardHeader: React.FC = () => {
                       notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-4 border-b border-slate-100 dark:border-slate-700 last:border-b-0 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors ${
-                            !notification.read ? 'bg-blue-50 dark:bg-slate-700/50' : ''
-                          }`}
+                          className={`p-4 border-b border-slate-100 dark:border-slate-700 last:border-b-0 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer transition-colors ${!notification.read ? 'bg-blue-50 dark:bg-slate-700/50' : ''
+                            }`}
                           onClick={() => markAsRead(notification.id)}
                         >
                           <div className="flex items-start space-x-3">
