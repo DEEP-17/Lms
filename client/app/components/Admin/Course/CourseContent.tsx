@@ -600,7 +600,7 @@ export const CourseContent: React.FC<CourseContentProps> = ({ benefits,
         </div>
       </div>
 
-      
+
       <div className='w-full flex items-center justify-between'
       >
         <div

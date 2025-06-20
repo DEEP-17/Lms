@@ -6,7 +6,7 @@ import CourseInformation from './CourseInformation';
 import CourseOptions from './CourseOptions';
 
 const CreateCourse = () => {
-  const [active, setActive] = useState(2);
+  const [active, setActive] = useState(0);
   const [course, setCourse] = useState({
     title: '',
     description: '',
