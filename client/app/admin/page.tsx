@@ -1,29 +1,41 @@
 'use client';
 
-import  Heading  from "../utils/Heading";
-import React from "react";
+import { redirect } from "next/navigation";
+import React, { useState } from "react";
+import DashboardHero from "../components/Admin/dashboard/DashboardHero";
 import AdminSidebar from "../components/Admin/sidebar/AdminSidebar";
 import AdminProtected from "../hooks/adminProtected";
-import DashboardHero from "../components/Admin/dashboard/DashboardHero";
-import { redirect } from "next/navigation";
-type props ={}
-const page=(props: props) => {
+import Heading from "../utils/Heading";
+
+type props = {}
+
+const page = (props: props) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  const handleSidebarToggle = (collapsed: boolean) => {
+    setIsSidebarCollapsed(collapsed);
+  };
+
   return (
-    <div>
-        <AdminProtected>
-            <Heading title="Elearning-Admin"
-            description="Admin Dashboard for Elearning Platform"
-            keywords="programming,MERN,REDUX"/>
-            <div className="flex h-[200vh]">
-                <div className="1500px:w-[16%] w-1/5">
-                <AdminSidebar onNavigate={redirect} />
-                </div>
-                <div className="w-[85%]">
-                <DashboardHero/>
-                </div>
-            </div>
-        </AdminProtected>
+    <div className="admin-layout overflow-hidden">
+      <AdminProtected>
+        <Heading title="Elearning-Admin"
+          description="Admin Dashboard for Elearning Platform"
+          keywords="programming,MERN,REDUX" />
+
+        {/* Sidebar */}
+        <AdminSidebar onNavigate={redirect} onToggle={handleSidebarToggle} />
+
+        {/* Main Content Area */}
+        <div
+          className={`transition-all duration-300 ease-in-out min-h-screen overflow-x-hidden ${isSidebarCollapsed ? 'ml-16' : 'ml-72'
+            }`}
+        >
+          <DashboardHero />
+        </div>
+      </AdminProtected>
     </div>
   );
 }
+
 export default page;

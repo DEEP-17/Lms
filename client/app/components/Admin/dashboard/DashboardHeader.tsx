@@ -81,7 +81,7 @@ const DashboardHeader: React.FC = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 transition-colors duration-300">
+    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 transition-colors duration-300 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Logo/Brand */}
         <div className="flex items-center space-x-4">
@@ -99,7 +99,7 @@ const DashboardHeader: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200 relative"
+              className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200 relative"
               title="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -134,7 +134,7 @@ const DashboardHeader: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="max-h-96 overflow-y-auto">
+                  <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-700">
                     {notifications.length === 0 ? (
                       <div className="p-4 text-center text-slate-500 dark:text-slate-400">
                         No notifications

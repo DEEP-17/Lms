@@ -33,4 +33,18 @@ export interface CourseFormData {
   prerequisites: { title: string }[];
   courseContent: ContentSectionData[];
 }
+
+export interface StepValidation {
+  isCompleted: boolean;
+  isSaved: boolean;
+  errors: string[];
+}
+
+export interface CourseStepStatus {
+  step0: StepValidation; // Course Information
+  step1: StepValidation; // Course Benefits/Prerequisites
+  step2: StepValidation; // Course Content
+  step3: StepValidation; // Course Preview
+}
+
 export type TitleItem = { title: string };

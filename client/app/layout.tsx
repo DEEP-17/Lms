@@ -30,16 +30,16 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
-        <body className={`${poppins.variable} ${josefin.variable} bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to:black duration-300`}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={`${poppins.variable} ${josefin.variable} bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to:black duration-300`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SessionProvider>
             <Providers>
               <Toaster position="top-center" reverseOrder={false} />
               <Custom>{children}</Custom>
             </Providers>
           </SessionProvider>
-      </ThemeProvider>
-        </body>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

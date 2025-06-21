@@ -4,22 +4,82 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --foreground-rgb:0, 0, 0;
-  --background-start-rgb:214,219,220;
-  --background-end-rgb:255,255,255;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
 }
-
-
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb:255, 255, 255;
-    --background-start-rgb:0,0,0;
-    --background-end-rgb:0,0,0;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
+html,
+body {
+  overflow-x: hidden !important;
+}
 
+/* Custom Scrollbar Styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark mode scrollbar */
+.dark .scrollbar-thin {
+  scrollbar-color: #475569 #1e293b;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default focus outline and add custom one */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Input number styling */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -32,31 +92,121 @@ input[type="number"] {
 
 body {
   color: rgb(var(--foreground-rgb));
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-.hero_animation{
-  background-image: linear-gradient(147,92deg,hsla(239,76%,53%,0.456)10.41%,hsla(0,0%,100%,0)89.25%);
-  animation:changeBackgroundColor 8s infinite alternate;
+
+/* Hero animation */
+.hero_animation {
+  background-image: linear-gradient(147, 92deg, hsla(239, 76%, 53%, 0.456)10.41%, hsla(0, 0%, 100%, 0)89.25%);
+  animation: changeBackgroundColor 8s infinite alternate;
 }
+
 @keyframes changeBackgroundColor {
-  0%,100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   16.67% {
     opacity: 0.9;
   }
+
   33.33% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 0.6;
   }
+
   66.67% {
     opacity: 0.5;
   }
+
   83.33% {
     opacity: 0.4;
   }
 }
-.shake{
-animation:shake 0.5s ease-in-out ;
+
+/* Shake animation */
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
   }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Admin panel specific styles */
+.admin-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.dark .admin-layout {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Course setup specific styles */
+.course-setup-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.dark .course-setup-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Fix color mismatches in course components */
+.course-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.dark .course-card {
+  background: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+/* Consistent border colors */
+.course-border {
+  border-color: rgba(229, 231, 235, 0.5);
+}
+
+.dark .course-border {
+  border-color: rgba(71, 85, 105, 0.5);
+}
+
+/* Improved button hover effects */
+.btn-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}

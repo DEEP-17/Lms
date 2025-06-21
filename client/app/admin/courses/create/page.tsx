@@ -1,29 +1,38 @@
 'use client';
-import React from 'react'
+import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
 import Heading from '@/app/utils/Heading';
+import React, { useState } from 'react';
 import CreateCourse from "../../../components/Admin/Course/CreateCourse";
-import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 
 type Props = {}
 
 const page = (props: Props) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  const handleSidebarToggle = (collapsed: boolean) => {
+    setIsSidebarCollapsed(collapsed);
+  };
+
   return (
-    <div>
-        <Heading
-          title="Create Course"
-          description="Fill in the details below to create a new course."
-            keywords="create course, admin, elearning, course management"
-        />
-        <div className="flex">
-            <div className="1550px:w-[16%] w-1/5">
-                <AdminSidebar />
-            </div>
-            <div className="w-[85%]">
-                <DashboardHeader  />
-                <CreateCourse />
-            </div>
-        </div>
+    <div className="admin-layout overflow-hidden">
+      <Heading
+        title="Create Course"
+        description="Fill in the details below to create a new course."
+        keywords="create course, admin, elearning, course management"
+      />
+
+      {/* Sidebar */}
+      <AdminSidebar onToggle={handleSidebarToggle} />
+
+      {/* Main Content Area */}
+      <div
+        className={`transition-all duration-300 ease-in-out min-h-screen overflow-x-hidden ${isSidebarCollapsed ? 'ml-16' : 'ml-72'
+          }`}
+      >
+        <DashboardHeader />
+        <CreateCourse />
+      </div>
     </div>
   )
 }

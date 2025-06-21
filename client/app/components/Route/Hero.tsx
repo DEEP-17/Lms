@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Search, Play } from 'lucide-react';
 import { Button } from '@mui/material';
+import { Play, Search } from 'lucide-react';
+import React from 'react';
 
 const Hero: React.FC = () => {
   return (

@@ -1,18 +1,25 @@
 'use client';
-import { ContentSectionData } from '@/types/course';
-import { Plus, Save } from 'lucide-react';
+import { ContentSectionData, StepValidation } from '@/types/course';
+import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 import ContentSection from './ContentSection';
 
 interface Props {
-  active: number;
-  setActive: (step: number) => void;
   contentData: ContentSectionData[];
   setContentData: (content: ContentSectionData[]) => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  validation?: StepValidation;
 }
 
-const CourseContent: React.FC<Props> = ({ active, setActive, contentData, setContentData }) => {
+const CourseContent: React.FC<Props> = ({
+  contentData,
+  setContentData,
+  onNext,
+  onPrevious,
+  validation
+}) => {
   const [sections, setSections] = useState<ContentSectionData[]>(contentData.length > 0 ? contentData : [
     {
       id: '1',
@@ -46,11 +53,11 @@ const CourseContent: React.FC<Props> = ({ active, setActive, contentData, setCon
     setContentData(updatedSections);
   };
 
-  const saveContent = () => {
-    console.log('Saving content:', sections);
-    setContentData(sections);
-    toast.success('Content saved successfully!');
-  };
+  // const saveContent = () => {
+  //   console.log('Saving content:', sections);
+  //   setContentData(sections);
+  //   toast.success('Content saved successfully!');
+  // };
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
@@ -58,16 +65,21 @@ const CourseContent: React.FC<Props> = ({ active, setActive, contentData, setCon
       <div className="mb-8 pb-6 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Content Builder</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Content</h1>
             <p className="text-gray-600 dark:text-gray-400">Organize your course content into sections and components</p>
+
+            {/* Validation Errors */}
+            {validation && validation.errors.length > 0 && (
+              <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <h3 className="text-red-800 dark:text-red-200 font-semibold mb-2">Please fix the following errors:</h3>
+                <ul className="list-disc list-inside text-red-700 dark:text-red-300 text-sm space-y-1">
+                  {validation.errors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-          <button
-            onClick={saveContent}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:ring-4 focus:ring-blue-500/30 outline-none"
-          >
-            <Save className="w-5 h-5" />
-            <span className="font-semibold">Save Content</span>
-          </button>
         </div>
       </div>
 
@@ -105,13 +117,13 @@ const CourseContent: React.FC<Props> = ({ active, setActive, contentData, setCon
         {/* Navigation */}
         <div className="w-full flex items-center justify-between pt-8 border-t border-gray-200 dark:border-slate-700">
           <button
-            onClick={() => setActive(active - 1)}
+            onClick={onPrevious}
             className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md'
           >
             ← Previous
           </button>
           <button
-            onClick={() => setActive(active + 1)}
+            onClick={onNext}
             className='px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5'
           >
             Next →

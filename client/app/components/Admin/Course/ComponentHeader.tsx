@@ -26,7 +26,7 @@ const ComponentHeader: React.FC<ComponentHeaderProps> = ({
 
             <div className="flex-1">
                <h4 className="text-md font-medium text-gray-700 dark:text-gray-300">
-                  {title || `Video Component ${componentIndex + 1}`}
+                  {title || `Video ${componentIndex + 1}`}
                </h4>
                <p className="text-xs text-gray-500 mt-1">
                   Component {componentIndex + 1}

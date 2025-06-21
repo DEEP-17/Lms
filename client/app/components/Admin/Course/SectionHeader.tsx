@@ -31,11 +31,11 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
    };
 
    return (
-      <div className="flex items-center justify-between p-4 bg-gray-100 border-b border-gray-200 hover:bg-gray-200/50 transition-colors duration-200 group">
+      <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-800 rounded-2xl border  dark:border-slate-700 border-b border-gray-200 transition-colors duration-200 group">
          <div className="flex items-center flex-1">
             <button
                onClick={onToggle}
-               className="mr-3 p-1 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors duration-200"
+               className="mr-3 p-1 hover:bg-gray-200 dark:hover:bg-slate-400 rounded transition-colors duration-200"
             >
                {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" />
                   : <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -54,10 +54,10 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
             ) : (
                <div className="flex-1">
                   <h3
-                     className="text-lg font-medium text-gray-900 cursor-pointer hover:text-blue-400 transition-colors duration-200"
+                     className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-400 transition-colors duration-200"
                      onClick={() => setIsEditing(true)}
                   >
-                     {title}
+                        {title|| `Section ${componentCount}`}
                   </h3>
                   <p className="text-xs text-gray-500 mt-1">
                      {componentCount} component{componentCount !== 1 ? 's' : ''}

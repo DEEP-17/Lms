@@ -89,7 +89,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
-    
+
 
     const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
         if ((e.target as HTMLDivElement).id === "screen") {
@@ -102,9 +102,9 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             {/* Main Header */}
             <header
                 className={`w-full top-0 z-50 fixed transition-colors duration-500 ease-in-out ${!active
-                        ? "bg-white dark:bg-slate-900 shadow-lg backdrop-blur-md"
+                    ? "bg-white dark:bg-slate-900 shadow-lg backdrop-blur-md"
                     : "bg-transparent  dark:bg-slate-900/60 shadow-none backdrop-blur-0"
-                }`}
+                    }`}
             >
                 <div className="max-w-[1200px] mx-auto px-4">
                     <div className="flex items-center justify-between h-16">
@@ -138,7 +138,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                                         width={35}
                                         height={35}
                                         className="rounded-full border-2 border-black dark:border-black shadow-xl object-cover w-full h-full"
-                                        style={{border:(activeItem===5)?"3px solid #ffc107":"none"}}
+                                        style={{ border: (activeItem === 5) ? "3px solid #ffc107" : "none" }}
                                     />
                                 </Link>
                             ) : (

@@ -2,10 +2,10 @@
 import { useLogOutQuery } from '@/redux/features/auth/authApi';
 import { signOut } from 'next-auth/react';
 import React, { FC, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import ChangePassword from './ChangePassword';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
-import ChangePassword from './ChangePassword';
-import toast from 'react-hot-toast';
 
 type Props = {
    user: any;
@@ -20,7 +20,7 @@ const Profile: FC<Props> = ({ user }) => {
 
    const logOutHandler = async () => {
       setLogout(true);
-      await signOut({callbackUrl: '/'});
+      await signOut({ callbackUrl: '/' });
       toast.success('Logged out successfully');
    };
 
@@ -72,7 +72,7 @@ const Profile: FC<Props> = ({ user }) => {
             }
             {
                active === 2 && (
-                  <ChangePassword/>
+                  <ChangePassword />
                )
             }
          </div>
