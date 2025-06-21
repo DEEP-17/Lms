@@ -1,13 +1,14 @@
-'use client'
-import { styles } from '@/app/styles/style';
+'use client';
+
+import { CourseFormData } from '@/types/course';
 import React, { FC, useState } from 'react';
 
 type Props = {
-    course: any;
-    setCourse: (course: any) => void;
+    course: CourseFormData;
+    setCourse: (course: CourseFormData) => void;
     active: number;
     setActive: (active: number) => void;
-}
+};
 
 const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) => {
     const [dragging, setDragging] = useState(false);
@@ -52,60 +53,75 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
     };
 
     return (
-        <div className='w-[80%] m-auto mt-24 min-h-screen p-8 rounded-lg bg-white dark:bg-slate-900 transition-colors duration-300'>
-            <form onSubmit={handleSubmit} className={`${styles.label}`}>
+        <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Information</h1>
+                <p className="text-gray-600 dark:text-gray-400">Fill in the basic details of your course</p>
+            </div>
 
+            <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Course Title */}
-                <div>
-                    <label className="text-gray-900 dark:text-white transition-colors duration-300">
-                        Course Title
+                <div className="space-y-3">
+                    <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                        Course Title *
                     </label>
                     <input
                         type="text"
                         required
-                        value={course.title}
-                        onChange={(e) => setCourse({ ...course, title: e.target.value })}
+                        value={course.name}
+                        onChange={(e) => setCourse({ ...course, name: e.target.value })}
                         placeholder='Enter Course Title'
-                        className={`${styles.input}`}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                     />
                 </div>
 
-                <br />
-
                 {/* Description */}
-                <div className='mb-5'>
-                    <label className="text-gray-900 dark:text-white transition-colors duration-300">
-                        Course Description
+                <div className="space-y-3">
+                    <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                        Course Description *
                     </label>
                     <textarea
                         required
                         value={course.description}
                         onChange={(e) => setCourse({ ...course, description: e.target.value })}
                         placeholder='Enter Course Description'
-                        className={`${styles.input}`}
+                        rows={4}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none"
                     />
                 </div>
 
-                <br />
+                {/* Tags */}
+                <div className="space-y-3">
+                    <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                        Tags
+                    </label>
+                    <input
+                        type="text"
+                        value={course.tags}
+                        onChange={(e) => setCourse({ ...course, tags: e.target.value })}
+                        placeholder='Enter Course Tags (comma separated)'
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
+                    />
+                </div>
 
                 {/* Category + Price */}
-                <div className='w-full flex gap-5'>
-                    <div className='w-[50%]'>
-                        <label className="text-gray-900 dark:text-white transition-colors duration-300">
-                            Category
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className="space-y-3">
+                        <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                            Category *
                         </label>
                         <input
                             type="text"
                             required
-                            value={course.category}
-                            onChange={(e) => setCourse({ ...course, category: e.target.value })}
+                            value={course.level}
+                            onChange={(e) => setCourse({ ...course, level: e.target.value })}
                             placeholder='Enter Course Category'
-                            className={`${styles.input}`}
+                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                         />
                     </div>
-                    <div className='w-[50%]'>
-                        <label className="text-gray-900 dark:text-white transition-colors duration-300">
-                            Price
+                    <div className="space-y-3">
+                        <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                            Price *
                         </label>
                         <input
                             type="number"
@@ -113,17 +129,15 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
                             value={course.price}
                             onChange={(e) => setCourse({ ...course, price: e.target.value })}
                             placeholder='Enter Course Price'
-                            className={`${styles.input}`}
+                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                         />
                     </div>
                 </div>
 
-                <br />
-
                 {/* Expected Price + Level */}
-                <div className='w-full flex gap-5'>
-                    <div className='w-[50%]'>
-                        <label className="text-gray-900 dark:text-white transition-colors duration-300">
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className="space-y-3">
+                        <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
                             Expected Price
                         </label>
                         <input
@@ -131,17 +145,17 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
                             value={course.estimatedPrice}
                             onChange={(e) => setCourse({ ...course, estimatedPrice: e.target.value })}
                             placeholder='Enter Expected Price'
-                            className={`${styles.input}`}
+                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                         />
                     </div>
-                    <div className='w-[50%]'>
-                        <label className="text-gray-900 dark:text-white transition-colors duration-300">
+                    <div className="space-y-3">
+                        <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
                             Course Level
                         </label>
                         <select
                             value={course.level}
                             onChange={(e) => setCourse({ ...course, level: e.target.value })}
-                            className={`${styles.input} text-gray-900 dark:text-white bg-white dark:bg-slate-800 transition-colors duration-300`}
+                            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                         >
                             <option value="">Select Level</option>
                             <option value="Beginner">Beginner</option>
@@ -151,11 +165,9 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
                     </div>
                 </div>
 
-                <br />
-
                 {/* Demo URL */}
-                <div className='mb-5'>
-                    <label className="text-gray-900 dark:text-white transition-colors duration-300">
+                <div className="space-y-3">
+                    <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
                         Demo URL
                     </label>
                     <input
@@ -163,14 +175,15 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
                         value={course.demoUrl}
                         onChange={(e) => setCourse({ ...course, demoUrl: e.target.value })}
                         placeholder='Enter Demo URL'
-                        className={`${styles.input}`}
+                        className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                     />
                 </div>
 
-                <br />
-
                 {/* Thumbnail Upload */}
-                <div className='w-full'>
+                <div className="space-y-3">
+                    <label className="block text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                        Course Thumbnail
+                    </label>
                     <input
                         type="file"
                         accept="image/*"
@@ -180,34 +193,47 @@ const CourseInformation: FC<Props> = ({ course, setCourse, active, setActive }) 
                     />
                     <label
                         htmlFor="file"
-                        className={`w-full h-[200px] flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer relative transition-colors duration-300 ${dragging ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-transparent'}`}
+                        className={`w-full h-[250px] flex items-center justify-center border-2 border-dashed rounded-xl cursor-pointer relative transition-all duration-300 group ${dragging
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                            : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                            }`}
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
                         {course.thumbnail ? (
-                            <img src={course.thumbnail} alt="Course Thumbnail" className="w-full h-full object-cover rounded-lg" />
+                            <img
+                                src={typeof course.thumbnail === 'string' ? course.thumbnail : ''}
+                                alt="Course Thumbnail"
+                                className="w-full h-full object-cover rounded-xl"
+                            />
                         ) : (
-                            <span className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 transition-colors duration-300">
-                                Upload Image
-                            </span>
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 transition-colors duration-300">
+                                    <svg className="w-8 h-8 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                </div>
+                                <p className="text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                                    PNG, JPG, GIF up to 10MB
+                                </p>
+                            </div>
                         )}
                     </label>
                 </div>
 
-                <br />
-
                 {/* Next Button */}
-                <div className='w-full flex justify-center'>
-                    <input
+                <div className='w-full flex justify-center pt-6'>
+                    <button
                         type="submit"
-                        value='Next'
-                        className="w-[200px] py-2 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg text-white font-bold text-center cursor-pointer transition-colors duration-300"
-                    />
+                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:ring-4 focus:ring-blue-500/30 outline-none"
+                    >
+                        Continue to Course Options
+                    </button>
                 </div>
-
-                <br /><br />
-
             </form>
         </div>
     );

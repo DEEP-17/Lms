@@ -1,110 +1,104 @@
 'use client';
+
+import { CourseFormData } from '@/types/course';
 import React, { useState } from 'react';
 import CourseContent from './CourseContent';
 import CourseData from './CourseData';
 import CourseInformation from './CourseInformation';
 import CourseOptions from './CourseOptions';
+import CoursePreview from './CoursePreview';
+
 
 const CreateCourse = () => {
-  const [active, setActive] = useState(0);
-  const [courseInfo, setCourseInfo] = useState({
-    title: '',
+  const [active, setActive] = useState<number>(0);
+
+  const [courseInfo, setCourseInfo] = useState<CourseFormData>({
+    name: '',
     description: '',
-    category: '',
+    level: '',
     price: '',
     estimatedPrice: '',
-    level: '',
     tags: '',
     demoUrl: '',
     thumbnail: '',
+    benefits: [{ title: '' }],
+    prerequisites: [{ title: '' }],
+    courseContent: [
+      {
+        id: '1',
+        title: '',
+        components: [
+          {
+            id: '1',
+            videoTitle: '',
+            videoUrl: '',
+            videoDescription: '',
+            links: [{ id: '1', title: '', url: '' }],
+          },
+        ],
+      },
+    ],
   });
-  const [courseData, setCourseData] = useState(null);
-  const [benefits, setBenefits] = useState([{ title: '' }]);
-  const [prerequisites, setPrerequisites] = useState([{ title: '' }]);
-  const [courseContentData, setCourseContentData] = useState([{
-    videoUrl: '',
-    title: '',
-    description: '',
-    videoSection: '',
-    links: [{ title: '', url: '' }],
-    suggestion: "",
-  }]);
 
   const handleSubmit = async () => {
-    // format benefits array
-    const formattedBenefits = benefits.map((benefit) => ({ title: benefit.title }));
-    // format prerequisites array
-    const formattedPrerequisites = prerequisites.map((prerequisite) => ({ title: prerequisite.title }));
-    // format course content data
-    const formattedCourseContentData = courseContentData.map((courseContent) => ({
-      videoUrl: courseContent.videoUrl,
-      title: courseContent.title,
-      description: courseContent.description,
-      videoSection: courseContent.videoSection,
-      links: courseContent.links.map(link => ({ title: link.title, url: link.url })),
-      suggestion: courseContent.suggestion,
-    }));
-    // Prepare our data object
-    const data = {
-      name: courseInfo.title,
-      description: courseInfo.description,
-      category: courseInfo.category,
-      price: courseInfo.price,
-      estimatedPrice: courseInfo.estimatedPrice,
-      level: courseInfo.level,
-      tags: courseInfo.tags,
-      demoUrl: courseInfo.demoUrl,
-      thumbnail: courseInfo.thumbnail,
-      content: formattedCourseContentData,
-      totalVideos: courseContentData.length,
-      benefits: formattedBenefits,
-      prerequisites: formattedPrerequisites,
-      courseContent: formattedCourseContentData,
-    };
-
-    setCourseData(data);
-    console.log('Course Data:', data);
+    console.log('Course Data:', courseInfo);
+    // You can also: await createCourse(courseInfo);
   };
 
   return (
-    <div className="w-full min-h-screen flex bg-white dark:bg-slate-900 transition-colors duration-300">
-
+    <div className="w-full min-h-screen flex bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-300">
       {/* Sidebar */}
-      <div className="w-[250px] p-4 border-r border-slate-300 dark:border-slate-700 sticky top-20 h-[calc(100vh-80px)] overflow-y-auto hidden md:block">
+      <div className="w-[280px] p-6 border-r border-gray-200 dark:border-slate-700 sticky top-20 h-[calc(100vh-80px)] overflow-y-auto hidden md:block bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg">
         <CourseOptions active={active} setActive={setActive} />
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        {active === 0 && (
-          <CourseInformation
-            course={courseInfo}
-            setCourse={setCourseInfo}
-            active={active}
-            setActive={setActive}
-          />
-        )}
-        {active === 1 && (
-          <CourseData
-            benefits={benefits}
-            prerequisites={prerequisites}
-            setbenefits={setBenefits}
-            setPrerequisites={setPrerequisites}
-            active={active}
-            setActive={setActive}
-          />
-        )}
-        {active === 2 && (
-          <CourseContent
-            active={active}
-            setActive={setActive}
-            courseContentData={courseContentData}
-            setCourseContentData={setCourseContentData}
-            handleSubmit={handleSubmit}
-          />
-        )}
-      </div>
+      <div className="flex-1 p-8 overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
+          {active === 0 && (
+            <CourseInformation
+              course={courseInfo}
+              setCourse={setCourseInfo}
+              active={active}
+              setActive={setActive}
+            />
+          )}
 
+          {active === 1 && (
+            <CourseData
+              benefits={courseInfo.benefits}
+              prerequisites={courseInfo.prerequisites}
+              setBenefits={(updatedBenefits) =>
+                setCourseInfo((prev) => ({ ...prev, benefits: updatedBenefits }))
+              }
+              setPrerequisites={(updatedPrerequisites) =>
+                setCourseInfo((prev) => ({ ...prev, prerequisites: updatedPrerequisites }))
+              }
+              active={active}
+              setActive={setActive}
+            />
+          )}
+
+          {active === 2 && (
+            <CourseContent
+              active={active}
+              setActive={setActive}
+              contentData={courseInfo.courseContent}
+              setContentData={(updatedContent) =>
+                setCourseInfo((prev) => ({ ...prev, courseContent: updatedContent }))
+              }
+            />
+          )}
+
+          {active === 3 && (
+            <CoursePreview
+              course={courseInfo}
+              onEdit={() => setActive(0)}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
