@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { FC } from 'react';
 import { AiOutlineLogout } from 'react-icons/ai';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
@@ -16,7 +16,7 @@ type Props =
 const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHandler }) => {
    return (
       <div className='w-full flex flex-col gap-2 sm:gap-3'>
-         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 1 ? "bg-primary/10 dark:bg-primary/20 border border-primary" : "bg-transparent border border-transparent"} hover:bg-primary/20 dark:hover:bg-primary/30`}
+         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 1 ? "bg-slate-900/10 dark:bg-slate-900/20 border border-primary" : "bg-transparent border border-transparent"} hover:bg-slate-900/20 dark:hover:bg-slate-900/30 cursor-pointer`}
             onClick={() => setActive(1)}>
             <Image
                src={user && user.avatar && user.avatar.public_id !== "default_avatar"
@@ -29,18 +29,19 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
             />
             <h5 className='ml-2 sm:ml-3 text-sm sm:text-base font-medium font-Popins text-text dark:text-text-light'>My Account</h5>
          </div>
-         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 2 ? "bg-secondary/10 dark:bg-secondary/20 border border-secondary" : "bg-transparent border border-transparent"} hover:bg-secondary/20 dark:hover:bg-secondary/30`}
+         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 2 ? "bg-slate-900/10 dark:bg-slate-900/20 border border-primary" : "bg-transparent border border-transparent"} hover:bg-slate-900/20 dark:hover:bg-slate-900/30 cursor-pointer`}
             onClick={() => setActive(2)}>
             <RiLockPasswordLine size={20} className="text-secondary" />
             <h5 className='ml-2 sm:ml-3 text-sm sm:text-base font-medium font-Popins text-text dark:text-text-light'>Change Password</h5>
          </div>
-         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 3 ? "bg-accent/10 dark:bg-accent/20 border border-accent" : "bg-transparent border border-transparent"} hover:bg-accent/20 dark:hover:bg-accent/30`}
+         <div className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 3 ? "bg-slate-900/10 dark:bg-slate-900/20 border border-primary" : "bg-transparent border border-transparent"} hover:bg-slate-900/20 dark:hover:bg-slate-900/30 cursor-pointer`}
             onClick={() => setActive(3)}>
             <SiCoursera size={20} className="text-accent" />
             <h5 className='ml-2 sm:ml-3 text-sm sm:text-base font-medium font-Popins text-text dark:text-text-light'>Enrolled Courses</h5>
          </div>
          {user && user.role === 'admin' && (
-            <Link className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 3 ? "bg-accent/10 dark:bg-accent/20 border border-accent" : "bg-transparent border border-transparent"} hover:bg-accent/20 dark:hover:bg-accent/30`}
+            <Link className={`w-full flex items-center justify-center px-2 sm:px-3 py-2 sm:py-4 cursor-pointer transition-colors duration-200 rounded-lg ${active === 4 ? "bg-slate-900/10 dark:bg-slate-900/20 border border-primary" : "bg-transparent border border-transparent"} hover:bg-slate-900/20 dark:hover:bg-slate-900/30 cursor-pointer`}
+               onClick={() => setActive(4)}
                href="/admin">
                <MdOutlineAdminPanelSettings size={20} className="text-accent" />
                <h5 className='ml-2 sm:ml-3 text-sm sm:text-base font-medium font-Popins text-text dark:text-text-light'>Admin Dashboard</h5>

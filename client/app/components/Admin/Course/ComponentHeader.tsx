@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@mui/material';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -18,7 +19,7 @@ const ComponentHeader: React.FC<ComponentHeaderProps> = ({
          <div className="flex items-center flex-1">
             <button
                onClick={onToggle}
-               className="mr-3 p-1 hover:bg-gray-300 dark:hover:bg-slate-600 rounded transition-colors duration-200"
+               className="mr-3 p-1 hover:bg-gray-300 dark:hover:bg-slate-600 rounded transition-colors duration-200 cursor-pointer"
             >
                {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-500" />
                   : <ChevronRight className="w-4 h-4 text-gray-500" />}
@@ -37,7 +38,7 @@ const ComponentHeader: React.FC<ComponentHeaderProps> = ({
          <div className="flex items-center space-x-2">
             <button
                onClick={onDelete}
-               className="p-2 hover:bg-red-600/20 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100"
+               className="p-2 hover:bg-red-600/20 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
             >
                <Trash2 className="w-4 h-4 text-red-400" />
             </button>

@@ -1,6 +1,7 @@
 'use client';
 
 import { CourseStepStatus } from '@/types/course';
+import { Button } from '@mui/material';
 import { CheckCircle, ChevronLeft, ChevronRight, Eye, FileText, Lock, PlayCircle, Save, Settings } from 'lucide-react';
 import React, { FC, useState } from 'react';
 
@@ -76,7 +77,7 @@ const CourseOptions: FC<Props> = ({
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">Course Setup</h2>
                 <button
                   onClick={handleToggle}
-                  className="p-1.5 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 btn-hover flex-shrink-0"
+                  className="p-1.5 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 btn-hover flex-shrink-0 cursor-pointer"
                   title="Collapse sidebar"
                 >
                   <ChevronLeft size={16} />
@@ -86,7 +87,7 @@ const CourseOptions: FC<Props> = ({
             {isCollapsed && (
               <button
                 onClick={handleToggle}
-                className="p-1.5 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 btn-hover"
+                className="p-1.5 rounded-lg bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 btn-hover cursor-pointer"
                 title="Expand sidebar"
               >
                 <ChevronRight size={16} />
@@ -108,7 +109,7 @@ const CourseOptions: FC<Props> = ({
             return (
               <div key={index} className="relative">
                 <div
-                  className={`w-full flex items-center py-3 px-4 rounded-xl cursor-pointer transition-all duration-300 group card-hover ${active === index
+                  className={`w-full flex  items-center py-3 px-4 rounded-xl cursor-pointer transition-all duration-300 group card-hover ${active === index
                     ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 shadow-lg'
                     : isLocked
                       ? 'bg-gray-100 dark:bg-slate-700/50 border-2 border-gray-300 dark:border-slate-600 opacity-60'
@@ -184,7 +185,7 @@ const CourseOptions: FC<Props> = ({
 
                   {/* Tooltip for collapsed state */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl border border-slate-700 max-w-xs">
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-slate-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl border border-slate-700 max-w-xs">
                       <div className="font-semibold mb-1">{option.title}</div>
                       <div className="text-xs text-slate-300">{option.description}</div>
                       <div className="text-xs text-slate-400 mt-1">Step {index + 1} of {options.length}</div>

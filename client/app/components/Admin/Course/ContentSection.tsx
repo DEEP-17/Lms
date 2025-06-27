@@ -1,5 +1,6 @@
 'use client';
 import { ContentSectionData, VideoComponent } from '@/types/course';
+import { Button } from '@mui/material';
 import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 import SectionHeader from './SectionHeader';
@@ -42,7 +43,7 @@ const ContentSection: React.FC<Props> = ({ section, onUpdate, onDelete }) => {
    };
 
    return (
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg group hover:shadow-xl transition-all duration-300">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg group hover:shadow-xl transition-all duration-300">
          <SectionHeader
             title={section.title}
             isExpanded={isExpanded}
@@ -67,7 +68,7 @@ const ContentSection: React.FC<Props> = ({ section, onUpdate, onDelete }) => {
                {/* Add Component Button */}
                <button
                   onClick={addComponent}
-                  className="w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group"
+                  className="w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group cursor-pointer"
                >
                   <div className="flex items-center justify-center space-x-3">
                      <div className="p-2 bg-gray-100 dark:bg-slate-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 rounded-full transition-all duration-300">

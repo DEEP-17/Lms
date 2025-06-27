@@ -1,6 +1,7 @@
 'use client';
 
 import { CourseFormData, StepValidation } from '@/types/course';
+import { Button } from '@mui/material';
 import React, { FC, useState } from 'react';
 
 type Props = {
@@ -70,7 +71,7 @@ const CourseInformation: FC<Props> = ({
     const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
     return (
-        <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
+        <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Information</h1>
                 <p className="text-gray-600 dark:text-gray-400">Fill in the basic details of your course</p>
@@ -219,14 +220,14 @@ const CourseInformation: FC<Props> = ({
                     <button
                         type="button"
                         onClick={onPrevious}
-                        className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md'
+                        className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md cursor-pointer'
                     >
                         ← Previous
                     </button>
 
                     <button
                         type="submit"
-                        className='px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5'
+                        className='px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer'
                     >
                         Next →
                     </button>

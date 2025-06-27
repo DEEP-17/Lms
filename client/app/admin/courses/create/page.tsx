@@ -27,7 +27,7 @@ const page = (props: Props) => {
 
       {/* Main Content Area */}
       <div
-        className={`transition-all duration-300 ease-in-out min-h-screen overflow-x-hidden ${isSidebarCollapsed ? 'ml-16' : 'ml-72'
+        className={`transition-all duration-300 ease-in-out min-h-screen overflow-x-hidden text-black ${isSidebarCollapsed ? 'ml-16' : 'ml-72'
           }`}
       >
         <DashboardHeader />

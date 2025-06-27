@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import { Button } from '@mui/material';
 import { useTheme } from "next-themes";
+import React, { useEffect, useState } from "react";
 import { BiMoon, BiSun } from "react-icons/bi";
 
 export const ThemeSwitcher = () => {
@@ -19,17 +20,17 @@ export const ThemeSwitcher = () => {
             aria-label="Toggle Theme"
             onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark"
             )}
-            className="flex items-center justify-center mx-4 focus:outline-none"
+            className="flex items-center justify-center mx-4 focus:outline-none cursor-pointer"
         >
             {currentTheme === "dark" ? (
                 <BiSun
                     size={25}
-                    className="text-white hover:text-[#37a39a] transition-colors duration-300"
+                    className="text-white hover:text-[#37a39a] transition-colors duration-300 cursor-pointer"
                 />
             ) : (
                 <BiMoon
                     size={25}
-                    className="text-black hover:text-[#37a39a] transition-colors duration-300"
+                    className="text-black hover:text-[#37a39a] transition-colors duration-300 cursor-pointer"
                 />
             )}
         </button>

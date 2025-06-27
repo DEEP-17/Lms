@@ -1,4 +1,10 @@
-import { apiSlice } from '../api/apiSlice';
+import { User } from "../../../types/user";
+import { apiSlice } from "../api/apiSlice";
+
+export interface APIResponse {
+  success?: boolean;
+  message?: string;
+}
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -6,7 +12,7 @@ export const userApi = apiSlice.injectEndpoints({
       query: (avatar) => ({
         url: "/update-user-avatar",
         method: "PUT",
-        body: {avatar},
+        body: { avatar },
         credentials: "include" as const,
       }),
     }),
@@ -19,10 +25,41 @@ export const userApi = apiSlice.injectEndpoints({
       }),
     }),
     updatePassword: builder.mutation({
-      query: ({ oldPassword,newPassword }) => ({
+      query: ({ oldPassword, newPassword }) => ({
         url: "/update-user-password",
         method: "PUT",
         body: { oldPassword, newPassword },
+        credentials: "include" as const,
+      }),
+    }),
+    getAllUsers: builder.query<User[], void>({
+      query: () => ({
+        url: "/get-all-users",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    updateUserRole: builder.mutation<APIResponse, { id: string; role: string }>(
+      {
+        query: ({ id, role }) => ({
+          url: "/update-user-role",
+          method: "PUT",
+          body: { id, role },
+          credentials: "include" as const,
+        }),
+      }
+    ),
+    deleteUser: builder.mutation<APIResponse, string>({
+      query: (id) => ({
+        url: `/delete-user/${id}`,
+        method: "DELETE",
+        credentials: "include" as const,
+      }),
+    }),
+    getUserById: builder.query<User, string>({
+      query: (id) => ({
+        url: `/user/${id}`,
+        method: "GET",
         credentials: "include" as const,
       }),
     }),
@@ -30,6 +67,11 @@ export const userApi = apiSlice.injectEndpoints({
 });
 
 export const {
-   useUpdateAvatarMutation, useEditProfileMutation,
-   useUpdatePasswordMutation
+  useUpdateAvatarMutation,
+  useEditProfileMutation,
+  useUpdatePasswordMutation,
+  useGetAllUsersQuery,
+  useUpdateUserRoleMutation,
+  useDeleteUserMutation,
+  useGetUserByIdQuery,
 } = userApi;

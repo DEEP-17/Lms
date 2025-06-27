@@ -1,0 +1,36 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="hoodGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Hooded figure -->
+  <ellipse cx="32" cy="24" rx="12" ry="8" fill="url(#hoodGradient)" stroke="#374151" stroke-width="1"/>
+  <path d="M20 24C20 32 25 40 32 40C39 40 44 32 44 24" fill="url(#hoodGradient)" stroke="#374151" stroke-width="1"/>
+  
+  <!-- Computer screen -->
+  <rect x="16" y="32" width="32" height="20" rx="2" fill="url(#screenGradient)" stroke="#059669" stroke-width="2"/>
+  <rect x="18" y="34" width="28" height="16" rx="1" fill="#1F2937"/>
+  
+  <!-- Code on screen -->
+  <text x="20" y="40" font-family="monospace" font-size="6" fill="#10B981">$ nmap -sS</text>
+  <text x="20" y="48" font-family="monospace" font-size="6" fill="#F59E0B">$ hydra -l</text>
+  <text x="20" y="56" font-family="monospace" font-size="6" fill="#EF4444">$ metasploit</text>
+  
+  <!-- Security elements -->
+  <circle cx="48" cy="16" r="3" fill="#EF4444" stroke="#DC2626" stroke-width="1"/>
+  <path d="M46 16L50 16M48 14L48 18" stroke="white" stroke-width="1" stroke-linecap="round"/>
+  
+  <!-- Matrix-style background elements -->
+  <circle cx="12" cy="12" r="1" fill="#10B981" opacity="0.6"/>
+  <circle cx="52" cy="52" r="1" fill="#10B981" opacity="0.6"/>
+  <circle cx="12" cy="52" r="1" fill="#10B981" opacity="0.6"/>
+  <circle cx="52" cy="12" r="1" fill="#10B981" opacity="0.6"/>
+</svg> 

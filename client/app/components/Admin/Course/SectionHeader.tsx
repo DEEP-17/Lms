@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import { Button } from '@mui/material';
 import { ChevronDown, ChevronRight, Edit2, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface SectionHeaderProps {
    title: string;
@@ -31,11 +32,11 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
    };
 
    return (
-      <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-800 rounded-2xl border  dark:border-slate-700 border-b border-gray-200 transition-colors duration-200 group">
+      <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-900 rounded-2xl border  dark:border-slate-700 border-b border-gray-200 transition-colors duration-200 group">
          <div className="flex items-center flex-1">
             <button
                onClick={onToggle}
-               className="mr-3 p-1 hover:bg-gray-200 dark:hover:bg-slate-400 rounded transition-colors duration-200"
+               className="mr-3 p-1 hover:bg-gray-200 dark:hover:bg-slate-400 rounded transition-colors duration-200 cursor-pointer"
             >
                {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" />
                   : <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -48,7 +49,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
                   onChange={(e) => setEditTitle(e.target.value)}
                   onBlur={handleSave}
                   onKeyDown={handleKeyPress}
-                  className="flex-1 bg-gray-200 dark:bg-slate-800 text-gray-900 px-3 py-1 rounded border border-gray-300 dark:border-slate-700 focus:border-blue-500 focus:outline-none"
+                  className="flex-1 bg-gray-200 dark:bg-slate-900 text-gray-900 px-3 py-1 rounded border border-gray-300 dark:border-slate-700 focus:border-blue-500 focus:outline-none"
                   autoFocus
                />
             ) : (
@@ -57,7 +58,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
                      className="text-lg font-medium text-gray-900 dark:text-white cursor-pointer hover:text-blue-400 transition-colors duration-200"
                      onClick={() => setIsEditing(true)}
                   >
-                        {title|| `Section ${componentCount}`}
+                     {title || `Section ${componentCount}`}
                   </h3>
                   <p className="text-xs text-gray-500 mt-1">
                      {componentCount} component{componentCount !== 1 ? 's' : ''}
@@ -69,13 +70,13 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
          <div className="flex items-center space-x-2">
             <button
                onClick={() => setIsEditing(true)}
-               className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100"
+               className="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
             >
                <Edit2 className="w-4 h-4 text-gray-400" />
             </button>
             <button
                onClick={onDelete}
-               className="p-2 hover:bg-red-600/20 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100"
+               className="p-2 hover:bg-red-600/20 rounded transition-colors duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
             >
                <Trash2 className="w-4 h-4 text-red-400" />
             </button>

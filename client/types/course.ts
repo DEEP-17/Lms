@@ -21,6 +21,7 @@ export interface ContentSectionData {
 }
 
 export interface CourseFormData {
+  _id?: string;
   name: string;
   description: string;
   price: number | string;

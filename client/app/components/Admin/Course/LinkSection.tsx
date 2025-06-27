@@ -1,8 +1,8 @@
 import { Link } from '@/types/course';
+import { Button } from '@mui/material';
 import { Plus, X } from 'lucide-react';
 import React from 'react';
 import FormField from './FormField';
-
 interface Props {
    links: Link[];
    onLinksChange: (links: Link[]) => void;
@@ -38,7 +38,7 @@ const LinkSection: React.FC<Props> = ({ links, onLinksChange }) => {
                   <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Resource Link {index + 1}</h4>
                   <button
                      onClick={() => removeLink(link.id)}
-                     className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300 group"
+                     className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300 group cursor-pointer"
                   >
                      <X className="w-4 h-4 text-red-400 group-hover:text-red-600" />
                   </button>
@@ -64,7 +64,7 @@ const LinkSection: React.FC<Props> = ({ links, onLinksChange }) => {
 
          <button
             onClick={addLink}
-            className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group"
+            className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group cursor-pointer"
          >
             <div className="flex items-center justify-center space-x-3">
                <div className="p-2 bg-gray-100 dark:bg-slate-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 rounded-full transition-all duration-300">

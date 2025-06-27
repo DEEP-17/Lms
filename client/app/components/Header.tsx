@@ -1,12 +1,15 @@
 'use client';
 import { useLogOutQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { Button } from '@mui/material';
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 import React, { FC, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { HiOutlineMenuAlt3, HiOutlineUserCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
+import { User } from "../../types/user";
 import Login from "../components/Auth/Login";
 import SignUp from "../components/Auth/SignUp";
 import Verification from "../components/Auth/Verification";
@@ -27,10 +30,11 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     const [active, setActive] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
-    const { user } = useSelector((state: any) => state.auth);
+    const { user } = useSelector((state: { auth: { user: User | null } }) => state.auth);
     const { data } = useSession();
     const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
     const [logout, setLogout] = useState(false);
+    const pathname = usePathname();
     useLogOutQuery(undefined, { skip: !logout ? true : false });
 
     useEffect(() => {
@@ -97,20 +101,28 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         }
     };
 
+    const handleNavClick = () => {
+        setOpenSidebar(false); // Close mobile sidebar when any nav item is clicked
+    };
+
     return (
         <div>
             {/* Main Header */}
             <header
-                className={`w-full top-0 z-50 fixed transition-colors duration-500 ease-in-out ${!active
-                    ? "bg-white dark:bg-slate-900 shadow-lg backdrop-blur-md"
-                    : "bg-transparent  dark:bg-slate-900/60 shadow-none backdrop-blur-0"
-                    }`}
+                className={`w-full top-0 z-50 fixed transition-all duration-300 ease-in-out
+                  ${active
+                        ? 'bg-white/80 dark:bg-slate-800/80 shadow-lg backdrop-blur-md h-16'
+                        : 'bg-white/60 dark:bg-slate-800/60 shadow-none backdrop-blur h-16'}
+                `}
+                style={{
+                    boxShadow: active ? '0 2px 16px 0 rgba(0,0,0,0.08)' : 'none',
+                    borderBottom: active ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                }}
             >
-                <div className="max-w-[1200px] mx-auto px-4">
-                    <div className="flex items-center justify-between h-16">
-
+                <div className="h-16 flex items-center justify-between mx-10">
+                    <div className="flex w-full h-full items-center gap-6">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center space-x-2">
+                        <Link href="/" className="flex items-center gap-2 h-full">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                                 <span className="text-white font-bold text-lg">E</span>
                             </div>
@@ -119,26 +131,25 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                             </span>
                         </Link>
 
-                        {/* Desktop Nav */}
-                        <nav className="hidden md:flex items-center space-x-8">
-                            <NavItems activeItem={activeItem} isMobile={false} />
+                        {/* Centered Nav */}
+                        <nav className="hidden md:flex items-center justify-center gap-8 h-full relative w-full">
+                            <NavItems isMobile={false} onNavClick={handleNavClick} pathname={pathname} />
                         </nav>
 
                         {/* Desktop Right Side */}
-                        <div className="hidden md:flex items-center space-x-4">
+                        <div className="hidden md:flex items-center space-x-4 h-full flex-shrink-0">
                             <ThemeSwitcher />
-
                             {isMounted && user ? (
-                                <Link href="/profile" className="h-[35px] w-[35px]">
+                                <Link href="/profile" className="h-[35px] w-[35px] flex items-center justify-center">
                                     <Image
-                                        src={user && user.avatar && user.avatar.public_id !== "default_avatar"
+                                        src={(user && user.avatar && user.avatar.public_id !== "default_avatar" && user.avatar.url)
                                             ? user.avatar.url
                                             : "/avatar.jpg"}
                                         alt="Profile"
                                         width={35}
                                         height={35}
-                                        className="rounded-full border-2 border-black dark:border-black shadow-xl object-cover w-full h-full"
-                                        style={{ border: (activeItem === 5) ? "3px solid #ffc107" : "none" }}
+                                        className="rounded-full border-2 border-cyan-400 dark:border-cyan-200 shadow-xl object-cover w-full h-full"
+                                    
                                     />
                                 </Link>
                             ) : (
@@ -152,7 +163,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
 
                         {/* Mobile Menu Button */}
                         <button
-                            className="md:hidden"
+                            className="md:hidden flex items-center justify-center h-full cursor-pointer"
                             onClick={() => setOpenSidebar(true)}
                         >
                             <HiOutlineMenuAlt3
@@ -169,11 +180,11 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 <div
                     id="screen"
                     onClick={handleClose}
-                    className="fixed inset-0 z-[9999] bg-black bg-opacity-40"
+                    className="fixed inset-0 z-[9999] bg-black bg-opacity-40 cursor-pointer"
                 >
-                    <aside className="fixed top-0 right-0 w-[80%] sm:w-[70%] max-w-[350px] h-full bg-white dark:bg-slate-900 p-6 space-y-4">
+                    <aside className="fixed top-0 right-0 w-[80%] sm:w-[70%] max-w-[350px] h-full bg-white dark:bg-slate-800 p-6 space-y-4">
                         <nav className="flex flex-col space-y-4">
-                            <NavItems activeItem={activeItem} isMobile={true} />
+                            <NavItems activeItem={activeItem} isMobile={true} onNavClick={handleNavClick} pathname={pathname} />
 
                             <HiOutlineUserCircle
                                 size={26}

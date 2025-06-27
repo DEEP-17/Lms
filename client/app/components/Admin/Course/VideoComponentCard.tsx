@@ -59,7 +59,7 @@ const VideoComponentCard: React.FC<Props> = ({
                   rows={4}
                />
 
-               <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-600">
+               <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-gray-200 dark:border-slate-600">
                   <h5 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resource Links</h5>
                   <LinkSection
                      links={component.links}

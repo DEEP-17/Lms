@@ -1,6 +1,8 @@
 'use client';
 
+import { useCreateCourseMutation } from '@/redux/features/api/apiSlice';
 import { CourseFormData, CourseStepStatus, StepValidation } from '@/types/course';
+import { Button } from '@mui/material';
 import { CheckCircle, Menu, Save } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -57,9 +59,79 @@ const CreateCourse = () => {
     step3: { isCompleted: false, isSaved: false, errors: [] },
   });
 
+  const [createCourse] = useCreateCourseMutation();
+
   const handleSubmit = async () => {
-    console.log('Course Data:', courseInfo);
-    // You can also: await createCourse(courseInfo);
+    // Transform courseInfo to match server expectations
+    const payload: unknown = {
+      ...courseInfo,
+      price: Number(courseInfo.price),
+      estimatedPrice: courseInfo.estimatedPrice ? Number(courseInfo.estimatedPrice) : undefined,
+      courseData: courseInfo.courseContent.map(section => ({
+        title: section.title,
+        description: section.components[0]?.videoDescription || '',
+        videoUrl: section.components[0]?.videoUrl || '',
+        videoThumbnail: {}, // You may need to handle this if you support video thumbnails
+        videoSection: section.title,
+        videoLength: 0, // You may want to calculate or input this
+        videoPlayer: '', // Set if you have this info
+        links: section.components[0]?.links || [],
+        suggestion: '', // Set if you have this info
+        questions: [], // New course, so empty
+      })),
+      thumbnail: courseInfo.thumbnail, // If you need to upload to cloudinary, handle here
+    };
+    try {
+      await createCourse(payload).unwrap();
+      toast.success('Course created successfully!');
+      // Reset all fields and redirect to step 1
+      setCourseInfo({
+        name: '',
+        description: '',
+        level: '',
+        price: '',
+        estimatedPrice: '',
+        tags: '',
+        demoUrl: '',
+        thumbnail: '',
+        benefits: [{ title: '' }],
+        prerequisites: [{ title: '' }],
+        courseContent: [
+          {
+            id: '1',
+            title: '',
+            components: [
+              {
+                id: '1',
+                videoTitle: '',
+                videoUrl: '',
+                videoDescription: '',
+                links: [{ id: '1', title: '', url: '' }],
+              },
+            ],
+          },
+        ],
+      });
+      setStepStatus({
+        step0: { isCompleted: false, isSaved: false, errors: [] },
+        step1: { isCompleted: false, isSaved: false, errors: [] },
+        step2: { isCompleted: false, isSaved: false, errors: [] },
+        step3: { isCompleted: false, isSaved: false, errors: [] },
+      });
+      setActive(0);
+      setShowValidation({ 0: false, 1: false, 2: false, 3: false });
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error &&
+        'data' in error &&
+        (error as { data?: { message?: string } }).data?.message
+      ) {
+        toast.error((error as { data?: { message?: string } }).data?.message ?? 'An error occurred');
+      } else {
+        toast.error('Failed to create course');
+      }
+    }
   };
 
   const handleSidebarToggle = (collapsed: boolean) => {
@@ -208,7 +280,7 @@ const CreateCourse = () => {
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-300 overflow-x-hidden">
       {/* Course Options Sidebar - Desktop */}
-      <div className={`hidden lg:block transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-[280px]'} flex-shrink-0 h-full overflow-y-auto border-r border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg`}>
+      <div className={`hidden lg:block transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-[280px]'} flex-shrink-0 h-full overflow-y-auto border-r border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-lg`}>
         <CourseOptions
           active={active}
           setActive={setActive}
@@ -221,7 +293,7 @@ const CreateCourse = () => {
       {/* Course Options Sidebar - Mobile Overlay */}
       {showCourseOptionsMobile && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-800 shadow-2xl overflow-y-auto border-r border-gray-200 dark:border-slate-700">
+          <div className="w-64 max-w-[80vw] h-full bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto border-r border-gray-200 dark:border-slate-700">
             <CourseOptions
               active={active}
               setActive={setActive}
@@ -230,7 +302,7 @@ const CreateCourse = () => {
               isStepAccessible={isStepAccessible}
             />
           </div>
-          <div className="flex-1 bg-black/40" onClick={() => setShowCourseOptionsMobile(false)} />
+          <div className="flex-1 bg-black/40 cursor-pointer" onClick={() => setShowCourseOptionsMobile(false)} />
         </div>
       )}
 
@@ -238,7 +310,7 @@ const CreateCourse = () => {
       <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto max-w-full min-w-0">
         {/* Mobile toggle button for course options */}
         <button
-          className="lg:hidden flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-all"
+          className="lg:hidden flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-all cursor-pointer"
           onClick={() => setShowCourseOptionsMobile(true)}
         >
           <Menu size={20} />
@@ -246,7 +318,7 @@ const CreateCourse = () => {
         </button>
 
         {/* Step Header with Save Button */}
-        <div className="flex items-center justify-between mb-6 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
+        <div className="flex items-center justify-between mb-6 p-4 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Step {active + 1} of 4
@@ -267,7 +339,7 @@ const CreateCourse = () => {
             )}
             <button
               onClick={saveCurrentStep}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
             >
               <Save size={16} />
               Save Step

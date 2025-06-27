@@ -3,6 +3,7 @@ import { ContentSectionData, StepValidation } from '@/types/course';
 import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 // import toast from 'react-hot-toast';
+import { Button } from '@mui/material';
 import ContentSection from './ContentSection';
 
 interface Props {
@@ -60,7 +61,7 @@ const CourseContent: React.FC<Props> = ({
   // };
 
   return (
-    <div className="w-full max-w-6xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
+    <div className="w-full max-w-6xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
       {/* Header */}
       <div className="mb-8 pb-6 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
@@ -97,7 +98,7 @@ const CourseContent: React.FC<Props> = ({
         {/* Add Section Button */}
         <button
           onClick={addSection}
-          className="w-full p-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group"
+          className="w-full p-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group cursor-pointer"
         >
           <div className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-gray-100 dark:bg-slate-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/20 rounded-full transition-all duration-300">
@@ -118,13 +119,13 @@ const CourseContent: React.FC<Props> = ({
         <div className="w-full flex items-center justify-between pt-8 border-t border-gray-200 dark:border-slate-700">
           <button
             onClick={onPrevious}
-            className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md'
+            className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md cursor-pointer'
           >
             ← Previous
           </button>
           <button
             onClick={onNext}
-            className='px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5'
+            className='px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer'
           >
             Next →
           </button>

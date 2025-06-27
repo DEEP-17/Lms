@@ -1,10 +1,10 @@
 'use client'
 import Protected from '@/app/hooks/useProtected'
 import React, { FC } from 'react'
-import Header from '../components/Header'
-import Heading from '../utils/Heading'
 import { useSelector } from 'react-redux'
+import Header from '../components/Header'
 import Profile from '../components/Profile/Profile'
+import Heading from '../utils/Heading'
 type Props = {}
 const page: FC<Props> = (props) => {
   const [open, setOpen] = React.useState(false);
@@ -22,7 +22,7 @@ const page: FC<Props> = (props) => {
         <Header
           open={open}
           setOpen={setOpen}
-          activeItem={activeItem}
+          activeItem={-1}
           setRoute={setRoute}
           route={route}
         />

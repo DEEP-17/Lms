@@ -111,7 +111,7 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
                 <div className="w-full mt-5 text-black dark:text-white flex items-center justify-between">
                     <input type="submit"
                         value="Login"
-                        className={`${styles.button}`} />
+                        className={`${styles.button} cursor-pointer`} />
                 </div>
                 <br />
                 <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">

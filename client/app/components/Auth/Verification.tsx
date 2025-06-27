@@ -1,4 +1,5 @@
 import { useActivationMutation } from '@/redux/features/auth/authApi';
+import { Button } from '@mui/material';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { VscWorkspaceTrusted } from 'react-icons/vsc';
@@ -104,7 +105,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
             <div className="w-full flex justify-center">
 
                 <button
-                    className={`${styles.button}`}
+                    className={`${styles.button} cursor-pointer`}
                     onClick={verificationHandler}
                 >Verify OTP</button>
             </div>

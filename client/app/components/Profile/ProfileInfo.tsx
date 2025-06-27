@@ -2,6 +2,7 @@
 
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { useEditProfileMutation, useUpdateAvatarMutation } from '@/redux/features/user/userApi';
+import { Button } from '@mui/material';
 import { Pencil } from 'lucide-react';
 import Image from 'next/image';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
@@ -120,7 +121,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
 
          {editingAvatar && (
             <button
-               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all disabled:opacity-50"
+               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all disabled:opacity-50 cursor-pointer"
                onClick={handleAvatarSave}
                disabled={avatarLoading}
             >
@@ -139,13 +140,13 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
                className={`w-full px-3 sm:px-4 py-2 border ${editingName
                   ? 'border-blue-500 dark:border-blue-400'
                   : 'border-slate-300 dark:border-slate-600'
-                  } rounded-md bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none ${editingName ? 'focus:ring-2 focus:ring-blue-500' : ''
+                  } rounded-md bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none ${editingName ? 'focus:ring-2 focus:ring-blue-500' : ''
                   } text-sm sm:text-base`}
             />
             {/* Pencil Icon */}
             {!editingName && (
                <button
-                  className="absolute right-2 top-11 text-slate-400 hover:text-blue-500 transition-all"
+                  className="absolute right-2 top-11 text-slate-400 hover:text-blue-500 transition-all cursor-pointer"
                   onClick={() => setEditingName(true)}
                >
                   <Pencil size={18} className="flex items-center" />
@@ -153,7 +154,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
             )}
             {editingName && (
                <button
-                  className="absolute right-2 top-11 text-blue-500 hover:text-blue-700 transition-all"
+                  className="absolute right-2 top-11 text-blue-500 hover:text-blue-700 transition-all cursor-pointer"
                   onClick={() => setEditingName(false)}
                >
                   <RiCloseCircleFill size={18} className="flex items-center" />
@@ -164,14 +165,14 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
          {/* Email (non-editable) */}
          <div className="w-full flex flex-col gap-2">
             <label className="text-slate-600 dark:text-slate-300 font-semibold text-sm sm:text-base">Email:</label>
-            <p className="px-3 sm:px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-md text-slate-900 dark:text-slate-100 text-sm sm:text-base break-words">
+            <p className="px-3 sm:px-4 py-2 bg-slate-100 dark:bg-slate-900 rounded-md text-slate-900 dark:text-slate-100 text-sm sm:text-base break-words">
                {displayUser?.email}
             </p>
          </div>
 
          {editingName && (
             <button
-               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all"
+               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all cursor-pointer"
                onClick={handleNameSave}
             >
                Update

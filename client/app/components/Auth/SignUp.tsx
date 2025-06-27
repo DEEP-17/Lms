@@ -130,7 +130,7 @@ const SignUp: FC<Props> = ({ setRoute }) => {
                 <div className="w-full mt-2">
                     <input type="submit"
                         value="Sign Up"
-                        className={`${styles.button}`} />
+                        className={`${styles.button} cursor-pointer`} />
                 </div>
                 <br />
                 <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">

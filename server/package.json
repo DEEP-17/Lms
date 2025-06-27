@@ -8,7 +8,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "init-layout": "ts-node utils/initializeLayoutData.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

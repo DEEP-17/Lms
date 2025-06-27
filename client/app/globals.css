@@ -20,6 +20,7 @@
 html,
 body {
   overflow-x: hidden !important;
+  padding-top: 0;
 }
 
 /* Custom Scrollbar Styles */
@@ -67,6 +68,20 @@ body {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+/* Section display improvements */
+section {
+  scroll-margin-top: 100px;
+}
+
+/* Landing page section improvements */
+.landing-section {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  padding: 5rem 0;
 }
 
 /* Remove default focus outline and add custom one */
@@ -209,4 +224,28 @@ body {
 .card-hover:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Improve section transitions */
+section {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Landing page specific styles */
+.landing-page {
+  padding-top: 0;
+}
+
+.landing-page section {
+  scroll-margin-top: 100px;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  padding: 5rem 0;
+}
+
+/* Hero section specific */
+.landing-page section#hero {
+  min-height: 80vh;
+  padding: 2rem 0;
 }

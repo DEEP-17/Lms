@@ -1,5 +1,6 @@
 import { CourseFormData, StepValidation } from '@/types/course';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { Button } from '@mui/material';
 import React, { FC } from 'react';
 
 export type TitleItem = { title: string };
@@ -30,7 +31,7 @@ const CourseData: FC<Props> = ({
     const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
     return (
-        <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
+        <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Benefits/Prerequisites</h1>
                 <p className="text-gray-600 dark:text-gray-400">Define what students will learn and what they need to know</p>
@@ -60,22 +61,9 @@ const CourseData: FC<Props> = ({
                     className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-300"
                 >
                     <option value="">Select a category</option>
-                    <option value="Programming">Programming</option>
-                    <option value="Design">Design</option>
-                    <option value="Business">Business</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Health & Fitness">Health & Fitness</option>
-                    <option value="Music">Music</option>
-                    <option value="Photography">Photography</option>
-                    <option value="Language">Language</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Science">Science</option>
-                    <option value="Education">Education</option>
-                    <option value="Personal Development">Personal Development</option>
-                    <option value="Cooking">Cooking</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Other">Other</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Complex">Complex</option>
                 </select>
             </div>
 
@@ -107,7 +95,7 @@ const CourseData: FC<Props> = ({
                 </div>
                 <button
                     onClick={() => setBenefits([...benefits, { title: '' }])}
-                    className="mt-4 flex items-center space-x-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg transition-all duration-300 group"
+                    className="mt-4 flex items-center space-x-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg transition-all duration-300 group cursor-pointer"
                 >
                     <AddCircleIcon className="w-5 h-5" />
                     <span className="font-medium">Add Benefit</span>
@@ -142,7 +130,7 @@ const CourseData: FC<Props> = ({
                 </div>
                 <button
                     onClick={() => setPrerequisites([...prerequisites, { title: '' }])}
-                    className="mt-4 flex items-center space-x-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg transition-all duration-300 group"
+                    className="mt-4 flex items-center space-x-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg transition-all duration-300 group cursor-pointer"
                 >
                     <AddCircleIcon className="w-5 h-5" />
                     <span className="font-medium">Add Prerequisite</span>
@@ -153,14 +141,14 @@ const CourseData: FC<Props> = ({
             <div className='w-full flex items-center justify-between pt-8 border-t border-gray-200 dark:border-slate-700'>
                 <button
                     onClick={onPrevious}
-                    className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md'
+                    className='px-6 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:shadow-md cursor-pointer'
                 >
                     ← Previous
                 </button>
 
                 <button
                     onClick={onNext}
-                    className='px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5'
+                    className='px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-xl flex items-center justify-center text-white font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 cursor-pointer'
                 >
                     Next →
                 </button>

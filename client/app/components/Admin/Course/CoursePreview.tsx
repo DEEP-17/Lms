@@ -3,6 +3,7 @@
 import { CourseFormData } from '@/types/course';
 import React, { FC } from 'react';
 
+import { Button } from '@mui/material';
 type Props = {
    course: CourseFormData;
    onEdit: () => void;
@@ -12,7 +13,7 @@ type Props = {
 
 const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
    return (
-      <div className="w-full max-w-5xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
+      <div className="w-full max-w-5xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
          <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Preview</h1>
             <p className="text-gray-600 dark:text-gray-400">Review your course before publishing</p>
@@ -115,7 +116,7 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Course Content</h3>
             <div className="space-y-6">
                {course.courseContent.map((section, secIndex) => (
-                  <div key={secIndex} className="border border-gray-200 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-800">
+                  <div key={secIndex} className="border border-gray-200 dark:border-slate-600 rounded-xl p-4 bg-white dark:bg-slate-900">
                      <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                         {section.title || `Section ${secIndex + 1}`}
                      </h4>
@@ -168,20 +169,20 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
          <div className="flex justify-between pt-8 border-t border-gray-200 dark:border-slate-700">
             <button
                onClick={onPrevious}
-               className="px-8 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition-all duration-300 hover:shadow-md"
+               className="px-8 py-3 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer"
             >
                ← Previous
             </button>
             <div className="flex gap-4">
                <button
                   onClick={onEdit}
-                  className="px-8 py-3 bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold rounded-xl transition-all duration-300 hover:shadow-md"
+                  className="px-8 py-3 bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer"
                >
                   Edit Course
                </button>
                <button
                   onClick={onSubmit}
-                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
                >
                   Publish Course →
                </button>
