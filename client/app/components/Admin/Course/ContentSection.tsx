@@ -43,7 +43,7 @@ const ContentSection: React.FC<Props> = ({ section, onUpdate, onDelete }) => {
    };
 
    return (
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg group hover:shadow-xl transition-all duration-300">
+      <div className="bg-white text-black dark:text-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg group hover:shadow-xl transition-all duration-300">
          <SectionHeader
             title={section.title}
             isExpanded={isExpanded}

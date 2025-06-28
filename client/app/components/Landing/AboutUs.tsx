@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AboutUs = () => (
-   <section id="aboutus" className="h-screen py-40 bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
+   <section id="aboutus" className="h-screen py-56 bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       <div className="max-w-4xl mx-auto px-6 text-center">
          <h2 className="text-3xl md:text-4xl font-bold text-[#2563eb] dark:text-cyan-200 mb-4">About Us</h2>
          <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">

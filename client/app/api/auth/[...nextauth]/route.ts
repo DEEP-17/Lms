@@ -1,20 +1,55 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+
+const providers = [];
+
+// Only add providers if environment variables are properly set
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  );
+}
+
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+  providers.push(
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    })
+  );
+}
 
 const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-    }),
-  ],
-  session: { strategy: "jwt" },
-  secret: process.env.SECRET,
+  providers,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
+  },
+  secret: process.env.NEXTAUTH_SECRET || process.env.SECRET,
+  debug: process.env.NODE_ENV === "development",
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token.user) {
+        session.user = token.user;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
 });
 
 export { handler as GET, handler as POST };

@@ -1,9 +1,9 @@
 'use client';
 
+import CoursePlayer from '@/app/utils/CoursePlayer';
 import { CourseFormData } from '@/types/course';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
-import { Button } from '@mui/material';
 type Props = {
    course: CourseFormData;
    onEdit: () => void;
@@ -12,12 +12,86 @@ type Props = {
 };
 
 const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
+   const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
+
+   // Collect all videos for preview
+   const allVideos: { videoUrl: string; title: string; type: string }[] = [];
+
+   // Add demo video if available
+   if (course.demoUrl) {
+      allVideos.push({
+         videoUrl: course.demoUrl,
+         title: 'Demo Video',
+         type: 'demo'
+      });
+   }
+
+   // Add course content videos
+   course.courseContent.forEach((section, secIndex) => {
+      section.components.forEach((comp, compIndex) => {
+         if (comp.videoUrl) {
+            allVideos.push({
+               videoUrl: comp.videoUrl,
+               title: `${section.title || `Section ${secIndex + 1}`} - ${comp.videoTitle || `Video ${compIndex + 1}`}`,
+               type: 'course'
+            });
+         }
+      });
+   });
+
    return (
       <div className="w-full max-w-5xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300">
          <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Course Preview</h1>
             <p className="text-gray-600 dark:text-gray-400">Review your course before publishing</p>
          </div>
+
+         {/* Video Player Preview */}
+         {selectedVideo && (
+            <div className="mb-8">
+               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Video Preview: {selectedVideo.title}</h3>
+               <div className="bg-black rounded-2xl overflow-hidden shadow-lg">
+                  <CoursePlayer videoUrl={selectedVideo.videoUrl} title={selectedVideo.title} />
+               </div>
+               <button
+                  onClick={() => setSelectedVideo(null)}
+                  className="mt-4 px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all duration-300"
+               >
+                  Close Preview
+               </button>
+            </div>
+         )}
+
+         {/* All Videos Preview Section */}
+         {allVideos.length > 0 && (
+            <div className="mb-8">
+               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Course Videos</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {allVideos.map((video, index) => (
+                     <div key={index} className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-3">
+                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${video.type === 'demo'
+                                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
+                                 : 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300'
+                              }`}>
+                              {video.type === 'demo' ? 'Demo' : 'Course'}
+                           </span>
+                           <span className="text-xs text-gray-500 dark:text-gray-400">#{index + 1}</span>
+                        </div>
+                        <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-3 line-clamp-2">
+                           {video.title}
+                        </h4>
+                        <button
+                           onClick={() => setSelectedVideo({ videoUrl: video.videoUrl, title: video.title })}
+                           className="w-full px-3 py-2 bg-cyan-200 hover:bg-cyan-300 text-black font-semibold rounded-lg text-sm transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                           ▶️ Watch Video
+                        </button>
+                     </div>
+                  ))}
+               </div>
+            </div>
+         )}
 
          {/* Thumbnail */}
          {course.thumbnail && (
@@ -124,9 +198,19 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
                         {section.components.map((comp, compIndex) => (
                            <div key={compIndex} className="p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
                               <div className="space-y-2">
-                                 <p className="font-medium text-gray-900 dark:text-white">
-                                    <span className="text-blue-600 dark:text-blue-400">Video {compIndex + 1}:</span> {comp.videoTitle || 'Untitled'}
-                                 </p>
+                                 <div className="flex items-center justify-between">
+                                    <p className="font-medium text-gray-900 dark:text-white">
+                                       <span className="text-blue-600 dark:text-blue-400">Video {compIndex + 1}:</span> {comp.videoTitle || 'Untitled'}
+                                    </p>
+                                    {comp.videoUrl && (
+                                       <button
+                                          onClick={() => setSelectedVideo({ videoUrl: comp.videoUrl, title: comp.videoTitle || 'Untitled' })}
+                                          className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold rounded-lg text-sm transition-all duration-300"
+                                       >
+                                          Preview Video
+                                       </button>
+                                    )}
+                                 </div>
                                  {comp.videoUrl && (
                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                        <span className="font-medium">URL:</span> {comp.videoUrl}

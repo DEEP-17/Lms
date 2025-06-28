@@ -32,7 +32,11 @@ export default function RootLayout({
     >
       <body className={`${poppins.variable} ${josefin.variable} bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to:black duration-300`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SessionProvider>
+          <SessionProvider
+            refetchInterval={5 * 60}
+            refetchOnWindowFocus={true}
+            refetchWhenOffline={false}
+          >
             <Providers>
               <Toaster position="top-center" reverseOrder={false} />
               <Custom>{children}</Custom>

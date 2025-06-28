@@ -32,7 +32,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
    };
 
    return (
-      <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-900 rounded-2xl border  dark:border-slate-700 border-b border-gray-200 transition-colors duration-200 group">
+      <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-900 text-black dark:text-white rounded-2xl border  dark:border-slate-700 border-b border-gray-200 transition-colors duration-200 group">
          <div className="flex items-center flex-1">
             <button
                onClick={onToggle}
@@ -49,7 +49,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
                   onChange={(e) => setEditTitle(e.target.value)}
                   onBlur={handleSave}
                   onKeyDown={handleKeyPress}
-                  className="flex-1 bg-gray-200 dark:bg-slate-900 text-gray-900 px-3 py-1 rounded border border-gray-300 dark:border-slate-700 focus:border-blue-500 focus:outline-none"
+                  className="flex-1 dark:text-white bg-gray-200 dark:bg-slate-900 text-gray-900 px-3 py-1 rounded border border-gray-300 dark:border-slate-700 focus:border-blue-500 focus:outline-none"
                   autoFocus
                />
             ) : (

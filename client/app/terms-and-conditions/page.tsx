@@ -28,6 +28,7 @@ const TermsAndConditionsPage = () => (
             <p className="mt-8 text-gray-700 dark:text-gray-300">For questions about these terms, please <a href="/contact-us" className="text-cyan-600 underline">contact us</a>.</p>
          </div>
       </section>
+      <Footer/>
    </>
 );
 

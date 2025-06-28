@@ -41,10 +41,10 @@ const Profile: FC<Props> = ({ user }) => {
    }, []);
 
    return (
-      <div className='px-auto h-screen py-30 flex flex-col md:flex-row gap-6 justify-center items-center dark:bg-slate-900 dark:text-white'>
+      <div className='px-auto h-screen py-30 flex flex-col md:flex-row gap-6 justify-center items-center bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-white text-black'>
          <div
             className={`flex flex-col justify-center items-center w-[100px] md:w-[310px] h-[500px] 
-            bg-white dark:bg-slate-800 
+            bg-white dark:bg-slate-900 
             text-black dark:text-white
             border border-slate-200 dark:border-[#ffffff1d] 
             rounded-lg shadow-lg p-4 
@@ -60,7 +60,7 @@ const Profile: FC<Props> = ({ user }) => {
             />
          </div>
          <div className={`flex flex-col justify-center items-center w-[600px] md:w-[1100px] h-[500px] 
-                  bg-white dark:bg-slate-800 
+                  bg-white dark:bg-slate-900 
                   border border-slate-200 dark:border-[#ffffff1d] 
                   rounded-lg shadow-lg p-4 
                   transition-all duration-300 

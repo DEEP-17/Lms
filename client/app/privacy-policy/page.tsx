@@ -31,6 +31,7 @@ const PrivacyPolicyPage = () => (
             <p className="mt-8 text-gray-700 dark:text-gray-300">For any questions or requests regarding your privacy, please contact us at <a href="/contact-us" className="text-cyan-600 underline">Contact Us</a>.</p>
          </div>
       </section>
+      <Footer/>
    </>
 );
 

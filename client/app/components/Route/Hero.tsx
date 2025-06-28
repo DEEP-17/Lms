@@ -60,7 +60,7 @@ const Hero: React.FC = () => {
               <Button size="large" className="bg-[#BE3D2A] text-white hover:bg-cyan-700 cursor-pointer" onClick={() => router.push('/courses')}>
                 Start Learning Now
               </Button>
-              <Button size="large" variant="outlined" className="border-cyan-400 text-cyan-200 hover:bg-[#E78B48]/10 flex items-center">
+              <Button size="large" variant="outlined" className="border-cyan-400 text-cyan-200 hover:bg-[#E78B48]/10 flex items-center" onClick={() => router.push('/watch-demo')}>
                 <Play className="w-4 h-4 mr-2" />
                 Watch Demo
               </Button>

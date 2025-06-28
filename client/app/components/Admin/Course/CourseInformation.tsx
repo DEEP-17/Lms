@@ -169,7 +169,7 @@ const CourseInformation: FC<Props> = ({
                         Demo URL
                     </label>
                     <input
-                        type="url"
+                        type="text"
                         value={course.demoUrl}
                         onChange={(e) => setCourse({ ...course, demoUrl: e.target.value })}
                         placeholder='Enter Demo URL'

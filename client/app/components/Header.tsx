@@ -127,7 +127,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                                 <span className="text-white font-bold text-lg">E</span>
                             </div>
                             <span className="text-xl font-bold text-black dark:text-white hover:text-[#37a39a] dark:hover:text-[#37a39a] transition-colors">
-                                Elearning
+                                SecureWaveTechnologies
                             </span>
                         </Link>
 
@@ -137,7 +137,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                         </nav>
 
                         {/* Desktop Right Side */}
-                        <div className="hidden md:flex items-center space-x-4 h-full flex-shrink-0">
+                        <div className="hidden w-48 md:flex items-center justify-end space-x-4 h-full flex-shrink-0">
                             <ThemeSwitcher />
                             {isMounted && user ? (
                                 <Link href="/profile" className="h-[35px] w-[35px] flex items-center justify-center">
