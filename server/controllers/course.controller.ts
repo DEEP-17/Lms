@@ -1,3 +1,4 @@
+import axios from "axios";
 import cloudinary from "cloudinary";
 import { AnyARecord } from "dns";
 import ejs from "ejs";
@@ -11,27 +12,55 @@ import { createCourse } from "../services/course.service";
 import ErrorHandler from "../utils/ErrorHandler";
 import { redis } from "../utils/redis";
 import sendMail from "../utils/sendMail";
-import axios from 'axios';
 
 export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
       const thumbnail = data.thumbnail;
-      if (thumbnail) {
-        const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
-          folder: "courses",
-        });
 
+      // Only upload to cloudinary if thumbnail is a valid string (base64 or URL)
+      if (
+        thumbnail &&
+        typeof thumbnail === "string" &&
+        thumbnail.trim() !== ""
+      ) {
+        try {
+          const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+            folder: "courses",
+          });
+
+          data.thumbnail = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        } catch (cloudinaryError: any) {
+          console.error("Cloudinary upload error:", cloudinaryError);
+          // If cloudinary upload fails, keep the original thumbnail or set a default
+          if (
+            cloudinaryError.message.includes(
+              "Missing required parameter - file"
+            )
+          ) {
+            // If it's an invalid file, remove the thumbnail
+            delete data.thumbnail;
+          } else {
+            return next(new ErrorHandler("Failed to upload thumbnail", 500));
+          }
+        }
+      } else {
+        // If no thumbnail provided, set a default empty structure
         data.thumbnail = {
-          public_id: myCloud.public_id,
-          url: myCloud.secure_url,
+          public_id: "",
+          url: "",
         };
       }
+
       const course = await CourseModel.create(data);
       // Delete allCourses cache from Redis (once, after DB mutation)
       try {
         await redis.del("allCourses");
+        await redis.del("allCoursesForAdmin");
       } catch (err) {
         console.error("Redis error (uploadCourse):", err);
       }
@@ -51,17 +80,49 @@ export const editCourse = CatchAsyncError(
       const thumbnail = data.thumbnail;
       const newThumbnail = data.newThumbnail;
 
-      if (thumbnail) {
-        await cloudinary.v2.uploader.destroy(thumbnail.public_id);
-        const myCloud = await cloudinary.v2.uploader.upload(newThumbnail, {
-          folder: "courses",
-        });
+      // Handle thumbnail update
+      if (
+        thumbnail &&
+        newThumbnail &&
+        typeof newThumbnail === "string" &&
+        newThumbnail.trim() !== ""
+      ) {
+        try {
+          // Delete old thumbnail if it exists
+          if (thumbnail.public_id) {
+            await cloudinary.v2.uploader.destroy(thumbnail.public_id);
+          }
 
-        data.thumbnail = {
-          public_id: myCloud.public_id,
-          url: myCloud.secure_url,
-        };
+          // Upload new thumbnail
+          const myCloud = await cloudinary.v2.uploader.upload(newThumbnail, {
+            folder: "courses",
+          });
+
+          data.thumbnail = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        } catch (cloudinaryError: any) {
+          console.error("Cloudinary upload error:", cloudinaryError);
+          // If cloudinary upload fails, keep the original thumbnail
+          if (
+            cloudinaryError.message.includes(
+              "Missing required parameter - file"
+            )
+          ) {
+            // If it's an invalid file, keep the existing thumbnail
+            delete data.thumbnail;
+            delete data.newThumbnail;
+          } else {
+            return next(new ErrorHandler("Failed to upload thumbnail", 500));
+          }
+        }
+      } else {
+        // If no new thumbnail provided, keep the existing thumbnail structure
+        delete data.newThumbnail;
+        // Don't modify the existing thumbnail
       }
+
       const courseId = req.params.id;
 
       const course = await CourseModel.findByIdAndUpdate(
@@ -77,6 +138,8 @@ export const editCourse = CatchAsyncError(
       // Delete allCourses cache from Redis (once, after DB mutation)
       try {
         await redis.del("allCourses");
+        await redis.del("allCoursesForAdmin");
+        await redis.del(`courseForAdmin_${courseId}`);
       } catch (err) {
         console.error("Redis error (editCourse):", err);
       }
@@ -143,6 +206,68 @@ export const getAllCourses = CatchAsyncError(
         success: true,
         courses,
       });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+//get all courses with full details for admin ---- for editing purposes
+export const getAllCoursesForAdmin = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const isCached = await redis.get("allCoursesForAdmin");
+      if (isCached) {
+        return res.status(200).json({
+          success: true,
+          courses: JSON.parse(isCached),
+        });
+      }
+      const courses = await CourseModel.find(); // Fetch all fields without exclusions
+
+      if (!courses || courses.length === 0) {
+        return next(new ErrorHandler("No courses found", 404));
+      }
+      await redis.set("allCoursesForAdmin", JSON.stringify(courses), "EX", 240);
+      res.status(200).json({
+        success: true,
+        courses,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+//get single course with full details for admin ---- for editing purposes
+export const getSingleCourseForAdmin = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const courseId = req.params.id;
+
+      const isCached = await redis.get(`courseForAdmin_${courseId}`);
+      if (isCached) {
+        res.status(200).json({
+          success: true,
+          course: JSON.parse(isCached),
+        });
+      } else {
+        const course = await CourseModel.findById(courseId); // Fetch all fields without exclusions
+
+        if (!course) {
+          return next(new ErrorHandler("Course not found", 404));
+        }
+        await redis.set(
+          `courseForAdmin_${courseId}`,
+          JSON.stringify(course),
+          "EX",
+          240
+        );
+        res.status(200).json({
+          success: true,
+          course,
+        });
+      }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -464,20 +589,58 @@ export const generateVideoUrl = CatchAsyncError(
     try {
       const { videoId } = req.body;
       const response = await axios.post(
-        `https://dev.vdocipher.com/api/videos/${videoId}/otp`, {
-          ttl:300
-      }, {
+        `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+        {
+          ttl: 300,
+        },
+        {
           headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-            Authorization:`Apisecret ${process.env.VDOCIPHER_API_SECRET}`
-          }
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+          },
         }
       );
 
       res.json(response.data);
-    } catch(error:any) {
+    } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
-)
+);
+
+//get enrolled courses for the current user
+export const getEnrolledCourses = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user) {
+        return next(new ErrorHandler("You are not logged in", 401));
+      }
+
+      const userCourseList = req.user?.courses;
+      if (!userCourseList || userCourseList.length === 0) {
+        return res.status(200).json({
+          success: true,
+          courses: [],
+        });
+      }
+
+      // Get course IDs from user's enrolled courses
+      const courseIds = userCourseList.map((course: any) => course._id);
+
+      // Fetch the actual course details
+      const courses = await CourseModel.find({
+        _id: { $in: courseIds },
+      }).select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+
+      res.status(200).json({
+        success: true,
+        courses,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);

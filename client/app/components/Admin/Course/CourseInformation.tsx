@@ -1,7 +1,6 @@
 'use client';
 
 import { CourseFormData, StepValidation } from '@/types/course';
-import { Button } from '@mui/material';
 import React, { FC, useState } from 'react';
 
 type Props = {
@@ -69,6 +68,17 @@ const CourseInformation: FC<Props> = ({
     };
 
     const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
+
+    // Helper function to get thumbnail URL safely
+    const getThumbnailUrl = (thumbnail: CourseFormData['thumbnail']): string => {
+        if (typeof thumbnail === 'string') {
+            return thumbnail;
+        }
+        if (thumbnail && typeof thumbnail === 'object' && 'url' in thumbnail) {
+            return thumbnail.url || '';
+        }
+        return '';
+    };
 
     return (
         <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
@@ -201,7 +211,7 @@ const CourseInformation: FC<Props> = ({
                     >
                         {course.thumbnail ? (
                             <img
-                                src={course.thumbnail as string}
+                                src={getThumbnailUrl(course.thumbnail)}
                                 alt="Course Thumbnail"
                                 className="w-full h-full object-cover rounded-xl"
                             />

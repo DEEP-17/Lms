@@ -21,18 +21,29 @@ export interface ContentSectionData {
 }
 
 export interface CourseFormData {
+  ratings: any;
+  purchased: number;
   _id?: string;
   name: string;
   description: string;
   price: number | string;
   estimatedPrice?: number | string;
-  thumbnail: string | ArrayBuffer | null;
+  thumbnail: string | ArrayBuffer | null | { public_id?: string; url?: string }; // Handle both client and server formats
+  newThumbnail?: string; // For edit mode
   tags: string;
   level: string;
   demoUrl: string;
   benefits: { title: string }[];
   prerequisites: { title: string }[];
   courseContent: ContentSectionData[];
+  courseData?: Array<{
+    _id?: string;
+    title?: string;
+    videoSection?: string;
+    videoUrl?: string;
+    description?: string;
+    links?: Array<{ _id?: string; title?: string; url?: string }>;
+  }>;
 }
 
 export interface StepValidation {

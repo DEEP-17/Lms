@@ -3,9 +3,8 @@ import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
 import AdminProtected from '@/app/hooks/adminProtected';
 import Heading from '@/app/utils/Heading';
-import { useDeleteCourseMutation, useGetAllCoursesQuery } from '@/redux/features/api/apiSlice';
+import { useDeleteCourseMutation, useGetAllCoursesForAdminQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
-import { Button } from '@mui/material';
 import Lottie from 'lottie-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -16,7 +15,7 @@ const LiveCoursesPage = () => {
    const handleSidebarToggle = (collapsed: boolean) => {
       setIsSidebarCollapsed(collapsed);
    };
-   const { data, isLoading, isError, refetch } = useGetAllCoursesQuery();
+   const { data, isLoading, isError, refetch } = useGetAllCoursesForAdminQuery();
    const courses: CourseFormData[] = Array.isArray(data?.courses)
       ? data.courses
       : Array.isArray(data)
@@ -34,6 +33,23 @@ const LiveCoursesPage = () => {
          .then((res) => res.json())
          .then(setAnimationData);
    }, []);
+
+   // Refetch data on component mount to ensure fresh data
+   useEffect(() => {
+      refetch();
+   }, [refetch]);
+
+   // Refetch data when page becomes visible (useful when navigating back from edit page)
+   useEffect(() => {
+      const handleVisibilityChange = () => {
+         if (!document.hidden) {
+            refetch();
+         }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+   }, [refetch]);
 
    const handleDelete = async (id: string) => {
       setPendingDeleteId(id);
@@ -77,7 +93,10 @@ const LiveCoursesPage = () => {
             <div className={`transition-all duration-300 ease-in-out min-h-screen overflow-x-hidden ${isSidebarCollapsed ? 'ml-16' : 'ml-72'}`}>
                <DashboardHeader />
                <div className="p-8">
-                  <h1 className="text-2xl font-bold mb-4 text-black">Live Courses</h1>
+                  <div className="flex justify-between items-center mb-4">
+                     <h1 className="text-2xl font-bold text-black dark:text-white">Live Courses</h1>
+                     
+                  </div>
                   <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-6">
                      {isLoading ? (
                         <div className="p-8 text-center text-lg">Loading courses...</div>
@@ -89,31 +108,39 @@ const LiveCoursesPage = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                            {courses.map((course: CourseFormData, idx: number) => (
                               <div key={course._id || idx} className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden flex flex-col">
-                                 {(course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && course.thumbnail.url) ? (
-                                    <img
-                                       src={course.thumbnail.url}
-                                       alt={course.name}
-                                       className="w-full h-60 object-cover object-center"
-                                    />
-                                 ) : (course.thumbnail && typeof course.thumbnail === 'string') ? (
-                                    <img
-                                       src={course.thumbnail}
-                                       alt={course.name}
-                                       className="w-full h-60 object-cover object-center"
-                                    />
-                                 ) : (
-                                    <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
-                                       {animationData ? (
-                                          <Lottie
-                                             animationData={animationData}
-                                             loop
-                                             autoplay
+                                 {(() => {
+                                    if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                                       return (
+                                          <img
+                                             src={course.thumbnail.url}
+                                             alt={course.name}
+                                             className="w-full h-60 object-cover object-center"
                                           />
-                                       ) : (
-                                          <span className="text-gray-400">No Image</span>
-                                       )}
-                                    </div>
-                                 )}
+                                       );
+                                    } else if (typeof course.thumbnail === 'string' && course.thumbnail.length > 0) {
+                                       return (
+                                          <img
+                                             src={course.thumbnail}
+                                             alt={course.name}
+                                             className="w-full h-60 object-cover object-center"
+                                          />
+                                       );
+                                    } else {
+                                       return (
+                                          <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                             {animationData ? (
+                                                <Lottie
+                                                   animationData={animationData}
+                                                   loop
+                                                   autoplay
+                                                />
+                                             ) : (
+                                                <span className="text-gray-400">No Image</span>
+                                             )}
+                                          </div>
+                                       );
+                                    }
+                                 })()}
                                  <div className="p-6 flex-1 flex flex-col">
                                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{course.name}</h2>
                                     <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">{course.description}</p>
@@ -127,9 +154,6 @@ const LiveCoursesPage = () => {
                                           <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-semibold">Tags: {course.tags}</span>
                                        )}
                                     </div>
-                                    {course.demoUrl && (
-                                       <a href={course.demoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline text-sm mb-2">Demo Link</a>
-                                    )}
                                     <div className="mb-2">
                                        <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">Benefits:</span>
                                        <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 text-xs ml-2">
@@ -144,7 +168,6 @@ const LiveCoursesPage = () => {
                                     </div>
                                     <div className="mt-auto pt-4 flex items-center justify-between">
                                        <span className="text-xs text-gray-500 dark:text-gray-400">Created: {course._id ? new Date(parseInt(course._id.substring(0, 8), 16) * 1000).toLocaleDateString() : '-'}</span>
-                                       <span className="text-xs text-gray-500 dark:text-gray-400">ID: {course._id || '-'}</span>
                                     </div>
                                     <div className="flex gap-2 mt-4">
                                        <button

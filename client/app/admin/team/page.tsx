@@ -19,16 +19,19 @@ const ManageTeamPage = () => {
    const router = useRouter();
 
    React.useEffect(() => {
-      if (
-         isError &&
-         typeof isError === 'object' &&
-         isError !== null &&
-         'status' in isError &&
-         (isError as any).status !== undefined &&
-         ((isError as any).status === 400 || (isError as any).status === 401)
-      ) {
-         router.push('/');
-      }
+      const handleErrorRedirect = async () => {
+         if (
+            isError &&
+            typeof isError === 'object' &&
+            isError !== null &&
+            'status' in isError &&
+            (isError as any).status !== undefined &&
+            ((isError as any).status === 400 || (isError as any).status === 401)
+         ) {
+            await router.push('/');
+         }
+      };
+      handleErrorRedirect();
    }, [isError, router]);
 
    return (

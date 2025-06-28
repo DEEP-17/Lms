@@ -1,9 +1,8 @@
 'use client';
 import { ContentSectionData, StepValidation } from '@/types/course';
 import { Plus } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import toast from 'react-hot-toast';
-import { Button } from '@mui/material';
 import ContentSection from './ContentSection';
 
 interface Props {
@@ -21,13 +20,20 @@ const CourseContent: React.FC<Props> = ({
   onPrevious,
   validation
 }) => {
-  const [sections, setSections] = useState<ContentSectionData[]>(contentData.length > 0 ? contentData : [
+  const [sections, setSections] = useState<ContentSectionData[]>([
     {
       id: '1',
       title: 'Untitled Section',
       components: []
     }
   ]);
+
+  // Update sections when contentData changes
+  useEffect(() => {
+    if (contentData && Array.isArray(contentData) && contentData.length > 0) {
+      setSections(contentData);
+    }
+  }, [contentData]);
 
   const addSection = () => {
     const newSection: ContentSectionData = {

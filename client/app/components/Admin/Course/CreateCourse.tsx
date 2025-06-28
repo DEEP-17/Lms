@@ -1,10 +1,9 @@
 'use client';
 
-import { useCreateCourseMutation } from '@/redux/features/api/apiSlice';
+import { useCreateCourseMutation, useEditCourseMutation } from '@/redux/features/api/apiSlice';
 import { CourseFormData, CourseStepStatus, StepValidation } from '@/types/course';
-import { Button } from '@mui/material';
 import { CheckCircle, Menu, Save } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import CourseContent from './CourseContent';
 import CourseData from './CourseData';
@@ -12,7 +11,21 @@ import CourseInformation from './CourseInformation';
 import CourseOptions from './CourseOptions';
 import CoursePreview from './CoursePreview';
 
-const CreateCourse = () => {
+interface CreateCourseProps {
+  isEditMode?: boolean;
+  courseId?: string;
+  initialCourseData?: CourseFormData;
+  onSuccess?: () => void;
+  onRefetch?: () => void;
+}
+
+const CreateCourse: React.FC<CreateCourseProps> = ({
+  isEditMode = false,
+  courseId,
+  initialCourseData,
+  onSuccess,
+  onRefetch
+}) => {
   const [active, setActive] = useState<number>(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showCourseOptionsMobile, setShowCourseOptionsMobile] = useState(false);
@@ -60,66 +73,195 @@ const CreateCourse = () => {
   });
 
   const [createCourse] = useCreateCourseMutation();
+  const [editCourse] = useEditCourseMutation();
+
+  // Initialize course data if in edit mode
+  useEffect(() => {
+    if (isEditMode && initialCourseData) {
+      // Transform server courseData structure to client courseContent structure
+      const transformCourseData = (courseData: Array<{
+        _id?: string;
+        title?: string;
+        videoSection?: string;
+        videoUrl?: string;
+        description?: string;
+        links?: Array<{ _id?: string; title?: string; url?: string }>;
+      }>) => {
+        return courseData.map((item, index) => ({
+          id: item._id || `section-${index + 1}`,
+          title: item.title || item.videoSection || '',
+          components: [
+            {
+              id: item._id || `component-${index + 1}`,
+              videoTitle: item.title || '',
+              videoUrl: item.videoUrl || '',
+              videoDescription: item.description || '',
+              links: item.links && Array.isArray(item.links) ? item.links.map((link, linkIndex: number) => ({
+                id: link._id || `link-${linkIndex + 1}`,
+                title: link.title || '',
+                url: link.url || ''
+              })) : [{ id: '1', title: '', url: '' }]
+            }
+          ]
+        }));
+      };
+
+      // Ensure courseContent is properly initialized
+      const courseDataWithDefaults = {
+        ...initialCourseData,
+        // Transform thumbnail from server object to string URL for form display
+        thumbnail: initialCourseData.thumbnail && typeof initialCourseData.thumbnail === 'object' && 'url' in initialCourseData.thumbnail
+          ? initialCourseData.thumbnail.url
+          : typeof initialCourseData.thumbnail === 'string'
+            ? initialCourseData.thumbnail
+            : '',
+        courseContent: initialCourseData.courseData && Array.isArray(initialCourseData.courseData) && initialCourseData.courseData.length > 0
+          ? transformCourseData(initialCourseData.courseData)
+          : initialCourseData.courseContent && Array.isArray(initialCourseData.courseContent) && initialCourseData.courseContent.length > 0
+            ? initialCourseData.courseContent
+            : [
+              {
+                id: '1',
+                title: '',
+                components: [
+                  {
+                    id: '1',
+                    videoTitle: '',
+                    videoUrl: '',
+                    videoDescription: '',
+                    links: [{ id: '1', title: '', url: '' }],
+                  },
+                ],
+              },
+            ],
+        benefits: initialCourseData.benefits && Array.isArray(initialCourseData.benefits) && initialCourseData.benefits.length > 0
+          ? initialCourseData.benefits
+          : [{ title: '' }],
+        prerequisites: initialCourseData.prerequisites && Array.isArray(initialCourseData.prerequisites) && initialCourseData.prerequisites.length > 0
+          ? initialCourseData.prerequisites
+          : [{ title: '' }],
+      };
+
+      setCourseInfo(courseDataWithDefaults);
+      // Mark all steps as completed and saved for edit mode
+      setStepStatus({
+        step0: { isCompleted: true, isSaved: true, errors: [] },
+        step1: { isCompleted: true, isSaved: true, errors: [] },
+        step2: { isCompleted: true, isSaved: true, errors: [] },
+        step3: { isCompleted: true, isSaved: true, errors: [] },
+      });
+    }
+  }, [isEditMode, initialCourseData]);
 
   const handleSubmit = async () => {
+    // Ensure courseContent is properly initialized
+    const safeCourseContent = courseInfo.courseContent && Array.isArray(courseInfo.courseContent) && courseInfo.courseContent.length > 0
+      ? courseInfo.courseContent
+      : [
+        {
+          id: '1',
+          title: '',
+          components: [
+            {
+              id: '1',
+              videoTitle: '',
+              videoUrl: '',
+              videoDescription: '',
+              links: [{ id: '1', title: '', url: '' }],
+            },
+          ],
+        },
+      ];
+
     // Transform courseInfo to match server expectations
-    const payload: unknown = {
+    const payload = {
       ...courseInfo,
       price: Number(courseInfo.price),
       estimatedPrice: courseInfo.estimatedPrice ? Number(courseInfo.estimatedPrice) : undefined,
-      courseData: courseInfo.courseContent.map(section => ({
+      courseData: safeCourseContent.map(section => ({
         title: section.title,
         description: section.components[0]?.videoDescription || '',
         videoUrl: section.components[0]?.videoUrl || '',
         videoThumbnail: {}, // You may need to handle this if you support video thumbnails
         videoSection: section.title,
-        videoLength: 0, // You may want to calculate or input this
+        videoLength: 0, // Default to 0, can be updated later
         videoPlayer: '', // Set if you have this info
         links: section.components[0]?.links || [],
         suggestion: '', // Set if you have this info
         questions: [], // New course, so empty
       })),
-      thumbnail: courseInfo.thumbnail, // If you need to upload to cloudinary, handle here
     };
+
+    // Handle thumbnail properly for create vs edit modes
+    if (isEditMode) {
+      // For edit mode, only send newThumbnail if it's a new string (not an object)
+      if (courseInfo.thumbnail && typeof courseInfo.thumbnail === 'string' && courseInfo.thumbnail.trim() !== '') {
+        payload.newThumbnail = courseInfo.thumbnail;
+        // Keep the existing thumbnail object for reference
+        if (initialCourseData?.thumbnail && typeof initialCourseData.thumbnail === 'object') {
+          payload.thumbnail = initialCourseData.thumbnail;
+        }
+      }
+    } else {
+      // For create mode, only send thumbnail if it's a valid string
+      if (courseInfo.thumbnail && typeof courseInfo.thumbnail === 'string' && courseInfo.thumbnail.trim() !== '') {
+        payload.thumbnail = courseInfo.thumbnail;
+      }
+    }
+
     try {
-      await createCourse(payload).unwrap();
-      toast.success('Course created successfully!');
-      // Reset all fields and redirect to step 1
-      setCourseInfo({
-        name: '',
-        description: '',
-        level: '',
-        price: '',
-        estimatedPrice: '',
-        tags: '',
-        demoUrl: '',
-        thumbnail: '',
-        benefits: [{ title: '' }],
-        prerequisites: [{ title: '' }],
-        courseContent: [
-          {
-            id: '1',
-            title: '',
-            components: [
-              {
-                id: '1',
-                videoTitle: '',
-                videoUrl: '',
-                videoDescription: '',
-                links: [{ id: '1', title: '', url: '' }],
-              },
-            ],
-          },
-        ],
-      });
-      setStepStatus({
-        step0: { isCompleted: false, isSaved: false, errors: [] },
-        step1: { isCompleted: false, isSaved: false, errors: [] },
-        step2: { isCompleted: false, isSaved: false, errors: [] },
-        step3: { isCompleted: false, isSaved: false, errors: [] },
-      });
-      setActive(0);
-      setShowValidation({ 0: false, 1: false, 2: false, 3: false });
+      if (isEditMode && courseId) {
+        await editCourse({ id: courseId, data: payload }).unwrap();
+        toast.success('Course updated successfully!');
+      } else {
+        await createCourse(payload).unwrap();
+        toast.success('Course created successfully!');
+      }
+
+      if (onSuccess) {
+        onSuccess();
+      } else if (!isEditMode) {
+        // Reset all fields and redirect to step 1 for new courses
+        setCourseInfo({
+          name: '',
+          description: '',
+          level: '',
+          price: '',
+          estimatedPrice: '',
+          tags: '',
+          demoUrl: '',
+          thumbnail: '',
+          benefits: [{ title: '' }],
+          prerequisites: [{ title: '' }],
+          courseContent: [
+            {
+              id: '1',
+              title: '',
+              components: [
+                {
+                  id: '1',
+                  videoTitle: '',
+                  videoUrl: '',
+                  videoDescription: '',
+                  links: [{ id: '1', title: '', url: '' }],
+                },
+              ],
+            },
+          ],
+        });
+        setStepStatus({
+          step0: { isCompleted: false, isSaved: false, errors: [] },
+          step1: { isCompleted: false, isSaved: false, errors: [] },
+          step2: { isCompleted: false, isSaved: false, errors: [] },
+          step3: { isCompleted: false, isSaved: false, errors: [] },
+        });
+        setActive(0);
+        setShowValidation({ 0: false, 1: false, 2: false, 3: false });
+      }
+
+      if (onRefetch) {
+        onRefetch();
+      }
     } catch (error: unknown) {
       if (
         typeof error === 'object' &&
@@ -129,7 +271,7 @@ const CreateCourse = () => {
       ) {
         toast.error((error as { data?: { message?: string } }).data?.message ?? 'An error occurred');
       } else {
-        toast.error('Failed to create course');
+        toast.error(isEditMode ? 'Failed to update course' : 'Failed to create course');
       }
     }
   };
@@ -155,8 +297,14 @@ const CreateCourse = () => {
   // Validate step 1 (Course Benefits/Prerequisites)
   const validateStep1 = (): StepValidation => {
     const errors: string[] = [];
-    const hasValidBenefits = courseInfo.benefits.some(benefit => benefit.title.trim() !== '');
-    const hasValidPrerequisites = courseInfo.prerequisites.some(prereq => prereq.title.trim() !== '');
+
+    // Ensure benefits and prerequisites exist and are arrays
+    const benefits = courseInfo.benefits && Array.isArray(courseInfo.benefits) ? courseInfo.benefits : [];
+    const prerequisites = courseInfo.prerequisites && Array.isArray(courseInfo.prerequisites) ? courseInfo.prerequisites : [];
+
+    const hasValidBenefits = benefits.some(benefit => benefit.title.trim() !== '');
+    const hasValidPrerequisites = prerequisites.some(prereq => prereq.title.trim() !== '');
+
     if (!courseInfo.level.trim()) errors.push('Course category is required');
 
     if (!hasValidBenefits) errors.push('At least one benefit is required');
@@ -172,9 +320,20 @@ const CreateCourse = () => {
   // Validate step 2 (Course Content)
   const validateStep2 = (): StepValidation => {
     const errors: string[] = [];
-    if (!courseInfo.courseContent[0]?.title.trim()) errors.push('Section title is required');
-    if (!courseInfo.courseContent[0]?.components[0]?.videoTitle.trim()) errors.push('Video title is required');
-    if (!courseInfo.courseContent[0]?.components[0]?.videoUrl.trim()) errors.push('Video URL is required');
+
+    // Ensure courseContent exists and has content
+    if (!courseInfo.courseContent || !Array.isArray(courseInfo.courseContent) || courseInfo.courseContent.length === 0) {
+      errors.push('At least one course section is required');
+      return {
+        isCompleted: false,
+        isSaved: stepStatus.step2.isSaved,
+        errors
+      };
+    }
+
+    if (!courseInfo.courseContent[0]?.title?.trim()) errors.push('Section title is required');
+    if (!courseInfo.courseContent[0]?.components?.[0]?.videoTitle?.trim()) errors.push('Video title is required');
+    if (!courseInfo.courseContent[0]?.components?.[0]?.videoUrl?.trim()) errors.push('Video URL is required');
 
     return {
       isCompleted: errors.length === 0,
@@ -321,7 +480,7 @@ const CreateCourse = () => {
         <div className="flex items-center justify-between mb-6 p-4 bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Step {active + 1} of 4
+              {isEditMode ? 'Edit Course' : 'Create Course'} - Step {active + 1} of 4
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {active === 0 && 'Course Information'}
@@ -396,6 +555,7 @@ const CreateCourse = () => {
               onEdit={() => setActive(0)}
               onSubmit={handleSubmit}
               onPrevious={goToPreviousStep}
+              isEditMode={isEditMode}
             />
           )}
         </div>

@@ -9,10 +9,22 @@ type Props = {
    onEdit: () => void;
    onSubmit: () => void;
    onPrevious?: () => void;
+   isEditMode?: boolean;
 };
 
-const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
+const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious, isEditMode = false }) => {
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
+
+   // Helper function to get thumbnail URL safely
+   const getThumbnailUrl = (thumbnail: CourseFormData['thumbnail']): string => {
+      if (typeof thumbnail === 'string') {
+         return thumbnail;
+      }
+      if (thumbnail && typeof thumbnail === 'object' && 'url' in thumbnail) {
+         return thumbnail.url || '';
+      }
+      return '';
+   };
 
    // Collect all videos for preview
    const allVideos: { videoUrl: string; title: string; type: string }[] = [];
@@ -71,8 +83,8 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
                      <div key={index} className="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between mb-3">
                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${video.type === 'demo'
-                                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
-                                 : 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300'
+                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
+                              : 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300'
                               }`}>
                               {video.type === 'demo' ? 'Demo' : 'Course'}
                            </span>
@@ -94,12 +106,12 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
          )}
 
          {/* Thumbnail */}
-         {course.thumbnail && (
+         {getThumbnailUrl(course.thumbnail) && (
             <div className="mb-8">
                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Course Thumbnail</h3>
                <div className="relative overflow-hidden rounded-2xl shadow-lg">
                   <img
-                     src={typeof course.thumbnail === 'string' ? course.thumbnail : undefined}
+                     src={getThumbnailUrl(course.thumbnail)}
                      alt="Course Thumbnail"
                      className="w-full h-[300px] object-cover"
                   />
@@ -268,7 +280,7 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious }) => {
                   onClick={onSubmit}
                   className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
                >
-                  Publish Course →
+                  {isEditMode ? 'Update Course →' : 'Publish Course →'}
                </button>
             </div>
          </div>

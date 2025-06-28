@@ -145,10 +145,78 @@ export const courseApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    getAllCoursesForAdmin: builder.query<
+      { success: boolean; courses: CourseFormData[] },
+      void
+    >({
+      query: () => ({
+        url: "/admin/get-all-courses",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    getSingleCourseForAdmin: builder.query<
+      { success: boolean; course: CourseFormData },
+      string
+    >({
+      query: (id) => ({
+        url: `/admin/get-course/${id}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    getEnrolledCourses: builder.query<
+      { success: boolean; courses: CourseFormData[] },
+      void
+    >({
+      query: () => ({
+        url: "/get-enrolled-courses",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    getCourseContent: builder.query<
+      {
+        success: boolean;
+        content: Array<{
+          _id: string;
+          title: string;
+          description: string;
+          videoUrl: string;
+          videoSection: string;
+          videoLength: number;
+          videoPlayer: string;
+          links: Array<{ title: string; url: string }>;
+          suggestion: string;
+          questions: Array<{
+            user: { name: string; email: string };
+            question: string;
+            questionReplies: Array<{
+              user: { name: string; email: string };
+              answer: string;
+            }>;
+          }>;
+        }>;
+      },
+      string
+    >({
+      query: (courseId) => ({
+        url: `/get-course-content/${courseId}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllCoursesQuery, useGetSingleCourseQuery } = courseApi;
+export const {
+  useGetAllCoursesQuery,
+  useGetSingleCourseQuery,
+  useGetAllCoursesForAdminQuery,
+  useGetSingleCourseForAdminQuery,
+  useGetEnrolledCoursesQuery,
+  useGetCourseContentQuery,
+} = courseApi;
 
 export const analyticsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

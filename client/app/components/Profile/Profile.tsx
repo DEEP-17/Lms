@@ -4,16 +4,29 @@ import { signOut } from 'next-auth/react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import ChangePassword from './ChangePassword';
+import EnrolledCourses from './EnrolledCourses';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
 
+interface User {
+   _id: string;
+   name: string;
+   email: string;
+   avatar: {
+      public_id: string;
+      url: string;
+   };
+   role: string;
+   courses?: Array<{ _id: string }>;
+}
+
 type Props = {
-   user: any;
+   user: User;
 }
 
 const Profile: FC<Props> = ({ user }) => {
    const [scroll, setScroll] = useState(false);
-   const [avatar, setAvatar] = useState((user.avatar.public_id === 'default_avatar') ? null : user.avatar.url);
+   const [avatar] = useState((user.avatar.public_id === 'default_avatar') ? null : user.avatar.url);
    const [active, setActive] = useState(1);
    const [logout, setLogout] = useState(false);
    useLogOutQuery(undefined, { skip: !logout ? true : false });
@@ -41,7 +54,7 @@ const Profile: FC<Props> = ({ user }) => {
    }, []);
 
    return (
-      <div className='px-auto h-screen py-30 flex flex-col md:flex-row gap-6 justify-center items-center bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-white text-black'>
+      <div className='px-auto py-20 min-h-screen flex flex-col md:flex-row gap-6 justify-center items-top bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-white text-black'>
          <div
             className={`flex flex-col justify-center items-center w-[100px] md:w-[310px] h-[500px] 
             bg-white dark:bg-slate-900 
@@ -59,7 +72,7 @@ const Profile: FC<Props> = ({ user }) => {
                logOutHandler={logOutHandler}
             />
          </div>
-         <div className={`flex flex-col justify-center items-center w-[600px] md:w-[1100px] h-[500px] 
+         <div className={`flex flex-col justify-center items-center w-[600px] md:w-[1100px] min-h-[500px] 
                   bg-white dark:bg-slate-900 
                   border border-slate-200 dark:border-[#ffffff1d] 
                   rounded-lg shadow-lg p-4 
@@ -73,6 +86,11 @@ const Profile: FC<Props> = ({ user }) => {
             {
                active === 2 && (
                   <ChangePassword />
+               )
+            }
+            {
+               active === 3 && (
+                  <EnrolledCourses user={user} />
                )
             }
          </div>

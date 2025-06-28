@@ -2,18 +2,27 @@
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import CoursePlayer from '@/app/utils/CoursePlayer';
-import { useGetAllCoursesQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
+import { useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
+import { Play } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 // Extend CourseFormData to match API response
-interface CourseDetail extends Omit<CourseFormData, 'thumbnail'> {
+interface CourseDetail extends Omit<CourseFormData, 'thumbnail' | 'ratings' | 'purchased' | 'courseData'> {
    ratings?: number;
    purchased?: number;
    reviews?: unknown[];
-   courseData?: unknown[];
+   courseData?: Array<{
+      _id?: string;
+      title?: string;
+      videoSection?: string;
+      videoUrl?: string;
+      description?: string;
+      links?: Array<{ _id?: string; title?: string; url?: string }>;
+   }>;
    category?: string;
    thumbnail: {
       public_id: string;
@@ -28,6 +37,14 @@ const CourseDetailPage: React.FC = () => {
    const course: CourseDetail | undefined = data?.course as CourseDetail | undefined;
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
    const [activeTab, setActiveTab] = useState('overview');
+
+   // Check if user is enrolled
+   const { data: session } = useSession();
+   const { data: enrolledCoursesData } = useGetEnrolledCoursesQuery(undefined, {
+      skip: !session?.user
+   });
+   const enrolledCourses = enrolledCoursesData?.courses || [];
+   const isEnrolled = enrolledCourses.some((enrolledCourse: CourseFormData) => enrolledCourse._id === id);
 
    // Fetch all courses for related courses
    const { data: allCoursesData } = useGetAllCoursesQuery();
@@ -99,7 +116,7 @@ const CourseDetailPage: React.FC = () => {
                         <div className="flex items-center justify-between mb-4">
                            <h2 className="text-2xl font-bold text-black dark:text-white">Course Preview</h2>
                            {course.demoUrl && (
-                              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold">
+                              <span className="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 rounded-full text-sm font-semibold">
                                  Demo Available
                               </span>
                            )}
@@ -168,9 +185,21 @@ const CourseDetailPage: React.FC = () => {
                               )}
                            </div>
                            <div className="flex flex-wrap gap-4">
-                              <button className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-                                 Enroll Now
-                              </button>
+                              {isEnrolled ? (
+                                 <>
+                                    <Link
+                                       href={`/courses/${course._id}/components`}
+                                       className="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center gap-2"
+                                    >
+                                       <Play className="w-5 h-5" />
+                                       Continue Learning
+                                    </Link>
+                                 </>
+                              ) : (
+                                 <button className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                                    Enroll Now
+                                 </button>
+                              )}
                               <button className="px-8 py-3 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition-all duration-300 cursor-pointer">
                                  Add to Wishlist
                               </button>
@@ -358,7 +387,7 @@ const CourseDetailPage: React.FC = () => {
                         {relatedCourses.map((rc) => (
                            <div
                               key={rc._id}
-                              className="group cursor-pointer transition-all duration-300 hover:scale-105"
+                              className="group transition-all duration-300 hover:scale-102"
                            >
                               <div className="relative overflow-hidden rounded-2xl mb-4">
                                  <img

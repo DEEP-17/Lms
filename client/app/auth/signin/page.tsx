@@ -9,11 +9,13 @@ export default function SignIn() {
 
    useEffect(() => {
       // Check if user is already signed in
-      getSession().then((session) => {
+      const checkSession = async () => {
+         const session = await getSession();
          if (session) {
-            router.push('/');
+            await router.push('/');
          }
-      });
+      };
+      checkSession();
    }, [router]);
 
    const handleGoogleSignIn = () => {

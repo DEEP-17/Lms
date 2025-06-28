@@ -65,9 +65,12 @@ const UsersPage = () => {
    };
 
    useEffect(() => {
-      if (isError && (isError.status === 400 || isError.status === 401)) {
-         router.push('/');
-      }
+      const handleErrorRedirect = async () => {
+         if (isError && (isError.status === 400 || isError.status === 401)) {
+            await router.push('/');
+         }
+      };
+      handleErrorRedirect();
    }, [isError, router]);
 
    return (
