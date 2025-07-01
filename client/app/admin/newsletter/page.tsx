@@ -9,6 +9,7 @@ import { Button } from '@mui/material';
 import { Mail, Send, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { AiOutlineMail } from 'react-icons/ai';
 
 const NewsletterPage: React.FC = () => {
    const { data: subscribersData, isLoading: loadingSubs } = useGetNewsletterSubscribersQuery();
@@ -86,7 +87,7 @@ const NewsletterPage: React.FC = () => {
                   <div className="max-w-4xl mx-auto">
                      <div className="mb-8">
                         <h1 className="text-3xl font-bold text-cyan-700 dark:text-cyan-300 flex items-center gap-3">
-                           <Mail className="w-8 h-8" />
+                           <AiOutlineMail className="w-8 h-8" />
                            Newsletter Management
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -105,7 +106,7 @@ const NewsletterPage: React.FC = () => {
                               <div className="flex gap-2">
                                  <button
                                     onClick={selectAll}
-                                    className="px-3 py-1 text-xs bg-[#BE3D2A] dark:bg-[#102E50] text-cyan-700 dark:text-cyan-300 rounded hover:bg-[#BE3D2A] dark:hover:bg-[#102E50] cursor-pointer"
+                                    className="px-3 py-1 text-xs bg-white dark:bg-[#102E50] text-cyan-700 dark:text-cyan-300 rounded hover:bg-gray-100 dark:hover:bg-[#102E50] cursor-pointer"
                                  >
                                     Select All
                                  </button>
@@ -149,7 +150,7 @@ const NewsletterPage: React.FC = () => {
                         {/* Email Composition */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6">
                            <h2 className="text-xl font-semibold text-cyan-700 dark:text-cyan-300 flex items-center gap-2 mb-4">
-                              <Send className="w-5 h-5" />
+                              <Mail className="w-5 h-5" />  
                               Compose Email
                            </h2>
 
@@ -192,7 +193,7 @@ const NewsletterPage: React.FC = () => {
                               <button
                                  type="submit"
                                  disabled={isLoading || subscribers.length === 0}
-                                 className="w-full py-3 bg-[#E78B48] hover:bg-[#BE3D2A] disabled:bg-gray-300 disabled:cursor-not-allowed text-black font-bold rounded-lg transition-all duration-200 shadow-md hover:shadow-xl focus:ring-2 focus:ring-cyan-400 flex items-center justify-center gap-2 cursor-pointer"
+                                 className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer w-full"
                               >
                                  {isLoading ? (
                                     <>

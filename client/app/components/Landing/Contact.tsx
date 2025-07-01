@@ -3,6 +3,7 @@ import { useSubmitContactMutation } from '@/redux/features/api/apiSlice';
 import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaCheck, FaPaperPlane, FaSpinner } from 'react-icons/fa';
 const Contact = () => {
    const [form, setForm] = useState({ name: '', email: '', message: '' });
    const [submitted, setSubmitted] = useState(false);
@@ -66,10 +67,22 @@ const Contact = () => {
                />
                <button
                   type="submit"
-                  className="w-full py-3 bg-cyan-200 hover:bg-cyan-300 text-black font-bold rounded-lg transition-all duration-200 shadow-md hover:shadow-xl focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                  className="w-full p-4 text-center flex items-center justify-center gap-2 px-5 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                   disabled={isLoading}
                >
-                  {isLoading ? 'Submitting...' : submitted ? 'Submitted!' : 'Send Message'}
+                  {isLoading ? (
+                     <>
+                        <FaSpinner className="w-4 h-4 animate-spin" /> Submitting...
+                     </>
+                  ) : submitted ? (
+                     <>
+                        <FaCheck className="w-4 h-4" /> Submitted!
+                        </>
+                     ) : (
+                           <>
+                              <FaPaperPlane className="w-4 h-4" /> Send Message
+                           </>
+                  )}
                </button>
             </form>
          </div>

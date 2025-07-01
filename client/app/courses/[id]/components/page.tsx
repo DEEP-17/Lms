@@ -3,11 +3,12 @@
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import { useGetCourseContentQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
+import Lottie from 'lottie-react';
 import { BookOpen, ChevronRight, Clock, Download, MessageCircle, Play } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 const CourseComponentsPage: FC = () => {
@@ -21,6 +22,7 @@ const CourseComponentsPage: FC = () => {
 
    const course = courseData?.course;
    const content = contentData?.content || [];
+   const [animationData, setAnimationData] = useState<any>(null);
 
    // Handle authentication redirect in useEffect
    useEffect(() => {
@@ -32,6 +34,22 @@ const CourseComponentsPage: FC = () => {
       };
       handleAuthRedirect();
    }, [session, router]);
+
+   const formatDuration = (seconds: number): string => {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      if (hours > 0) {
+         return `${hours}h ${minutes}m`;
+      }
+      return `${minutes}m`;
+   };
+
+   useEffect(() => {
+      fetch('/animation.json')
+         .then((res) => res.json())
+         .then(setAnimationData);
+   }, []);
 
    // Show loading while checking authentication
    if (!session?.user) {
@@ -99,30 +117,10 @@ const CourseComponentsPage: FC = () => {
       );
    }
 
-   const formatDuration = (seconds: number): string => {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-
-      if (hours > 0) {
-         return `${hours}h ${minutes}m`;
-      }
-      return `${minutes}m`;
-   };
-
-   const getThumbnailUrl = (thumbnail: any): string => {
-      if (typeof thumbnail === 'string') {
-         return thumbnail;
-      }
-      if (thumbnail && typeof thumbnail === 'object' && 'url' in thumbnail) {
-         return thumbnail.url || '';
-      }
-      return '';
-   };
-
    return (
       <>
          <Header activeItem={1} route="/courses" />
-         <section className="min-h-screen py-20 bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 py-12">
+         <section className="min-h-screen py-20 bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
             <div className="max-w-6xl mx-auto px-4">
                {/* Breadcrumb */}
                <nav className="text-lg text-gray-500 dark:text-gray-400 mb-6 flex items-center gap-2">
@@ -136,11 +134,39 @@ const CourseComponentsPage: FC = () => {
                {/* Course Header */}
                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 p-6 mb-8">
                   <div className="flex items-start gap-6">
-                     <img
-                        src={getThumbnailUrl(course.thumbnail)}
-                        alt={course.name}
-                        className="w-32 h-32 object-cover rounded-lg shadow-md"
-                     />
+                     {(() => {
+                        if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                           return (
+                              <img
+                                 src={course.thumbnail.url}
+                                 alt={course.name}
+                                 className="w-72 h-60 object-cover object-center"
+                              />
+                           );
+                        } else if (typeof course.thumbnail === 'string' && course.thumbnail.length > 0) {
+                           return (
+                              <img
+                                 src={course.thumbnail}
+                                 alt={course.name}
+                                 className="w-72 h-60 object-cover object-center"
+                              />
+                           );
+                        } else {
+                           return (
+                              <div className="w-72 h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                 {animationData ? (
+                                    <Lottie
+                                       animationData={animationData}
+                                       loop
+                                       autoplay
+                                    />
+                                 ) : (
+                                    <span className="text-gray-400">No Image</span>
+                                 )}
+                              </div>
+                           );
+                        }
+                     })()}
                      <div className="flex-1">
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                            {course.name}

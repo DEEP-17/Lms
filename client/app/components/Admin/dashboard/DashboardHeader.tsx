@@ -1,6 +1,5 @@
 import { ThemeSwitcher } from '@/app/utils/ThemeSwitcher';
 import { useGetAllNotificationsQuery, useUpdateNotificationMutation } from '@/redux/features/api/apiSlice';
-import { Button } from '@mui/material';
 import { AlertTriangle, Bell, CheckCircle, MessageSquare } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -82,7 +81,7 @@ const DashboardHeader: React.FC = () => {
                       {unreadCount > 0 && (
                         <button
                           onClick={markAllAsRead}
-                          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium cursor-pointer"
+                          className="flex items-center justify-center text-sm gap-2 px-2 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                         >
                           Mark all as read
                         </button>
@@ -123,7 +122,7 @@ const DashboardHeader: React.FC = () => {
                               {notification.status === 'unread' && (
                                 <button
                                   onClick={() => markAsRead(notification._id)}
-                                  className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors duration-200 cursor-pointer"
+                                  className="mt-3 flex items-center justify-center gap-2 px-2 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 transition cursor-pointer text-xs"
                                 >
                                   Mark as Read
                                 </button>

@@ -2,7 +2,8 @@
 
 import CoursePlayer from '@/app/utils/CoursePlayer';
 import { CourseFormData } from '@/types/course';
-import React, { FC, useState } from 'react';
+import Lottie from 'lottie-react';
+import React, { FC, useEffect, useState } from 'react';
 
 type Props = {
    course: CourseFormData;
@@ -14,17 +15,13 @@ type Props = {
 
 const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious, isEditMode = false }) => {
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
+   const [animationData, setAnimationData] = useState<any>(null);
 
-   // Helper function to get thumbnail URL safely
-   const getThumbnailUrl = (thumbnail: CourseFormData['thumbnail']): string => {
-      if (typeof thumbnail === 'string') {
-         return thumbnail;
-      }
-      if (thumbnail && typeof thumbnail === 'object' && 'url' in thumbnail) {
-         return thumbnail.url || '';
-      }
-      return '';
-   };
+   useEffect(() => {
+      fetch('/animation.json')
+         .then((res) => res.json())
+         .then(setAnimationData);
+   }, []);
 
    // Collect all videos for preview
    const allVideos: { videoUrl: string; title: string; type: string }[] = [];
@@ -106,19 +103,45 @@ const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious, isEdit
          )}
 
          {/* Thumbnail */}
-         {getThumbnailUrl(course.thumbnail) && (
             <div className="mb-8">
                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Course Thumbnail</h3>
                <div className="relative overflow-hidden rounded-2xl shadow-lg">
-                  <img
-                     src={getThumbnailUrl(course.thumbnail)}
-                     alt="Course Thumbnail"
-                     className="w-full h-[300px] object-cover"
-                  />
+               {(() => {
+                  if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                     return (
+                        <img
+                           src={course.thumbnail.url}
+                           alt={course.name}
+                           className="w-full h-60 object-cover object-center"
+                        />
+                     );
+                  } else if (typeof course.thumbnail === 'string' && course.thumbnail.length > 0) {
+                     return (
+                        <img
+                           src={course.thumbnail}
+                           alt={course.name}
+                           className="w-full h-60 object-cover object-center"
+                        />
+                     );
+                  } else {
+                     return (
+                        <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                           {animationData ? (
+                              <Lottie
+                                 animationData={animationData}
+                                 loop
+                                 autoplay
+                              />
+                           ) : (
+                              <span className="text-gray-400">No Image</span>
+                           )}
+                        </div>
+                     );
+                  }
+               })()}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                </div>
             </div>
-         )}
 
          {/* Course Info */}
          <div className="mb-8 p-6 bg-gray-50 dark:bg-slate-700/50 rounded-2xl">

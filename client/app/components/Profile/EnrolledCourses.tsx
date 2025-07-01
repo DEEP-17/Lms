@@ -129,7 +129,7 @@ const EnrolledCourses: FC<Props> = () => {
               <div className="flex-shrink-0 ml-4">
                 <Link
                   href={`/courses/${course._id}/components`}
-                  className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition flex items-center gap-2 text-sm font-medium whitespace-nowrap"
+                  className="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                 >
                   <Play className="w-4 h-4" />
                   Continue Learning
@@ -145,7 +145,7 @@ const EnrolledCourses: FC<Props> = () => {
         <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <div className="w-4 h-4 text-blue-600 dark:text-blue-400">📚</div>
+              <div className="w-4 h-4 text-blue-600 dark:text-blue-400 flex justify-center items-center">📚</div>
             </div>
             <div>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -159,7 +159,7 @@ const EnrolledCourses: FC<Props> = () => {
         <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-              <div className="w-4 h-4 text-green-600 dark:text-green-400">⏱️</div>
+              <div className="w-4 h-4 text-green-600 dark:text-green-400 flex justify-center items-center">⏱️</div>
             </div>
             <div>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -173,7 +173,7 @@ const EnrolledCourses: FC<Props> = () => {
         <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-              <div className="w-4 h-4 text-yellow-600 dark:text-yellow-400">⭐</div>
+              <div className="w-4 h-4 text-yellow-600 dark:text-yellow-400 flex justify-center items-center">⭐</div>
             </div>
             <div>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -187,7 +187,7 @@ const EnrolledCourses: FC<Props> = () => {
         <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-              <div className="w-4 h-4 text-purple-600 dark:text-purple-400">✅</div>
+              <div className="w-4 h-4 text-purple-600 dark:text-purple-400 flex justify-center items-center">✅</div>
             </div>
             <div>
               <p className="text-lg font-bold text-gray-900 dark:text-white">

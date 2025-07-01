@@ -116,7 +116,7 @@ const EditTestimonials: FC<Props> = () => {
                   <button
                      type="button"
                      onClick={addTestimonial}
-                     className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300 focus:ring-4 focus:ring-green-500/20 outline-none cursor-pointer"
+                     className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                   >
                      <Plus className="h-4 w-4" />
                      <span>Add Testimonial</span>
@@ -290,7 +290,7 @@ const EditTestimonials: FC<Props> = () => {
                <button
                   type="submit"
                   disabled={isUpdating}
-                  className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition-all duration-300 focus:ring-4 focus:ring-blue-500/20 outline-none cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                >
                   <Save className="h-5 w-5" />
                   <span>{isUpdating ? 'Saving...' : 'Save Changes'}</span>

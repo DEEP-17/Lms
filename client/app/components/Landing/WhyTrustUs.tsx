@@ -1,7 +1,7 @@
 import { useGetWhyTrustUsDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { FaBoxOpen } from 'react-icons/fa';
 
 export default function WhyTrustUs() {
    const { data, isLoading, error } = useGetWhyTrustUsDataQuery(undefined, {
@@ -90,9 +90,11 @@ export default function WhyTrustUs() {
                   ))}
                </ul>
                <button
-                  className="bg-cyan-200 hover:bg-cyan-300 focus:bg-cyan-300 text-black px-3 py-3 rounded-lg font-bold transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl transform hover:scale-105 focus:scale-95 focus:ring-2 focus:ring-cyan-400"
+                  className="flex items-center gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                   onClick={() => router.push('/courses')}
                >
+                  {/* Suggest Explore icon  other than FaArrowRight*/}
+                  <FaBoxOpen className="w-4 h-4" />
                   Explore courses
                </button>
             </div>

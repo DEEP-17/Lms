@@ -6,8 +6,10 @@ import Heading from '@/app/utils/Heading';
 import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } from '@/redux/features/user/userApi';
 import { User } from '@/types/user';
 import { Button } from '@mui/material';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const roleOptions = [
    { value: 'user', label: 'User' },
@@ -17,6 +19,7 @@ const roleOptions = [
 const UsersPage = () => {
 
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+   const { status: sessionStatus } = useSession();
    const router = useRouter();
 
    const handleSidebarToggle = (collapsed: boolean) => {
@@ -65,13 +68,21 @@ const UsersPage = () => {
    };
 
    useEffect(() => {
-      const handleErrorRedirect = async () => {
-         if (isError && (isError.status === 400 || isError.status === 401)) {
-            await router.push('/');
-         }
-      };
-      handleErrorRedirect();
-   }, [isError, router]);
+      if (sessionStatus === 'unauthenticated') {
+         toast.error('You must be an admin to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router]);
+
+   if (sessionStatus === 'loading') {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
+   }
+
+   if (sessionStatus === 'unauthenticated') return null;
 
    return (
       <AdminProtected>

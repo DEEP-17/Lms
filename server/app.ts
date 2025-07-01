@@ -11,6 +11,8 @@ import newsletterRoute from "./routes/newsletter.route";
 import notificationRouter from "./routes/notification.route";
 import orderRouter from "./routes/order.route";
 import userRouter from "./routes/user.route";
+import { validateEnv } from "./utils/validateEnv";
+
 export const app = express();
 
 //body parser
@@ -59,3 +61,5 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 //error middleware
 app.use(ErrorMiddleware);
+
+validateEnv();

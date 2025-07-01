@@ -14,7 +14,7 @@ const Footer = () => {
                      <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                         <BookOpen className="w-5 h-5 text-white" />
                      </div>
-                     <span className="text-xl font-bold">Learnify</span>
+                     <span className="text-xl font-bold ">SecureWaveTechnologies</span>
                   </Link>
                   <p className="text-black dark:text-slate-400 text-sm">
                      Empowering learners worldwide with high-quality, accessible education.
@@ -38,7 +38,7 @@ const Footer = () => {
 
                {/* Quick Links */}
                <div>
-                  <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+                  <h3 className="text-lg font-semibold mb-4 dark:text-cyan-300">Quick Links</h3>
                   <ul className="space-y-2">
                      <li>
                         <Link href="/" className="text-black dark:text-slate-400 hover:text-gray-800 dark:hover:text-white transition-colors">
@@ -65,7 +65,7 @@ const Footer = () => {
 
                {/* Categories */}
                <div>
-                  <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                  <h3 className="text-lg font-semibold mb-4 dark:text-cyan-300">Categories</h3>
                   <ul className="space-y-2">
                      <li>
                         <a href="/courses" className="text-black dark:text-slate-400 hover:text-gray-800 dark:hover:text-white transition-colors">
@@ -87,7 +87,7 @@ const Footer = () => {
 
                {/* Support */}
                <div>
-                  <h3 className="text-lg font-semibold mb-4">Support</h3>
+                  <h3 className="text-lg font-semibold mb-4 dark:text-cyan-300">Support</h3>
                   <ul className="space-y-2">
                      <li>
                         <a href="/contact-us" className="text-black dark:text-slate-400 hover:text-gray-800 dark:hover:text-white transition-colors">
@@ -115,7 +115,7 @@ const Footer = () => {
 
             <div className="border-t border-gray-800  text-black dark:border-slate-700 mt-8 pt-8 text-center overflow-x-auto">
                <p className="text-black dark:text-slate-400 text-sm">
-                  © 2025 Learnify. All rights reserved. Made with ❤️ for learners worldwide.
+                  © 2025 SecureWaveTechnologies. All rights reserved. Made with ❤️ for learners worldwide.
                </p>
             </div>
          </div>

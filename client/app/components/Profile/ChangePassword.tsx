@@ -4,6 +4,7 @@ import { Button } from '@mui/material';
 import { Eye, EyeOff } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaLock } from 'react-icons/fa';
 type Props = {}
 const ChangePassword: FC<Props> = (props) => {
    const [oldPassword, setOldPassword] = useState('');
@@ -99,8 +100,9 @@ const ChangePassword: FC<Props> = (props) => {
 
             <button
                type="submit"
-               className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-all cursor-pointer"
+               className="flex items-center justify-center gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
             >
+               <FaLock className="w-4 h-4" />
                Change Password
             </button>
          </form>

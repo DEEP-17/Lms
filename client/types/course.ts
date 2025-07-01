@@ -21,15 +21,15 @@ export interface ContentSectionData {
 }
 
 export interface CourseFormData {
-  ratings: any;
+  ratings: number;
   purchased: number;
   _id?: string;
   name: string;
   description: string;
-  price: number | string;
-  estimatedPrice?: number | string;
-  thumbnail: string | ArrayBuffer | null | { public_id?: string; url?: string }; // Handle both client and server formats
-  newThumbnail?: string; // For edit mode
+  price: string;
+  estimatedPrice?: string;
+  thumbnail: string | null | { public_id?: string; url?: string }; // Handle both client and server formats
+  newThumbnail?: string | null | { public_id?: string; url?: string }; // For edit mode
   tags: string;
   level: string;
   demoUrl: string;

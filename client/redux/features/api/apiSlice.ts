@@ -118,10 +118,55 @@ export const orderApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    getStripePublishableKey: builder.query<
+      { success: boolean; publishableKey: string },
+      void
+    >({
+      query: () => ({
+        url: "/payment/stripePublishableKey",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    createPayment: builder.mutation<
+      { success: boolean; clientSecret: string },
+      { amount: number }
+    >({
+      query: ({ amount }) => ({
+        url: "/payment",
+        method: "POST",
+        body: { amount },
+        credentials: "include" as const,
+      }),
+    }),
+    createOrder: builder.mutation<
+      { success: boolean; order: Order },
+      {
+        courseId: string;
+        userId: string;
+        payment_info: object;
+      }
+    >({
+      query: ({ courseId, userId, payment_info }) => ({
+        url: "/create-order",
+        method: "POST",
+        body: {
+          courseId,
+          userId,
+          payment_info,
+        },
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllOrdersQuery } = orderApi;
+export const {
+  useGetAllOrdersQuery,
+  useGetStripePublishableKeyQuery,
+  useCreatePaymentMutation,
+  useCreateOrderMutation,
+} = orderApi;
 
 export const courseApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -206,6 +251,55 @@ export const courseApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    addReview: builder.mutation<
+      { success: boolean; course: CourseFormData },
+      { courseId: string; review: string; rating: number }
+    >({
+      query: ({ courseId, review, rating }) => ({
+        url: `/add-review/${courseId}`,
+        method: "PUT",
+        body: { review, rating },
+        credentials: "include" as const,
+      }),
+    }),
+    addReplyToReview: builder.mutation<
+      { success: boolean; course: CourseFormData },
+      { courseId: string; reviewId: string; comment: string }
+    >({
+      query: ({ courseId, reviewId, comment }) => ({
+        url: `/add-reply`,
+        method: "PUT",
+        body: { courseId, reviewId, comment },
+        credentials: "include" as const,
+      }),
+    }),
+    addQuestion: builder.mutation<
+      { success: boolean; course: CourseFormData },
+      { courseId: string; question: string; contentId: string }
+    >({
+      query: ({ courseId, question, contentId }) => ({
+        url: `/add-question`,
+        method: "PUT",
+        body: { courseId, question, contentId },
+        credentials: "include" as const,
+      }),
+    }),
+    addAnswer: builder.mutation<
+      { success: boolean; course: CourseFormData },
+      {
+        courseId: string;
+        questionId: string;
+        answer: string;
+        contentId: string;
+      }
+    >({
+      query: ({ courseId, questionId, answer, contentId }) => ({
+        url: `/add-answer`,
+        method: "PUT",
+        body: { courseId, questionId, answer, contentId },
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
@@ -216,6 +310,10 @@ export const {
   useGetSingleCourseForAdminQuery,
   useGetEnrolledCoursesQuery,
   useGetCourseContentQuery,
+  useAddReviewMutation,
+  useAddReplyToReviewMutation,
+  useAddQuestionMutation,
+  useAddAnswerMutation,
 } = courseApi;
 
 export const analyticsApi = apiSlice.injectEndpoints({
@@ -374,6 +472,16 @@ export const {
   useSendNewsletterEmailMutation,
 } = newsletterApi;
 
+export interface ContactQuery {
+  _id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+  answered: boolean;
+  answerText?: string;
+}
+
 export const contactApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     submitContact: builder.mutation<
@@ -409,16 +517,6 @@ export const contactApi = apiSlice.injectEndpoints({
     }),
   }),
 });
-
-export interface ContactQuery {
-  _id: string;
-  name: string;
-  email: string;
-  message: string;
-  createdAt: string;
-  answered: boolean;
-  answerText?: string;
-}
 
 export const {
   useSubmitContactMutation,

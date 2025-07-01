@@ -1,7 +1,8 @@
 'use client';
 
 import { CourseFormData, StepValidation } from '@/types/course';
-import React, { FC, useState } from 'react';
+import Lottie from 'lottie-react';
+import React, { FC, useEffect, useState } from 'react';
 
 type Props = {
     course: CourseFormData;
@@ -23,7 +24,7 @@ const CourseInformation: FC<Props> = ({
     validation
 }) => {
     const [dragging, setDragging] = useState(false);
-
+    const [animationData, setAnimationData] = useState<any>(null);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (onNext) {
@@ -69,16 +70,11 @@ const CourseInformation: FC<Props> = ({
 
     const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
-    // Helper function to get thumbnail URL safely
-    const getThumbnailUrl = (thumbnail: CourseFormData['thumbnail']): string => {
-        if (typeof thumbnail === 'string') {
-            return thumbnail;
-        }
-        if (thumbnail && typeof thumbnail === 'object' && 'url' in thumbnail) {
-            return thumbnail.url || '';
-        }
-        return '';
-    };
+    useEffect(() => {
+        fetch('/animation.json')
+            .then((res) => res.json())
+            .then(setAnimationData);
+    }, []);
 
     return (
         <div className='w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50 transition-all duration-300'>
@@ -210,12 +206,40 @@ const CourseInformation: FC<Props> = ({
                         onDrop={handleDrop}
                     >
                         {course.thumbnail ? (
-                            <img
-                                src={getThumbnailUrl(course.thumbnail)}
-                                alt="Course Thumbnail"
-                                className="w-full h-full object-cover rounded-xl"
-                            />
-                        ) : (
+                            () => {
+                                if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                                    return (
+                                        <img
+                                            src={course.thumbnail.url}
+                                            alt={course.name}
+                                            className="w-full h-60 object-cover object-center"
+                                        />
+                                    );
+                                } else if (typeof course.thumbnail === 'string' && course.thumbnail.length > 0) {
+                                    return (
+                                        <img
+                                            src={course.thumbnail}
+                                            alt={course.name}
+                                            className="w-full h-60 object-cover object-center"
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                            {animationData ? (
+                                                <Lottie
+                                                    animationData={animationData}
+                                                    loop
+                                                    autoplay
+                                                />
+                                            ) : (
+                                                <span className="text-gray-400">No Image</span>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                            })()
+                        : (
                             <div className="text-center">
                                 <div className="text-4xl text-gray-400 dark:text-gray-500 mb-4">📷</div>
                                 <p className="text-gray-600 dark:text-gray-400 font-medium">Drag and drop an image here, or click to select</p>

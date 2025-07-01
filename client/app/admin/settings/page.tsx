@@ -3,14 +3,35 @@ import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
 import AdminProtected from '@/app/hooks/adminProtected';
 import Heading from '@/app/utils/Heading';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const SettingsPage = () => {
 
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+   const { status: sessionStatus } = useSession();
+   const router = useRouter();
    const handleSidebarToggle = (collapsed: boolean) => {
       setIsSidebarCollapsed(collapsed);
    };
+   React.useEffect(() => {
+      if (sessionStatus === 'unauthenticated') {
+         toast.error('You must be an admin to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router]);
+
+   if (sessionStatus === 'loading') {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
+   }
+   if (sessionStatus === 'unauthenticated') return null;
+
    return (
       <AdminProtected>
          <div className="admin-layout overflow-hidden">

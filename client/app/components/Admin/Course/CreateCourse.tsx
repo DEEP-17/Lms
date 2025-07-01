@@ -29,42 +29,15 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
   const [active, setActive] = useState<number>(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showCourseOptionsMobile, setShowCourseOptionsMobile] = useState(false);
-  const [showValidation, setShowValidation] = useState<{ [key: number]: boolean }>({
-    0: false,
-    1: false,
-    2: false,
-    3: false
-  });
+  const [showValidation, setShowValidation] = useState<{ [key: number]: boolean }>({ 0: false, 1: false, 2: false, 3: false });
 
   const [courseInfo, setCourseInfo] = useState<CourseFormData>({
-    name: '',
-    description: '',
-    level: '',
-    price: '',
-    estimatedPrice: '',
-    tags: '',
-    demoUrl: '',
-    thumbnail: '',
-    benefits: [{ title: '' }],
-    prerequisites: [{ title: '' }],
-    courseContent: [
-      {
-        id: '1',
-        title: '',
-        components: [
-          {
-            id: '1',
-            videoTitle: '',
-            videoUrl: '',
-            videoDescription: '',
-            links: [{ id: '1', title: '', url: '' }],
-          },
-        ],
-      },
-    ],
+    name: '', description: '', level: '', price: '', estimatedPrice: '', tags: '', demoUrl: '', thumbnail: '',
+    ratings: 0, purchased: 0,
+    benefits: [{ title: '' }], prerequisites: [{ title: '' }],
+    courseContent: [{ id: '1', title: '', components: [{ id: '1', videoTitle: '', videoUrl: '', videoDescription: '', links: [{ id: '1', title: '', url: '' }] }] }]
   });
 
-  // Step validation and save status
   const [stepStatus, setStepStatus] = useState<CourseStepStatus>({
     step0: { isCompleted: false, isSaved: false, errors: [] },
     step1: { isCompleted: false, isSaved: false, errors: [] },
@@ -75,271 +48,137 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
   const [createCourse] = useCreateCourseMutation();
   const [editCourse] = useEditCourseMutation();
 
-  // Initialize course data if in edit mode
   useEffect(() => {
     if (isEditMode && initialCourseData) {
-      // Transform server courseData structure to client courseContent structure
-      const transformCourseData = (courseData: Array<{
-        _id?: string;
-        title?: string;
-        videoSection?: string;
-        videoUrl?: string;
-        description?: string;
-        links?: Array<{ _id?: string; title?: string; url?: string }>;
-      }>) => {
-        return courseData.map((item, index) => ({
-          id: item._id || `section-${index + 1}`,
-          title: item.title || item.videoSection || '',
-          components: [
-            {
-              id: item._id || `component-${index + 1}`,
-              videoTitle: item.title || '',
-              videoUrl: item.videoUrl || '',
-              videoDescription: item.description || '',
-              links: item.links && Array.isArray(item.links) ? item.links.map((link, linkIndex: number) => ({
-                id: link._id || `link-${linkIndex + 1}`,
-                title: link.title || '',
-                url: link.url || ''
-              })) : [{ id: '1', title: '', url: '' }]
-            }
-          ]
-        }));
-      };
+      const transformCourseData = (courseData: Array<any>) => courseData.map((item: any, index: number) => ({
+        id: item._id || `section-${index + 1}`,
+        title: item.title || item.videoSection || '',
+        components: [{
+          id: item._id || `component-${index + 1}`,
+          videoTitle: item.title || '',
+          videoUrl: item.videoUrl || '',
+          videoDescription: item.description || '',
+          links: item.links?.map((link: any, idx: number) => ({ id: link._id || `link-${idx + 1}`, title: link.title || '', url: link.url || '' })) || [{ id: '1', title: '', url: '' }]
+        }]
+      }));
 
-      // Ensure courseContent is properly initialized
-      const courseDataWithDefaults = {
+      const courseDataWithDefaults: CourseFormData = {
         ...initialCourseData,
-        // Transform thumbnail from server object to string URL for form display
-        thumbnail: initialCourseData.thumbnail && typeof initialCourseData.thumbnail === 'object' && 'url' in initialCourseData.thumbnail
-          ? initialCourseData.thumbnail.url
-          : typeof initialCourseData.thumbnail === 'string'
+        thumbnail:
+          typeof initialCourseData.thumbnail === 'object' && initialCourseData.thumbnail !== null
             ? initialCourseData.thumbnail
-            : '',
-        courseContent: initialCourseData.courseData && Array.isArray(initialCourseData.courseData) && initialCourseData.courseData.length > 0
+            : typeof initialCourseData.thumbnail === 'string'
+              ? initialCourseData.thumbnail
+              : '',
+        courseContent: initialCourseData.courseData?.length
           ? transformCourseData(initialCourseData.courseData)
-          : initialCourseData.courseContent && Array.isArray(initialCourseData.courseContent) && initialCourseData.courseContent.length > 0
-            ? initialCourseData.courseContent
-            : [
-              {
-                id: '1',
-                title: '',
-                components: [
-                  {
-                    id: '1',
-                    videoTitle: '',
-                    videoUrl: '',
-                    videoDescription: '',
-                    links: [{ id: '1', title: '', url: '' }],
-                  },
-                ],
-              },
-            ],
-        benefits: initialCourseData.benefits && Array.isArray(initialCourseData.benefits) && initialCourseData.benefits.length > 0
+          : initialCourseData.courseContent || courseInfo.courseContent,
+        benefits: Array.isArray(initialCourseData.benefits) && initialCourseData.benefits.length
           ? initialCourseData.benefits
           : [{ title: '' }],
-        prerequisites: initialCourseData.prerequisites && Array.isArray(initialCourseData.prerequisites) && initialCourseData.prerequisites.length > 0
+        prerequisites: Array.isArray(initialCourseData.prerequisites) && initialCourseData.prerequisites.length
           ? initialCourseData.prerequisites
-          : [{ title: '' }],
+          : [{ title: '' }]
       };
 
       setCourseInfo(courseDataWithDefaults);
-      // Mark all steps as completed and saved for edit mode
       setStepStatus({
-        step0: { isCompleted: true, isSaved: true, errors: [] },
-        step1: { isCompleted: true, isSaved: true, errors: [] },
-        step2: { isCompleted: true, isSaved: true, errors: [] },
+        step0: validateStep0(courseDataWithDefaults),
+        step1: validateStep1(courseDataWithDefaults),
+        step2: validateStep2(courseDataWithDefaults),
         step3: { isCompleted: true, isSaved: true, errors: [] },
       });
     }
   }, [isEditMode, initialCourseData]);
 
-  const handleSubmit = async () => {
-    // Ensure courseContent is properly initialized
-    const safeCourseContent = courseInfo.courseContent && Array.isArray(courseInfo.courseContent) && courseInfo.courseContent.length > 0
-      ? courseInfo.courseContent
-      : [
-        {
-          id: '1',
-          title: '',
-          components: [
-            {
-              id: '1',
-              videoTitle: '',
-              videoUrl: '',
-              videoDescription: '',
-              links: [{ id: '1', title: '', url: '' }],
-            },
-          ],
-        },
-      ];
+  const validateStep0 = (course = courseInfo): StepValidation => {
+    const errors: string[] = [];
+    if (!course.name.trim()) errors.push('Course title is required');
+    if (!course.description.trim()) errors.push('Course description is required');
+    if (!course.price) errors.push('Course price is required');
+    return { isCompleted: errors.length === 0, isSaved: stepStatus.step0.isSaved, errors };
+  };
 
-    // Transform courseInfo to match server expectations
+  const validateStep1 = (course = courseInfo): StepValidation => {
+    const errors: string[] = [];
+    const benefits = course.benefits || [];
+    const prerequisites = course.prerequisites || [];
+    const hasValidBenefits = benefits.some((b) => b.title.trim() !== '');
+    const hasValidPrerequisites = prerequisites.some((p) => p.title.trim() !== '');
+    if (!course.level.trim()) errors.push('Course category is required');
+    if (!hasValidBenefits) errors.push('At least one benefit is required');
+    if (!hasValidPrerequisites) errors.push('At least one prerequisite is required');
+    return { isCompleted: errors.length === 0, isSaved: stepStatus.step1.isSaved, errors };
+  };
+
+  const validateStep2 = (course = courseInfo): StepValidation => {
+    const errors: string[] = [];
+    if (!Array.isArray(course.courseContent) || course.courseContent.length === 0) {
+      errors.push('At least one course section is required');
+    } else {
+      course.courseContent.forEach((section, idx) => {
+        if (!section.title.trim()) errors.push(`Section ${idx + 1} title is required`);
+        const component = section.components[0];
+        if (!component.videoTitle.trim()) errors.push(`Video title missing in section ${idx + 1}`);
+        if (!component.videoUrl.trim()) errors.push(`Video URL missing in section ${idx + 1}`);
+      });
+    }
+    return { isCompleted: errors.length === 0, isSaved: stepStatus.step2.isSaved, errors };
+  };
+
+  const handleSubmit = async () => {
+    const safeContent = courseInfo.courseContent?.length ? courseInfo.courseContent : courseInfo.courseContent;
     const payload = {
       ...courseInfo,
       price: Number(courseInfo.price),
       estimatedPrice: courseInfo.estimatedPrice ? Number(courseInfo.estimatedPrice) : undefined,
-      courseData: safeCourseContent.map(section => ({
+      courseData: safeContent.map(section => ({
         title: section.title,
-        description: section.components[0]?.videoDescription || '',
-        videoUrl: section.components[0]?.videoUrl || '',
-        videoThumbnail: {}, // You may need to handle this if you support video thumbnails
+        description: section.components[0].videoDescription,
+        videoUrl: section.components[0].videoUrl,
+        videoThumbnail: {},
         videoSection: section.title,
-        videoLength: 0, // Default to 0, can be updated later
-        videoPlayer: '', // Set if you have this info
-        links: section.components[0]?.links || [],
-        suggestion: '', // Set if you have this info
-        questions: [], // New course, so empty
-      })),
+        videoLength: 0,
+        videoPlayer: '',
+        links: section.components[0].links || [],
+        suggestion: '',
+        questions: []
+      }))
     };
 
-    // Handle thumbnail properly for create vs edit modes
-    if (isEditMode) {
-      // For edit mode, only send newThumbnail if it's a new string (not an object)
-      if (courseInfo.thumbnail && typeof courseInfo.thumbnail === 'string' && courseInfo.thumbnail.trim() !== '') {
+    if (isEditMode && courseId) {
+      const isNewThumbnail = (
+        typeof courseInfo.thumbnail === 'string' &&
+        typeof initialCourseData?.thumbnail === 'object' &&
+        initialCourseData?.thumbnail?.url !== courseInfo.thumbnail
+      );
+      if (isNewThumbnail) {
         payload.newThumbnail = courseInfo.thumbnail;
-        // Keep the existing thumbnail object for reference
-        if (initialCourseData?.thumbnail && typeof initialCourseData.thumbnail === 'object') {
-          payload.thumbnail = initialCourseData.thumbnail;
-        }
+        payload.thumbnail = initialCourseData.thumbnail;
+      }
+
+      try {
+        await editCourse({ id: courseId, data: { ...payload, price: String(payload.price), estimatedPrice: String(payload.estimatedPrice || '') } }).unwrap();
+        toast.success('Course updated successfully!');
+        onSuccess?.();
+        onRefetch?.();
+      } catch (err) {
+        toast.error('Failed to update course');
       }
     } else {
-      // For create mode, only send thumbnail if it's a valid string
-      if (courseInfo.thumbnail && typeof courseInfo.thumbnail === 'string' && courseInfo.thumbnail.trim() !== '') {
-        payload.thumbnail = courseInfo.thumbnail;
-      }
-    }
-
-    try {
-      if (isEditMode && courseId) {
-        await editCourse({ id: courseId, data: payload }).unwrap();
-        toast.success('Course updated successfully!');
-      } else {
+      try {
         await createCourse(payload).unwrap();
         toast.success('Course created successfully!');
-      }
-
-      if (onSuccess) {
-        onSuccess();
-      } else if (!isEditMode) {
-        // Reset all fields and redirect to step 1 for new courses
-        setCourseInfo({
-          name: '',
-          description: '',
-          level: '',
-          price: '',
-          estimatedPrice: '',
-          tags: '',
-          demoUrl: '',
-          thumbnail: '',
-          benefits: [{ title: '' }],
-          prerequisites: [{ title: '' }],
-          courseContent: [
-            {
-              id: '1',
-              title: '',
-              components: [
-                {
-                  id: '1',
-                  videoTitle: '',
-                  videoUrl: '',
-                  videoDescription: '',
-                  links: [{ id: '1', title: '', url: '' }],
-                },
-              ],
-            },
-          ],
-        });
-        setStepStatus({
-          step0: { isCompleted: false, isSaved: false, errors: [] },
-          step1: { isCompleted: false, isSaved: false, errors: [] },
-          step2: { isCompleted: false, isSaved: false, errors: [] },
-          step3: { isCompleted: false, isSaved: false, errors: [] },
-        });
-        setActive(0);
-        setShowValidation({ 0: false, 1: false, 2: false, 3: false });
-      }
-
-      if (onRefetch) {
-        onRefetch();
-      }
-    } catch (error: unknown) {
-      if (
-        typeof error === 'object' &&
-        error &&
-        'data' in error &&
-        (error as { data?: { message?: string } }).data?.message
-      ) {
-        toast.error((error as { data?: { message?: string } }).data?.message ?? 'An error occurred');
-      } else {
-        toast.error(isEditMode ? 'Failed to update course' : 'Failed to create course');
+        onSuccess?.();
+        onRefetch?.();
+      } catch (err) {
+        toast.error('Failed to create course');
       }
     }
   };
 
   const handleSidebarToggle = (collapsed: boolean) => {
     setIsSidebarCollapsed(collapsed);
-  };
-
-  // Validate step 0 (Course Information)
-  const validateStep0 = (): StepValidation => {
-    const errors: string[] = [];
-    if (!courseInfo.name.trim()) errors.push('Course title is required');
-    if (!courseInfo.description.trim()) errors.push('Course description is required');
-    if (!courseInfo.price) errors.push('Course price is required');
-
-    return {
-      isCompleted: errors.length === 0,
-      isSaved: stepStatus.step0.isSaved,
-      errors
-    };
-  };
-
-  // Validate step 1 (Course Benefits/Prerequisites)
-  const validateStep1 = (): StepValidation => {
-    const errors: string[] = [];
-
-    // Ensure benefits and prerequisites exist and are arrays
-    const benefits = courseInfo.benefits && Array.isArray(courseInfo.benefits) ? courseInfo.benefits : [];
-    const prerequisites = courseInfo.prerequisites && Array.isArray(courseInfo.prerequisites) ? courseInfo.prerequisites : [];
-
-    const hasValidBenefits = benefits.some(benefit => benefit.title.trim() !== '');
-    const hasValidPrerequisites = prerequisites.some(prereq => prereq.title.trim() !== '');
-
-    if (!courseInfo.level.trim()) errors.push('Course category is required');
-
-    if (!hasValidBenefits) errors.push('At least one benefit is required');
-    if (!hasValidPrerequisites) errors.push('At least one prerequisite is required');
-
-    return {
-      isCompleted: errors.length === 0,
-      isSaved: stepStatus.step1.isSaved,
-      errors
-    };
-  };
-
-  // Validate step 2 (Course Content)
-  const validateStep2 = (): StepValidation => {
-    const errors: string[] = [];
-
-    // Ensure courseContent exists and has content
-    if (!courseInfo.courseContent || !Array.isArray(courseInfo.courseContent) || courseInfo.courseContent.length === 0) {
-      errors.push('At least one course section is required');
-      return {
-        isCompleted: false,
-        isSaved: stepStatus.step2.isSaved,
-        errors
-      };
-    }
-
-    if (!courseInfo.courseContent[0]?.title?.trim()) errors.push('Section title is required');
-    if (!courseInfo.courseContent[0]?.components?.[0]?.videoTitle?.trim()) errors.push('Video title is required');
-    if (!courseInfo.courseContent[0]?.components?.[0]?.videoUrl?.trim()) errors.push('Video URL is required');
-
-    return {
-      isCompleted: errors.length === 0,
-      isSaved: stepStatus.step2.isSaved,
-      errors
-    };
   };
 
   // Save current step
@@ -498,7 +337,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
             )}
             <button
               onClick={saveCurrentStep}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
             >
               <Save size={16} />
               Save Step

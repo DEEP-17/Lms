@@ -2,6 +2,7 @@ import { useGetKnowledgeGuaranteeDataQuery } from '@/redux/features/Layout/layou
 import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { FaArrowRight } from 'react-icons/fa';
 
 type KnowledgeGuaranteeImage = { url: string; public_id?: string };
 
@@ -68,9 +69,10 @@ export default function KnowledgeGuarantee() {
                   {knowledgeGuaranteeData?.description || 'We\'ve trained thousands in IT, management, and business skills. Our courses are crafted by experts, regularly updated, and guarantee practical knowledge and real-world skills. Join top IT professionals and boost your career.'}
                </p>
                <button
-                  className="px-3 py-3 bg-cyan-200 hover:bg-cyan-300 focus:bg-cyan-300 text-black rounded-lg font-bold shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer transform hover:scale-105 focus:scale-95 focus:ring-2 focus:ring-cyan-400"
+                  className="py-4 flex items-center gap-2 px-5 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                   onClick={() => router.push('/courses')}
                >
+                  <FaArrowRight className="w-4 h-4" />
                   {knowledgeGuaranteeData?.buttonText || 'Explore Courses'}
                </button>
             </div>

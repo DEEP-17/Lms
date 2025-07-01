@@ -8,10 +8,15 @@ import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
 import { CourseFormData } from '@/types/course';
 import { Order } from '@/types/order';
 import { User } from '@/types/user';
-import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const InvoicesPage = () => {
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+   const { status: sessionStatus } = useSession();
+   const router = useRouter();
    const handleSidebarToggle = (collapsed: boolean) => {
       setIsSidebarCollapsed(collapsed);
    };
@@ -33,6 +38,23 @@ const InvoicesPage = () => {
       const course = courses.find((c: CourseFormData) => String(c._id) === String(courseId));
       return course ? course.name : courseId;
    };
+
+   useEffect(() => {
+      if (sessionStatus === 'unauthenticated') {
+         toast.error('You must be an admin to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router]);
+
+   if (sessionStatus === 'loading') {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
+   }
+
+   if (sessionStatus === 'unauthenticated') return null;
 
    return (
       <AdminProtected>
@@ -61,7 +83,7 @@ const InvoicesPage = () => {
                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Invoice ID</th>
                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">User</th>
                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Course</th>
-                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Payment Info</th>
+                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Payment Status</th>
                                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th>
                               </tr>
                            </thead>
@@ -71,7 +93,13 @@ const InvoicesPage = () => {
                                     <td className="px-4 py-2 font-mono">{order._id}</td>
                                     <td className="px-4 py-2 font-mono">{getUserName(order.userId)}</td>
                                     <td className="px-4 py-2 font-mono">{getCourseName(order.courseId)}</td>
-                                    <td className="px-4 py-2 text-xs">{JSON.stringify(order.payment_info)}</td>
+                                    {
+                                       order.payment_info?.status === 'succeeded' ? (
+                                          <td className="px-4 py-2 text-xs text-green-500">Success</td>
+                                       ) : (
+                                          <td className="px-4 py-2 text-xs text-red-500">Failed</td>
+                                       )
+                                    }
                                     <td className="px-4 py-2">{new Date(order.createdAt).toLocaleString()}</td>
                                  </tr>
                               ))}

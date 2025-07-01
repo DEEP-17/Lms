@@ -1,16 +1,24 @@
 'use client'
 import Protected from '@/app/hooks/useProtected'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import React, { FC } from 'react'
+import { toast } from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import Header from '../components/Header'
 import Profile from '../components/Profile/Profile'
 import Heading from '../utils/Heading'
+
 type Props = {}
 const page: FC<Props> = (props) => {
   const [open, setOpen] = React.useState(false);
   const [activeItem] = React.useState(5);
   const [route, setRoute] = React.useState("Login");
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: any) => state.auth.user);
+  const router = useRouter();
+
+  if (!user) return null;
+
   return (
     <div>
       <Protected>

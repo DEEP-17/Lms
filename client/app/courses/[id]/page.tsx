@@ -2,13 +2,21 @@
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import CoursePlayer from '@/app/utils/CoursePlayer';
-import { useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
+import { useAddAnswerMutation, useAddQuestionMutation, useAddReplyToReviewMutation, useAddReviewMutation, useCreatePaymentMutation, useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useGetSingleCourseQuery, useGetStripePublishableKeyQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
+import Lottie from 'lottie-react';
 import { Play } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { FaPlus, FaRegStar, FaReply, FaStar } from 'react-icons/fa';
+import { IoCloseOutline } from 'react-icons/io5';
+import CheckoutForm from './CheckoutForm';
+
 
 // Extend CourseFormData to match API response
 interface CourseDetail extends Omit<CourseFormData, 'thumbnail' | 'ratings' | 'purchased' | 'courseData'> {
@@ -30,25 +38,71 @@ interface CourseDetail extends Omit<CourseFormData, 'thumbnail' | 'ratings' | 'p
    };
 }
 
+// Define a type for review and reply
+interface ReviewReply {
+   _id: string;
+   user?: { name?: string; avatar?: { url?: string } };
+   comment: string;
+}
+interface Review {
+   _id: string;
+   user?: { name?: string; avatar?: { url?: string } };
+   rating: number;
+   comment: string;
+   replies?: ReviewReply[];
+}
+
 const CourseDetailPage: React.FC = () => {
    const params = useParams();
    const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
-   const { data, isLoading, error } = useGetSingleCourseQuery(id ?? '', { skip: !id });
+   const { data, isLoading: isCourseLoading } = useGetSingleCourseQuery(id ?? '', { skip: !id });
    const course: CourseDetail | undefined = data?.course as CourseDetail | undefined;
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
    const [activeTab, setActiveTab] = useState('overview');
 
    // Check if user is enrolled
-   const { data: session } = useSession();
-   const { data: enrolledCoursesData } = useGetEnrolledCoursesQuery(undefined, {
+   const { data: session, status: sessionStatus } = useSession();
+   const { data: enrolledCoursesData, isLoading: isEnrolledLoading } = useGetEnrolledCoursesQuery(undefined, {
       skip: !session?.user
    });
    const enrolledCourses = enrolledCoursesData?.courses || [];
    const isEnrolled = enrolledCourses.some((enrolledCourse: CourseFormData) => enrolledCourse._id === id);
 
    // Fetch all courses for related courses
-   const { data: allCoursesData } = useGetAllCoursesQuery();
+   const { data: allCoursesData, isLoading: isAllCoursesLoading } = useGetAllCoursesQuery();
    const allCourses = (allCoursesData?.courses || []) as unknown as CourseDetail[];
+   const [open, setOpen] = useState(false);
+   const { data: config, isLoading: isConfigLoading } = useGetStripePublishableKeyQuery();
+   const [createPaymentIntent, { isLoading: isPaymentLoading }] = useCreatePaymentMutation();
+   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+   const [clientSecret, setClientSecret] = useState('');
+
+   const [addReview, { isLoading: isReviewLoading }] = useAddReviewMutation();
+   const [addReplyToReview, { isLoading: isReplyLoading }] = useAddReplyToReviewMutation();
+   const [reviewText, setReviewText] = useState('');
+   const [reviewRating, setReviewRating] = useState(5);
+   const [replyText, setReplyText] = useState<{ [reviewId: string]: string }>({});
+   const [openReply, setOpenReply] = useState<string | null>(null);
+   const [showAddReview, setShowAddReview] = useState(false);
+
+   useEffect(() => {
+      if (config?.publishableKey) {
+         setStripePromise(loadStripe(config.publishableKey));
+      }
+   }, [config]);
+
+   const handleOrder = async () => {
+      if (!course) return;
+      setOpen(true);
+      try {
+         const amount = Math.round(Number(course.price) * 100); // Stripe expects cents
+         const result = await createPaymentIntent({ amount }).unwrap();
+         setClientSecret(result.clientSecret);
+      } catch (error: any) {
+         toast.error('Failed to initialize payment. Please try again.');
+         setOpen(false);
+      }
+   };
 
    // Find related courses by tag or level, excluding current course
    let relatedCourses: CourseDetail[] = [];
@@ -67,11 +121,54 @@ const CourseDetailPage: React.FC = () => {
 
    }
 
+   const [animationData, setAnimationData] = useState<any>(null);
+   useEffect(() => {
+      fetch('/animation.json')
+         .then((res) => res.json())
+         .then(setAnimationData);
+   }, []);
+
+   const handleAddReview = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!reviewText || !reviewRating) return toast.error('Please provide a rating and comment.');
+      try {
+         await addReview({ courseId: id!, review: reviewText, rating: reviewRating }).unwrap();
+         setReviewText('');
+         setReviewRating(5);
+         toast.success('Review submitted!');
+      } catch {
+         toast.error('Failed to submit review.');
+      }
+   };
+
+   const handleAddReply = async (reviewId: string) => {
+      if (!replyText[reviewId]) return toast.error('Please enter a reply.');
+      try {
+         await addReplyToReview({ courseId: id!, reviewId, comment: replyText[reviewId] }).unwrap();
+         setReplyText((prev) => ({ ...prev, [reviewId]: '' }));
+         toast.success('Reply added!');
+      } catch {
+         toast.error('Failed to add reply.');
+      }
+   };
+
+   // Show loader until all required data is loaded
+   const isLoading =
+      isCourseLoading ||
+      sessionStatus === 'loading' ||
+      isEnrolledLoading ||
+      isAllCoursesLoading ||
+      isConfigLoading;
+
    if (isLoading) {
-      return <div className="min-h-screen flex items-center justify-center text-lg text-gray-600 dark:text-gray-300">Loading...</div>;
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
    }
-   if (error || !course) {
-      return <div className="min-h-screen flex items-center justify-center text-red-500">{(error as { message?: string })?.message || 'Course not found.'}</div>;
+   if (!course) {
+      return <div className="min-h-screen flex items-center justify-center text-red-500">Course not found.</div>;
    }
 
    return (
@@ -110,7 +207,124 @@ const CourseDetailPage: React.FC = () => {
 
                {/* Hero Section with Demo Video */}
                <div className="mb-12">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+
+                     {/* Course Info Section */}
+                     <div className="lg:col-span-2">
+                        <div className="flex items-start gap-2 mb-2">
+
+                           <div className="flex-1">
+                              <h1 className="text-3xl md:text-4xl font-extrabold text-black dark:text-white mb-2 leading-tight">
+                                 {course.name}
+                              </h1>
+                              <div className="flex flex-wrap items-center gap-4 mb-3">
+                                 <span className="text-yellow-400 text-lg">{'★'.repeat(Math.round(course.ratings ?? 0))}{'☆'.repeat(5 - Math.round(course.ratings ?? 0))}</span>
+                                 <span className="text-gray-600 dark:text-gray-300 text-sm">{course.ratings?.toFixed(2)} / 5</span>
+
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 mb-4">
+                                 {course.level && <span className="px-3 py-1 bg-cyan-100 dark:bg-slate-800 rounded-full text-cyan-700 dark:text-cyan-300 text-xs font-semibold">{course.level}</span>}
+
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 mb-4">
+                                 {course.tags && course.tags.split(',').map((tag: string, idx: number) => (
+                                    <span key={idx} className="px-3 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-full text-xs font-semibold">{tag.trim()}</span>
+                                 ))}
+                              </div>
+                              <div className="mb-6">
+                                 <div className="flex items-center gap-4 mb-4">
+                                    <span className="text-3xl font-bold text-cyan-600 dark:text-cyan-200">₹{course.price}</span>
+                                    {course.estimatedPrice && (
+                                       <span className="text-xl line-through text-gray-400">₹{course.estimatedPrice}</span>
+                                    )}
+
+                                 </div>
+                                 <div className='flex items-center gap-4 mb-4'>
+                                    {course.estimatedPrice && (
+                                       <span className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                                          {Math.round(((Number(course.estimatedPrice) - Number(course.price)) / Number(course.estimatedPrice)) * 100)}% OFF
+                                       </span>
+                                    )}
+                                 </div>
+                              </div>
+                           </div>
+                           <div className='flex-1 h-72 w-full'>
+                              {(() => {
+                                 if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                                    return (
+                                       <img
+                                          src={course.thumbnail.url}
+                                          alt={course.name}
+                                          className="w-full h-60 object-cover object-center"
+                                       />
+                                    );
+                                 } else if (typeof course.thumbnail === 'string') {
+                                    return (
+                                       <img
+                                          src={course.thumbnail}
+                                          alt={course.name}
+                                          className="w-full h-60 object-cover object-center"
+                                       />
+                                    );
+                                 } else {
+                                    return (
+                                       <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                          {animationData ? (
+                                             <Lottie
+                                                animationData={animationData}
+                                                loop
+                                                autoplay
+                                             />
+                                          ) : (
+                                             <span className="text-gray-400">No Image</span>
+                                          )}
+                                       </div>
+                                    );
+                                 }
+                              })()}
+                           </div>
+
+
+                        </div>
+                        <div className="flex flex-wrap gap-4 my-2">
+                           {isEnrolled ? (
+                              <>
+                                 <Link
+                                    href={`/courses/${course._id}/components`}
+                                    className="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center gap-2"
+                                 >
+                                    <Play className="w-5 h-5" />
+                                    Continue Learning
+                                 </Link>
+                              </>
+                           ) : (
+                              <button
+                                 className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                 onClick={handleOrder}
+                                 disabled={isPaymentLoading}
+                              >
+                                 {isPaymentLoading ? 'Initializing...' : 'Enroll Now'}
+                              </button>
+                           )}
+                        </div>
+
+                        {/* Course Highlights */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                           <div className="text-center p-2 bg-cyan-50 dark:bg-slate-800 rounded-xl">
+                              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                                 {Array.isArray(course.courseData) ? course.courseData.length : 0}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Lessons</div>
+                           </div>
+                           <div className="text-center p-2 bg-green-50 dark:bg-slate-800 rounded-xl">
+                              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                 {course.purchased ?? 0}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Students</div>
+                           </div>
+                        </div>
+                     </div>
                      {/* Demo Video Section */}
                      <div className="lg:col-span-1">
                         <div className="flex items-center justify-between mb-4">
@@ -144,84 +358,6 @@ const CourseDetailPage: React.FC = () => {
                            </div>
                         )}
                      </div>
-
-                     {/* Course Info Section */}
-                     <div className="lg:col-span-1">
-                        <div className="flex items-start gap-6 mb-6">
-                           <img
-                              src={course.thumbnail?.url || '/avatar.jpg'}
-                              alt={course.name}
-                              className="w-48 h-48 object-cover rounded-2xl shadow-lg border-2 border-cyan-100 dark:border-slate-700"
-                           />
-                           <div className="flex-1">
-                              <h1 className="text-3xl md:text-4xl font-extrabold text-black dark:text-white mb-2 leading-tight">
-                                 {course.name}
-                              </h1>
-                              <div className="flex flex-wrap items-center gap-4 mb-3">
-                                 <span className="text-yellow-400 text-lg">{'★'.repeat(Math.round(course.ratings ?? 0))}{'☆'.repeat(5 - Math.round(course.ratings ?? 0))}</span>
-                                 <span className="text-gray-600 dark:text-gray-300 text-sm">{course.ratings?.toFixed(2)} / 5</span>
-                                 <span className="text-gray-500 dark:text-gray-400 text-sm">{course.purchased ?? 0} students enrolled</span>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-3 mb-4">
-                                 {course.level && <span className="px-3 py-1 bg-cyan-100 dark:bg-slate-800 rounded-full text-cyan-700 dark:text-cyan-300 text-xs font-semibold">{course.level}</span>}
-                                 {course.tags && course.tags.split(',').map((tag: string, idx: number) => (
-                                    <span key={idx} className="px-3 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-full text-xs font-semibold">{tag.trim()}</span>
-                                 ))}
-                              </div>
-                           </div>
-                        </div>
-
-                        {/* Pricing Section */}
-                        <div className="mb-6">
-                           <div className="flex items-center gap-4 mb-4">
-                              <span className="text-3xl font-bold text-cyan-600 dark:text-cyan-200">₹{course.price}</span>
-                              {course.estimatedPrice && (
-                                 <span className="text-xl line-through text-gray-400">₹{course.estimatedPrice}</span>
-                              )}
-                              {course.estimatedPrice && (
-                                 <span className="text-sm text-green-600 dark:text-green-400 font-semibold">
-                                    {Math.round(((Number(course.estimatedPrice) - Number(course.price)) / Number(course.estimatedPrice)) * 100)}% OFF
-                                 </span>
-                              )}
-                           </div>
-                           <div className="flex flex-wrap gap-4">
-                              {isEnrolled ? (
-                                 <>
-                                    <Link
-                                       href={`/courses/${course._id}/components`}
-                                       className="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center gap-2"
-                                    >
-                                       <Play className="w-5 h-5" />
-                                       Continue Learning
-                                    </Link>
-                                 </>
-                              ) : (
-                                 <button className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-                                    Enroll Now
-                                 </button>
-                              )}
-                              <button className="px-8 py-3 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition-all duration-300 cursor-pointer">
-                                 Add to Wishlist
-                              </button>
-                           </div>
-                        </div>
-
-                        {/* Course Highlights */}
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                           <div className="text-center p-4 bg-cyan-50 dark:bg-slate-800 rounded-xl">
-                              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-                                 {Array.isArray(course.courseData) ? course.courseData.length : 0}
-                              </div>
-                              <div className="text-sm text-gray-600 dark:text-gray-400">Lessons</div>
-                           </div>
-                           <div className="text-center p-4 bg-green-50 dark:bg-slate-800 rounded-xl">
-                              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                 {course.purchased ?? 0}
-                              </div>
-                              <div className="text-sm text-gray-600 dark:text-gray-400">Students</div>
-                           </div>
-                        </div>
-                     </div>
                   </div>
                </div>
 
@@ -230,7 +366,7 @@ const CourseDetailPage: React.FC = () => {
                   <div className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-slate-700">
                      <button
                         onClick={() => setActiveTab('overview')}
-                        className={`px-6 py-3 font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'overview'
+                        className={`px-6 py-3 cursor-pointer font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'overview'
                            ? 'bg-cyan-600 text-white'
                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                            }`}
@@ -239,7 +375,7 @@ const CourseDetailPage: React.FC = () => {
                      </button>
                      <button
                         onClick={() => setActiveTab('curriculum')}
-                        className={`px-6 py-3 font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'curriculum'
+                        className={`px-6 py-3 cursor-pointer font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'curriculum'
                            ? 'bg-cyan-600 text-white'
                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                            }`}
@@ -248,7 +384,7 @@ const CourseDetailPage: React.FC = () => {
                      </button>
                      <button
                         onClick={() => setActiveTab('reviews')}
-                        className={`px-6 py-3 font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'reviews'
+                        className={`px-6 py-3 cursor-pointer font-semibold rounded-t-lg transition-all duration-300 ${activeTab === 'reviews'
                            ? 'bg-cyan-600 text-white'
                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                            }`}
@@ -346,24 +482,136 @@ const CourseDetailPage: React.FC = () => {
                   {/* Reviews Tab */}
                   {activeTab === 'reviews' && (
                      <div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-6">Student Reviews</h3>
+                        <div className='flex items-center justify-between'>
+                           <h3 className="text-2xl font-bold text-black dark:text-white mb-6">Student Reviews</h3>
+                           {/* Add Review Button */}
+                           {isEnrolled && !showAddReview && (
+                              <button
+                                 type="button"
+                                 className="mb-6 flex items-center gap-2 px-5 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
+                                 onClick={() => setShowAddReview(true)}
+                              >
+                                 <FaPlus className="w-4 h-4" />
+                                 Add Review
+                              </button>
+                           )}
+                        </div>
+
+                        {/* Add Review Form */}
+                        {isEnrolled && showAddReview && (
+                           <form onSubmit={handleAddReview} className="mb-8 relative bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-xl p-6 shadow-sm max-w-lg mx-auto animate-fade-in">
+                              <button
+                                 type="button"
+                                 className="absolute top-3 right-3 text-gray-400 hover:text-cyan-600 text-xl cursor-pointer"
+                                 onClick={() => setShowAddReview(false)}
+                                 title="Close"
+                              >
+                                 <IoCloseOutline />
+                              </button>
+                              <div className="mb-4 flex items-center gap-3">
+                                 <span className="font-semibold text-black dark:text-white">Your Rating:</span>
+                                 <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map(r => (
+                                       <button
+                                          key={r}
+                                          type="button"
+                                          className="focus:outline-none"
+                                          onClick={() => setReviewRating(r)}
+                                          tabIndex={0}
+                                       >
+                                          {reviewRating >= r ? <FaStar className="text-yellow-400 w-5 h-5 transition" /> : <FaRegStar className="text-gray-300 w-5 h-5 transition" />}
+                                       </button>
+                                    ))}
+                                 </div>
+                              </div>
+                              <textarea
+                                 value={reviewText}
+                                 onChange={e => setReviewText(e.target.value)}
+                                 className="w-full rounded-lg border border-cyan-200 dark:border-slate-700 px-4 py-2 mb-4 bg-cyan-50 dark:bg-slate-800 text-black dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900 transition min-h-[80px]"
+                                 placeholder="Write your review..."
+                                 rows={3}
+                              />
+                              <button
+                                 type="submit"
+                                 className="w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-semibold transition cursor-pointer shadow-sm"
+                                 disabled={isReviewLoading}
+                              >
+                                 {isReviewLoading ? 'Submitting...' : 'Submit Review'}
+                              </button>
+                           </form>
+                        )}
+                        {/* Reviews List */}
                         {Array.isArray(course.reviews) && course.reviews.length > 0 ? (
                            <div className="space-y-6">
-                              {(course.reviews as Array<{ _id: string; user?: { name?: string; avatar?: { url?: string } }; rating: number; comment: string }>).map((review) => (
-                                 <div key={review._id} className="border-b border-cyan-100 dark:border-slate-800 pb-6 last:border-b-0">
+                              {(course.reviews as Review[]).map((review) => (
+                                 <div key={review._id} className="border-b border-cyan-100 dark:border-slate-800 pb-8 last:border-b-0">
                                     <div className="flex items-start gap-4">
                                        <img
                                           src={review.user?.avatar?.url || '/avatar.jpg'}
                                           alt={review.user?.name || 'User'}
-                                          className="w-12 h-12 rounded-full object-cover border-2 border-cyan-200 dark:border-slate-700"
+                                          className="w-12 h-12 rounded-full object-cover border border-cyan-100 dark:border-slate-700 shadow-sm"
                                        />
                                        <div className="flex-1">
-                                          <div className="flex items-center gap-3 mb-2">
-                                             <h4 className="font-semibold text-black dark:text-white">{review.user?.name || 'Anonymous'}</h4>
-                                             <span className="text-yellow-400 text-sm">{'★'.repeat(Math.round(review.rating))}{'☆'.repeat(5 - Math.round(review.rating))}</span>
-                                             <span className="text-gray-500 dark:text-gray-400 text-sm">{review.rating}/5</span>
+                                          <div className="flex items-center gap-2 mb-1">
+                                             <h4 className="font-semibold text-black dark:text-white text-base">{review.user?.name || 'Anonymous'}</h4>
+                                             <span className="text-yellow-400 text-sm flex items-center gap-0.5">{'★'.repeat(Math.round(review.rating))}{'☆'.repeat(5 - Math.round(review.rating))}</span>
+                                             <span className="text-gray-400 text-xs">{review.rating}/5</span>
                                           </div>
-                                          <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                                          <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">{review.comment}</p>
+                                          {/* Reply Button */}
+                                          {isEnrolled && openReply !== review._id && (
+                                             <button
+                                                type="button"
+                                                className="text-cyan-600 hover:text-cyan-800 text-xs font-medium flex items-center gap-1 mb-2 cursor-pointer"
+                                                onClick={() => setOpenReply(openReply === review._id ? null : review._id)}
+                                             >
+                                                <FaReply className="w-3 h-3" /> Reply
+                                             </button>
+                                          )}
+                                          {/* Replies */}
+                                          {Array.isArray(review.replies) && review.replies.length > 0 && (
+                                             <div className="ml-6 pl-4 border-l-2 border-cyan-100 dark:border-slate-800 space-y-2">
+                                                {review.replies.map((reply, idx) => (
+                                                   <div key={reply._id || idx} className="flex items-start gap-2">
+                                                      <img src={reply.user?.avatar?.url || '/avatar.jpg'} alt={reply.user?.name || 'User'} className="w-8 h-8 rounded-full object-cover border border-cyan-100 dark:border-slate-700" />
+                                                      <div>
+                                                         <span className="font-semibold text-black dark:text-white text-xs">{reply.user?.name || 'Anonymous'}</span>
+                                                         <p className="text-gray-700 dark:text-gray-300 text-xs">{reply.comment}</p>
+                                                      </div>
+                                                   </div>
+                                                ))}
+                                             </div>
+                                          )}
+                                          {/* Reply Input - minimal, inline, with close */}
+                                          {isEnrolled && openReply === review._id && (
+                                             <form
+                                                onSubmit={e => { e.preventDefault(); handleAddReply(review._id); }}
+                                                className="mt-3 flex items-center gap-2 bg-cyan-50 dark:bg-slate-800 rounded-lg px-3 py-2 shadow-sm relative animate-fade-in"
+                                             >
+                                                <input
+                                                   type="text"
+                                                   value={replyText[review._id] || ''}
+                                                   onChange={e => setReplyText(prev => ({ ...prev, [review._id]: e.target.value }))}
+                                                   className="flex-1 rounded-lg border border-cyan-200 dark:border-slate-700 px-3 py-1 bg-white dark:bg-slate-900 text-black dark:text-white focus:border-cyan-500 focus:outline-none transition"
+                                                   placeholder="Reply to this review..."
+                                                />
+                                                <button
+                                                   type="submit"
+                                                   className="px-4 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-semibold transition cursor-pointer shadow-sm"
+                                                   disabled={isReplyLoading}
+                                                >
+                                                   {isReplyLoading ? 'Replying...' : 'Reply'}
+                                                </button>
+                                                <button
+                                                   type="button"
+                                                   className="flex items-center justify-center bg-red-700 w-8 h-8 rounded-lg text-black hover:text-cyan-600 text-lg cursor-pointer"
+                                                   onClick={() => setOpenReply(null)}
+                                                   title="Close"
+                                                >
+                                                   <IoCloseOutline />
+                                                </button>
+                                             </form>
+                                          )}
                                        </div>
                                     </div>
                                  </div>
@@ -390,11 +638,39 @@ const CourseDetailPage: React.FC = () => {
                               className="group transition-all duration-300 hover:scale-102"
                            >
                               <div className="relative overflow-hidden rounded-2xl mb-4">
-                                 <img
-                                    src={rc.thumbnail?.url || '/avatar.jpg'}
-                                    alt={rc.name}
-                                    className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
-                                 />
+                                 {(() => {
+                                    if (rc.thumbnail && typeof rc.thumbnail === 'object' && 'url' in rc.thumbnail && typeof rc.thumbnail.url === 'string' && rc.thumbnail.url.length > 0) {
+                                       return (
+                                          <img
+                                             src={rc.thumbnail.url}
+                                             alt={rc.name}
+                                             className="w-full h-60 object-cover object-center"
+                                          />
+                                       );
+                                    } else if (typeof rc.thumbnail === 'string') {
+                                       return (
+                                          <img
+                                             src={rc.thumbnail}
+                                             alt={rc.name}
+                                             className="w-full h-60 object-cover object-center"
+                                          />
+                                       );
+                                    } else {
+                                       return (
+                                          <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                             {animationData ? (
+                                                <Lottie
+                                                   animationData={animationData}
+                                                   loop
+                                                   autoplay
+                                                />
+                                             ) : (
+                                                <span className="text-gray-400">No Image</span>
+                                             )}
+                                          </div>
+                                       );
+                                    }
+                                 })()}
                                  {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div> */}
                               </div>
                               <h4 className="font-semibold text-black dark:text-white mb-2 line-clamp-2">{rc.name}</h4>
@@ -440,6 +716,33 @@ const CourseDetailPage: React.FC = () => {
             </div>
          </section>
          <Footer />
+         {open && (
+            <div className='w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center'>
+               <div className='w-[500px] min-h-[500px] bg-white dark:bg-slate-800 rounded-xl shadow p-6'>
+                  <div className="flex items-center justify-between mb-6">
+                     <h2 className="text-2xl font-bold text-black dark:text-white">Complete Payment</h2>
+                     <IoCloseOutline
+                        size={30}
+                        className='text-black dark:text-white cursor-pointer hover:text-gray-600 dark:hover:text-gray-300'
+                        onClick={() => { setOpen(false); setClientSecret('') }}
+                     />
+                  </div>
+
+                  {isPaymentLoading || !stripePromise || !clientSecret ? (
+                     <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600 dark:text-gray-400">
+                           {isPaymentLoading ? 'Creating payment session...' : 'Loading payment form...'}
+                        </p>
+                     </div>
+                  ) : (
+                     <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <CheckoutForm courseId={course?._id || id || ''} />
+                     </Elements>
+                  )}
+               </div>
+            </div>
+         )}
       </>
    );
 };

@@ -4,6 +4,8 @@ import AdminSidebar from "@/app/components/Admin/sidebar/AdminSidebar";
 import AdminProtected from "@/app/hooks/adminProtected";
 import { ContactQuery, useAnswerContactMutation, useGetAllContactsQuery } from '@/redux/features/api/apiSlice';
 import { Button } from '@mui/material';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
@@ -17,11 +19,15 @@ const QueriesPage = () => {
    const [showMsgModal, setShowMsgModal] = useState(false);
    const [msgModalContent, setMsgModalContent] = useState<string | null>(null);
    const [success, setSuccess] = useState(false);
+   const { status: sessionStatus } = useSession();
+   const router = useRouter();
 
    const handleSidebarToggle = (collapsed: boolean) => setIsSidebarCollapsed(collapsed);
 
    const { data, isLoading, refetch } = useGetAllContactsQuery();
    const queries = data?.contacts || [];
+   const [showAnswerModal, setShowAnswerModal] = useState(false);
+   const [answerModalContent, setAnswerModalContent] = useState<{ name: string; question: string; answer: string } | null>(null);
 
    const handleReply = (query: ContactQuery) => {
       setSelected(query);
@@ -55,6 +61,23 @@ const QueriesPage = () => {
       setShowMsgModal(true);
    };
 
+   React.useEffect(() => {
+      if (sessionStatus === 'unauthenticated') {
+         toast.error('You must be an admin to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router]);
+
+   if (sessionStatus === 'loading') {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
+   }
+
+   if (sessionStatus === 'unauthenticated') return null;
+
    return (
       <AdminProtected>
          <div className="admin-layout overflow-hidden">
@@ -82,7 +105,7 @@ const QueriesPage = () => {
                            </thead>
                            <tbody>
                               {queries.map((q) => (
-                                 <tr key={q._id} className="border-b border-gray-200 dark:border-slate-700 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors">
+                                 <tr key={q._id} className="border-b border-gray-200 dark:border-slate-700 hover:bg-cyan-50 dark:hover:bg-slate-800 transition-colors">
                                     <td className="px-4 py-2 dark:text-white">{q.name}</td>
                                     <td className="px-4 py-2 dark:text-white">{q.email}</td>
                                     <td className="px-4 py-2 max-w-xs truncate cursor-pointer text-cyan-700 dark:text-cyan-300 underline" title={q.message} onClick={() => handleShowMsg(q.message)}>
@@ -102,16 +125,49 @@ const QueriesPage = () => {
                                     </td>
                                     <td className="px-4 py-2 dark:text-white">
                                        {q.answered ? (
-                                          <span className="text-green-600 dark:text-green-300">Answered</span>
-                                       ) : (
-                                          <button
-                                             className="px-3 py-1 bg-[#E78B48] hover:bg-[#BE3D2A] text-black dark:text-white rounded shadow cursor-pointer"
-                                             onClick={() => handleReply(q)}
-                                          >
-                                             Reply
-                                          </button>
+                                          // View Answer button functionality
+                                          <>
+                                             <div className="flex flex-col gap-2">
+                                                <button
+                                                   className="flex items-center justify-center gap-2 px-1 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer text-xs w-24"
+                                                   onClick={() => {
+                                                      setShowAnswerModal(true);
+                                                      setAnswerModalContent({
+                                                         name: q.name,
+                                                         question: q.message,
+                                                         answer: q.answerText || '',
+                                                      });
+                                                   }}
+                                                >
+                                                   View Answer
+                                                </button>
+                                             </div>
+
+                                             {showAnswerModal && answerModalContent && (
+                                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-40">
+                                                   <div className="bg-white dark:bg-slate-900 rounded-xl p-8 shadow-xl max-w-lg w-full">
+                                                      <h2 className="text-xl font-bold mb-4 dark:text-white">Answer to {answerModalContent.name}</h2>
+                                                      <div className="mb-4 text-gray-700 dark:text-white whitespace-pre-line">{answerModalContent.answer}</div>
+                                                      <div className="flex justify-end">
+                                                         <button
+                                                            className="px-4 py-2 bg-[#E78B48] hover:bg-[#BE3D2A] text-black dark:text-white rounded cursor-pointer"
+                                                            onClick={() => setShowAnswerModal(false)}
+                                                         >
+                                                            Close
+                                                         </button>
+                                                      </div>
+                                                   </div>
+                                                </div>)}
+                                          </>
+                                             ) : (
+                                             <button
+                                                className="px-3 py-1 bg-[#E78B48] hover:bg-[#BE3D2A] text-black dark:text-white rounded shadow cursor-pointer"
+                                                onClick={() => handleReply(q)}
+                                             >
+                                                Reply
+                                             </button>
                                        )}
-                                    </td>
+                                          </td>
                                  </tr>
                               ))}
                            </tbody>

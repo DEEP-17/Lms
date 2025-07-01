@@ -176,7 +176,8 @@ export const logoutUser = CatchAsyncError(
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const refresh_token = req.cookies.refresh_token as string;
+      let refresh_token = req.cookies.refresh_token as string;
+      
       const decoded = jwt.verify(
         refresh_token,
         process.env.REFRESH_TOKEN as string
@@ -196,14 +197,14 @@ export const updateAccessToken = CatchAsyncError(
         { id: user._id },
         process.env.ACCESS_TOKEN as string,
         {
-          expiresIn: "5m",
+          expiresIn: "30m",
         }
       );
       const refreshToken = jwt.sign(
         { id: user._id },
         process.env.REFRESH_TOKEN as string,
         {
-          expiresIn: "3d",
+          expiresIn: "30m",
         }
       );
       res.locals.user = user;

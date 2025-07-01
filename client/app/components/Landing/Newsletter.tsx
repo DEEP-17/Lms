@@ -1,8 +1,9 @@
 import { useGetNewsletterDataQuery } from '@/redux/features/Layout/layoutApi';
 import { useSubscribeNewsletterMutation } from '@/redux/features/api/apiSlice';
-import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { AiOutlineMail } from 'react-icons/ai';
+import { FaBell, FaSpinner} from 'react-icons/fa';
 
 export default function Newsletter() {
    const { data, isLoading, error } = useGetNewsletterDataQuery(undefined, {
@@ -86,18 +87,19 @@ export default function Newsletter() {
                />
                <button
                   type="submit"
-                  className="w-[300px] px-8 py-3 bg-cyan-200 hover:bg-cyan-300 focus:bg-cyan-300 text-black rounded-lg font-bold shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer transform hover:scale-105 focus:scale-95 focus:ring-2 focus:ring-cyan-400"
+                  className="flex items-center justify-center w-[300px] gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                   disabled={loading}
                >
-                  {loading ? 'Subscribing...' : (newsletterData?.buttonText || 'Get Notified')}
+                  {loading ? (<>
+                     <FaSpinner className="w-4 h-4 animate-spin" /> Subscribing...
+                     Subscribing...</>) : (<><FaBell className="w-4 h-4" /> {newsletterData?.buttonText}</> || (<>
+                     {/* Notification icon    */}
+                     <FaBell className="w-4 h-4" />
+                     Get Notified</>))}
                </button>
             </form>
-            <div className="flex gap-3 items-center mt-4 rounded-2xl">
-               <img
-                  src="/newsletter.png"
-                  alt="NewsLetter"
-                  className="w-10 h-10 rounded-md bg-slate-300 object-cover shadow"
-               />
+            <div className="flex gap-1 items-center mt-4 rounded-2xl">
+               <AiOutlineMail className="w-8 h-8" />
                <span className="text-black dark:text-gray-300 text-sm">
                   {newsletterData?.visitorCount || '+2000 visitors worldwide'}
                </span>

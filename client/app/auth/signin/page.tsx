@@ -3,6 +3,7 @@
 import { getSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { toast } from "react-hot-toast";
 
 export default function SignIn() {
    const router = useRouter();
@@ -18,12 +19,30 @@ export default function SignIn() {
       checkSession();
    }, [router]);
 
-   const handleGoogleSignIn = () => {
-      signIn('google', { callbackUrl: '/' });
+   const handleGoogleSignIn = async () => {
+      try {
+         await signIn('google', { callbackUrl: '/' });
+      } catch (error: unknown) {
+         const err = error as { message?: string };
+         if (err?.message?.includes('client_fetch_error')) {
+            toast.error("Authentication service is currently unavailable. Please try again later.");
+         } else {
+            toast.error("An unexpected error occurred during sign in.");
+         }
+      }
    };
 
-   const handleGitHubSignIn = () => {
-      signIn('github', { callbackUrl: '/' });
+   const handleGitHubSignIn = async () => {
+      try {
+         await signIn('github', { callbackUrl: '/' });
+      } catch (error: unknown) {
+         const err = error as { message?: string };
+         if (err?.message?.includes('client_fetch_error')) {
+            toast.error("Authentication service is currently unavailable. Please try again later.");
+         } else {
+            toast.error("An unexpected error occurred during sign in.");
+         }
+      }
    };
 
    return (

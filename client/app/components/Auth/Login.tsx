@@ -118,9 +118,29 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
                     Or Join with
                 </h5>
                 <div className="flex items-center justify-center my-3 text-black dark:text-white">
-                    <FcGoogle size={30} className="cursor-pointer ml-2" onClick={() => { signIn("google") }} />
-                    <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={() => {
-                        signIn("github");
+                    <FcGoogle size={30} className="cursor-pointer ml-2" onClick={async () => {
+                        try {
+                            await signIn("google");
+                        } catch (error: unknown) {
+                            const err = error as { message?: string };
+                            if (err?.message?.includes('client_fetch_error')) {
+                                toast.error("Authentication service is currently unavailable. Please try again later.");
+                            } else {
+                                toast.error("An unexpected error occurred during sign in.");
+                            }
+                        }
+                    }} />
+                    <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={async () => {
+                        try {
+                            await signIn("github");
+                        } catch (error: unknown) {
+                            const err = error as { message?: string };
+                            if (err?.message?.includes('client_fetch_error')) {
+                                toast.error("Authentication service is currently unavailable. Please try again later.");
+                            } else {
+                                toast.error("An unexpected error occurred during sign in.");
+                            }
+                        }
                     }} />
                 </div>
                 <h5 className="dark:text-white text-black text-center pt-4 font-Poppins text-[14px]">

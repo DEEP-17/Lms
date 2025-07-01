@@ -4,6 +4,7 @@ import { Button } from '@mui/material';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { FaEnvelope } from 'react-icons/fa';
 
 interface FAQItem {
    question: string;
@@ -120,7 +121,7 @@ const FAQ: React.FC = () => {
 
             {/* Contact Section */}
             <div className="mt-12 bg-blue-50 dark:bg-slate-900 rounded-lg p-6 border border-blue-200 dark:border-slate-700">
-               <div className="text-center">
+               <div className="flex flex-col items-center justify-center">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                      Still have questions?
                   </h3>
@@ -128,9 +129,10 @@ const FAQ: React.FC = () => {
                      Can&apos;t find the answer you&apos;re looking for? Contact our support team.
                   </p>
                   <button
-                     className="px-4 py-2 bg-cyan-200 hover:bg-cyan-300 focus:bg-cyan-300 text-black font-bold rounded-lg transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl transform hover:scale-105 focus:scale-95 focus:ring-2 focus:ring-cyan-400"
+                     className="flex items-center justify-center text-center gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                      onClick={() => router.push('/contact-us')}
                   >
+                     <FaEnvelope className="w-4 h-4" />
                      Contact Support
                   </button>
                </div>

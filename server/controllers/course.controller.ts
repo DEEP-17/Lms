@@ -352,6 +352,7 @@ export const addQuestionInCourse = CatchAsyncError(
       await course.save();
       try {
         await redis.del("allCourses");
+        await redis.del(courseId);
       } catch (err) {
         console.error("Redis error (addQuestionInCourse):", err);
       }
@@ -436,6 +437,7 @@ export const addAnswer = CatchAsyncError(
       }
       try {
         await redis.del("allCourses");
+        await redis.del(courseId);
       } catch (err) {
         console.error("Redis error (addAnswer):", err);
       }
@@ -495,6 +497,7 @@ export const addReview = CatchAsyncError(
       await course.save();
       try {
         await redis.del("allCourses");
+        await redis.del(courseId);
       } catch (err) {
         console.error("Redis error (addReview):", err);
       }
@@ -544,6 +547,7 @@ export const addReplyToReview = CatchAsyncError(
       await course.save();
       try {
         await redis.del("allCourses");
+        await redis.del(courseId);
       } catch (err) {
         console.error("Redis error (addReplyToReview):", err);
       }

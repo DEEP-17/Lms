@@ -1,18 +1,21 @@
 'use client'
 import { useGetAllCoursesQuery, useGetEnrolledCoursesQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
+import Lottie from 'lottie-react';
 import { CheckCircle, Play } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
+import { FaSearch } from 'react-icons/fa';
 
 const CoursesPage: React.FC = () => {
-   const { data, isLoading, error } = useGetAllCoursesQuery();
-   const courses = data?.courses || [];
+   const { data: session, status: sessionStatus } = useSession();
+   const { data: allCoursesData, isLoading: isAllCoursesLoading } = useGetAllCoursesQuery();
+   const courses = allCoursesData?.courses || [];
    const searchParams = useSearchParams();
    const router = useRouter();
    const initialSearch = searchParams?.get('search') || '';
@@ -23,7 +26,6 @@ const CoursesPage: React.FC = () => {
    const coursesPerPage = 9; // 3x3 grid
 
    // Get enrolled courses for badges
-   const { data: session } = useSession();
    const { data: enrolledCoursesData } = useGetEnrolledCoursesQuery(undefined, {
       skip: !session?.user
    });
@@ -31,6 +33,14 @@ const CoursesPage: React.FC = () => {
    const enrolledCourseIds = enrolledCourses
       .filter((course: CourseFormData) => course._id)
       .map((course: CourseFormData) => course._id!);
+
+   const [animationData, setAnimationData] = useState<any>(null);
+
+   useEffect(() => {
+      fetch('/animation.json')
+         .then((res) => res.json())
+         .then(setAnimationData);
+   }, []);
 
    useEffect(() => {
       if (!isLoggedIn) {
@@ -160,6 +170,16 @@ const CoursesPage: React.FC = () => {
       );
    };
 
+   const isLoading = sessionStatus === 'loading' || isAllCoursesLoading;
+
+   if (isLoading) {
+      return (
+         <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
+         </div>
+      );
+   }
+
    return (
       <>
          <Header activeItem={1} route="/courses" />
@@ -182,14 +202,15 @@ const CoursesPage: React.FC = () => {
                         placeholder="Search courses by name, description, or level..."
                         className="flex-1 h-14 px-6 rounded-l-xl border-2 border-cyan-400/40 bg-white dark:bg-slate-900 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400 text-lg shadow-lg"
                      />
-                     <button type="submit" className="h-14 px-8 bg-cyan-200 hover:bg-cyan-300 text-black font-bold rounded-r-xl transition-all duration-200 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-cyan-400/50 cursor-pointer">
+                     <button type="submit" className="flex items-center justify-center text-md w-[130px] gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer">
+                        <FaSearch className="w-4 h-4" />
                         Search
                      </button>
                   </form>
                </div>
 
                {/* Results info */}
-               {!isLoading && !error && filteredCourses.length > 0 && (
+               {!isLoading && filteredCourses.length > 0 && (
                   <div className="mb-8 text-gray-600 dark:text-gray-300">
                      <span className="bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-md">
                         Showing {startIndex + 1}-{Math.min(endIndex, filteredCourses.length)} of {filteredCourses.length} courses
@@ -202,16 +223,6 @@ const CoursesPage: React.FC = () => {
                   <div className="text-center py-16">
                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto mb-4"></div>
                      <div className="text-lg text-gray-600 dark:text-gray-300">Loading courses...</div>
-                  </div>
-               ) : error ? (
-                  <div className="text-center py-16">
-                     <div className="text-red-500 text-lg mb-4">{'message' in error ? error.message : 'Failed to load courses.'}</div>
-                     <button
-                        onClick={() => window.location.reload()}
-                        className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
-                     >
-                        Try Again
-                     </button>
                   </div>
                ) : (
                   <>
@@ -227,14 +238,6 @@ const CoursesPage: React.FC = () => {
                               )}
                            </div>
                         ) : currentCourses.map(course => {
-                           let thumbnailUrl = '/avatar.jpg';
-                           if (course.thumbnail) {
-                              if (typeof course.thumbnail === 'string') {
-                                 thumbnailUrl = course.thumbnail;
-                              } else if (typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string') {
-                                 thumbnailUrl = course.thumbnail.url;
-                              }
-                           }
 
                            const isEnrolled = course._id ? enrolledCourseIds.includes(course._id) : false;
 
@@ -242,16 +245,44 @@ const CoursesPage: React.FC = () => {
                               <div key={course._id} className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
                                  {/* Course Thumbnail with Enrollment Badge */}
                                  <div className="relative flex-shrink-0">
-                                    <img
-                                       src={thumbnailUrl}
-                                       alt={course.name}
-                                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
+                                    {(() => {
+                                       if (course.thumbnail && typeof course.thumbnail === 'object' && 'url' in course.thumbnail && typeof course.thumbnail.url === 'string' && course.thumbnail.url.length > 0) {
+                                          return (
+                                             <img
+                                                src={course.thumbnail.url}
+                                                alt={course.name}
+                                                className="w-full h-60 object-cover object-center"
+                                             />
+                                          );
+                                       } else if (typeof course.thumbnail === 'string' && course.thumbnail.length > 0) {
+                                          return (
+                                             <img
+                                                src={course.thumbnail}
+                                                alt={course.name}
+                                                className="w-full h-60 object-cover object-center"
+                                             />
+                                          );
+                                       } else {
+                                          return (
+                                             <div className="w-full h-60 flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+                                                {animationData ? (
+                                                   <Lottie
+                                                      animationData={animationData}
+                                                      loop
+                                                      autoplay
+                                                   />
+                                                ) : (
+                                                   <span className="text-gray-400">No Image</span>
+                                                )}
+                                             </div>
+                                          );
+                                       }
+                                    })()}
 
                                     {/* Enrollment Badge */}
                                     {isEnrolled && (
                                        <div className="absolute top-3 right-3">
-                                          <div className="bg-cyan-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                                          <div className="flex items-center justify-center gap-2 px-2 py-1 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 transition">
                                              <CheckCircle className="w-3 h-3" />
                                              Enrolled
                                           </div>
@@ -261,7 +292,7 @@ const CoursesPage: React.FC = () => {
                                     {/* Level Badge */}
                                     {course.level && (
                                        <div className="absolute top-3 left-3">
-                                          <div className="bg-cyan-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                          <div className="flex items-center justify-center gap-2 px-2 py-1 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 transition">
                                              {course.level}
                                           </div>
                                        </div>
@@ -304,7 +335,7 @@ const CoursesPage: React.FC = () => {
                                        <span className="text-cyan-600 dark:text-cyan-400 font-semibold text-lg">₹{course.price}</span>
                                        <Link
                                           href={`/courses/${course._id}`}
-                                          className="px-4 py-2 font-bold rounded-lg transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl transform hover:scale-105 focus:scale-95 focus:ring-2 focus:ring-cyan-400 flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
+                                          className="flex items-center justify-center gap-2 px-5 py-4 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                                        >
                                           {isEnrolled ? (
                                              <>
