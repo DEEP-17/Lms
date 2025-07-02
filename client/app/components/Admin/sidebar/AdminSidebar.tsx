@@ -1,6 +1,5 @@
 import { useLogOutQuery } from '@/redux/features/auth/authApi';
 import { User } from '@/types/user';
-import { Button } from '@mui/material';
 import {
   BookOpen,
   ChevronLeft,
@@ -20,6 +19,7 @@ import {
   Users
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { cookies } from 'next/headers';
 import { usePathname, useRouter } from 'next/navigation';
 import { default as React, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -323,8 +323,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
   }, [logout, logoutRefetch]);
 
-  const logOutHandler = () => {
+  const logOutHandler = async () => {
     setLogout(true);
+    await signOut({ callbackUrl: '/' });
+    (await cookies()).delete('refresh_token');
   };
 
   return (

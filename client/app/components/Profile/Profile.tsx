@@ -1,4 +1,3 @@
-'use client'
 import { useLogOutQuery } from '@/redux/features/auth/authApi';
 import { signOut } from 'next-auth/react';
 import React, { FC, useEffect, useState } from 'react';
@@ -7,6 +6,7 @@ import ChangePassword from './ChangePassword';
 import EnrolledCourses from './EnrolledCourses';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
+import { cookies } from 'next/headers';
 
 interface User {
    _id: string;
@@ -34,6 +34,8 @@ const Profile: FC<Props> = ({ user }) => {
    const logOutHandler = async () => {
       setLogout(true);
       await signOut({ callbackUrl: '/' });
+      // delete refresh token from cookies
+      (await cookies()).delete('refresh_token');
       toast.success('Logged out successfully');
    };
 

@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import useAuth from '../hooks/useAuth';
 import { FaSearch } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -25,7 +24,7 @@ const CoursesPage: React.FC = () => {
    const initialPage = parseInt(searchParams?.get('page') || '1');
    const [search, setSearch] = React.useState(initialSearch);
    const [currentPage, setCurrentPage] = React.useState(initialPage);
-   const isLoggedIn = useAuth();
+   const [redirecting, setRedirecting] = useState(false);
    const coursesPerPage = 9; // 3x3 grid
 
    // Get enrolled courses for badges
@@ -46,11 +45,12 @@ const CoursesPage: React.FC = () => {
    }, []);
 
    useEffect(() => {
-      if (!isLoggedIn && !userData) {
-         toast.error('You must be logged in to access this page.');
+      if(sessionStatus === 'loading' || isUserLoading) return;
+      if (!session?.user && !userData) {
+         setRedirecting(true);
          router.replace('/');
       }
-   }, [isLoggedIn, router, userData]);
+   }, [session?.user, router, userData, sessionStatus, isUserLoading]);
 
    // Filter courses by search
    const filteredCourses = useMemo(() => {
@@ -134,9 +134,7 @@ const CoursesPage: React.FC = () => {
          return pages;
       };
 
-      if (isUserLoading) {
-         return <Loader />;
-      }
+      
       return (
          <div className="flex justify-center items-center gap-2 lg:gap-3 mt-16">
             {/* Previous button */}
@@ -179,11 +177,9 @@ const CoursesPage: React.FC = () => {
 
    const isLoading = sessionStatus === 'loading' || isAllCoursesLoading;
 
-   if (isLoading) {
+   if (isUserLoading || sessionStatus === 'loading') {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader/>
       );
    }
 

@@ -1,18 +1,22 @@
 import express from "express";
 import {
   activateUser,
-  loginUser,
-  registerUser,
-  logoutUser,
-  updateAccessToken,
+  deleteUser,
+  forgotPassword,
+  generateEmailVerificationToken,
+  getAllUsers,
   getUserInfo,
+  loginUser,
+  logoutUser,
+  registerUser,
+  resetPassword,
   socialAuth,
-  updateUserInfo,
+  updateAccessToken,
   updatePassword,
   updateProfilePicture,
-  getAllUsers,
+  updateUserInfo,
   updateUserRole,
-  deleteUser,
+  verifyEmail,
 } from "../controllers/user.controller";
 import { authorizeRoles, isAuthenticated } from "../middleware/auth";
 const userRouter = express.Router();
@@ -30,8 +34,30 @@ userRouter.get(
   "/get-all-users",
   isAuthenticated,
   authorizeRoles("admin"),
-  getAllUsers);
-userRouter.put("/update-user-role", isAuthenticated, authorizeRoles("admin"), updateUserRole);
-userRouter.delete("/delete-user/:id", isAuthenticated, authorizeRoles("admin"), deleteUser);
+  getAllUsers
+);
+userRouter.put(
+  "/update-user-role",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  updateUserRole
+);
+userRouter.delete(
+  "/delete-user/:id",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  deleteUser
+);
+
+userRouter.post(
+  "/generate-email-verification-link",
+  isAuthenticated,
+  generateEmailVerificationToken
+);
+
+userRouter.post("/verify-email", isAuthenticated, verifyEmail);
+
+userRouter.post("/forgot-password", forgotPassword);
+userRouter.post("/reset-password", resetPassword);
 
 export default userRouter;

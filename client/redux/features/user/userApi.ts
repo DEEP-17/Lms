@@ -63,6 +63,39 @@ export const userApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    generateEmailVerificationToken: builder.mutation<APIResponse, string>({
+      query: (id) => ({
+        url: `/generate-email-verification-link`,
+        method: "POST",
+        body: { id },
+        credentials: "include" as const,
+      }),
+    }),
+    verifyEmail: builder.mutation<APIResponse, string>({
+      query: (verificationToken) => ({
+        url: `/verify-email`,
+        method: "POST",
+        body: { verificationToken },
+        credentials: "include" as const,
+      }),
+    }),
+    forgotPassword: builder.mutation<APIResponse, { email: string }>({
+      query: ({ email }) => ({
+        url: "/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+    }),
+    resetPassword: builder.mutation<
+      APIResponse,
+      { token: string; email: string; password: string }
+    >({
+      query: ({ token, email, password }) => ({
+        url: "/reset-password",
+        method: "POST",
+        body: { token, email, password },
+      }),
+    }),
   }),
 });
 
@@ -74,4 +107,8 @@ export const {
   useUpdateUserRoleMutation,
   useDeleteUserMutation,
   useGetUserByIdQuery,
+  useGenerateEmailVerificationTokenMutation,
+  useVerifyEmailMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = userApi;

@@ -1,8 +1,7 @@
 'use client';
 
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
-import { useEditProfileMutation, useUpdateAvatarMutation } from '@/redux/features/user/userApi';
-import { Button } from '@mui/material';
+import { useEditProfileMutation, useGenerateEmailVerificationTokenMutation, useUpdateAvatarMutation } from '@/redux/features/user/userApi';
 import { Pencil } from 'lucide-react';
 import Image from 'next/image';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
@@ -24,6 +23,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
    const { data: userData, refetch } = useLoadUserQuery(undefined);
    const [updateAvatar, { isSuccess: avatarSuccess, isLoading: avatarLoading, error: avatarError }] = useUpdateAvatarMutation();
    const [editProfile, { isSuccess: profileSuccess, error: profileError }] = useEditProfileMutation();
+   const [generateEmailVerificationToken, { isSuccess: emailVerificationSuccess, isLoading: emailVerificationLoading, error: emailVerificationError }] = useGenerateEmailVerificationTokenMutation();
 
    const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -80,6 +80,17 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
       }
    }, [profileSuccess, profileError, refetch]);
 
+   useEffect(() => {
+      if (emailVerificationSuccess) {
+         toast.dismiss();
+         toast.success('Email verification link sent successfully');
+      }
+      if (emailVerificationError) {
+         toast.dismiss();
+         toast.error('Error sending email verification link');
+      }
+   }, [emailVerificationSuccess, emailVerificationError, user?.isVerified]);
+
    // Use fresh user data if available
    const displayUser = userData?.user || user;
    const displayAvatar = avatarPreview
@@ -87,6 +98,13 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
       : displayUser?.avatar?.public_id !== 'default_avatar'
          ? displayUser?.avatar?.url
          : '/avatar.jpg';
+
+   const handleEmailVerification = async () => {
+      await generateEmailVerificationToken(user?._id);
+      if (emailVerificationLoading) {
+         toast.loading('Sending email verification link...');
+      }
+   }
 
    return (
       <div className="flex flex-col items-center justify-center content-center gap-4 sm:gap-5 w-full max-w-md mx-auto p-2 sm:p-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-lg border border-primary/10 dark:border-primary/20">
@@ -121,7 +139,7 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
 
          {editingAvatar && (
             <button
-               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all disabled:opacity-50 cursor-pointer"
+               className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                onClick={handleAvatarSave}
                disabled={avatarLoading}
             >
@@ -165,14 +183,35 @@ const ProfileInfo: FC<Props> = ({ user, avatar }) => {
          {/* Email (non-editable) */}
          <div className="w-full flex flex-col gap-2">
             <label className="text-slate-600 dark:text-slate-300 font-semibold text-sm sm:text-base">Email:</label>
-            <p className="px-3 sm:px-4 py-2 bg-slate-100 dark:bg-slate-900 rounded-md text-slate-900 dark:text-slate-100 text-sm sm:text-base break-words">
-               {displayUser?.email}
-            </p>
+            <div className='flex items-center justify-between'>
+               <p className="px-3 sm:px-4 py-2 bg-slate-100 dark:bg-slate-900 rounded-md text-slate-900 dark:text-slate-100 text-sm sm:text-base break-words">
+                  {displayUser?.email}
+               </p>
+               {/* Email Verification add button to verify email */}
+               {
+                  !user.isVerified ? (
+                     <button
+                        className="flex items-center justify-center gap-2 px-2 py-1 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
+                        onClick={handleEmailVerification}
+                     >
+                        {(emailVerificationLoading) ? "Sending..." : "Verify Email"}
+                     </button>
+                  )
+                  :(
+                        <p className="flex items-center justify-center gap-2 px-2 py-1 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition">
+                        Verified
+                     </p>
+                  )
+               }
+            </div>
          </div>
+
+
+
 
          {editingName && (
             <button
-               className="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all cursor-pointer"
+               className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer"
                onClick={handleNameSave}
             >
                Update

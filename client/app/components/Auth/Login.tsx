@@ -108,10 +108,13 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
                         )
                     }
                 </div>
+                <div className="w-full mt-2 flex justify-end">
+                    <a href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">Forgot Password?</a>
+                </div>
                 <div className="w-full mt-5 text-black dark:text-white flex items-center justify-between">
                     <input type="submit"
                         value="Login"
-                        className={`${styles.button} cursor-pointer`} />
+                        className={`mx-auto w-full gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-semibold transition cursor-pointer`} />
                 </div>
                 <br />
                 <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">

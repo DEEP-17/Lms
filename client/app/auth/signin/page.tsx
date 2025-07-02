@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react';
 import { getSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -13,7 +14,7 @@ export default function SignIn() {
       const checkSession = async () => {
          const session = await getSession();
          if (session) {
-            await router.push('/');
+            router.push('/');
          }
       };
       checkSession();
