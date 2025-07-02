@@ -15,6 +15,8 @@ import {
 import ErrorHandler from "../utils/ErrorHandler";
 import {
   accessTokenOptions,
+  getAccessTokenExpire,
+  getRefreshTokenExpire,
   refreshTokenOptions,
   sendToken,
 } from "../utils/jwt";
@@ -43,7 +45,6 @@ export const registerUser = CatchAsyncError(
         password,
       };
       const activationToken = createActivationToken(user);
-      console.log(activationToken);
       const activationCode = activationToken.activationCode;
       const data = { user: { name: user.name }, activationCode };
       const html = await ejs.renderFile(
@@ -186,30 +187,20 @@ export const updateAccessToken = CatchAsyncError(
       if (!decoded) {
         return next(new ErrorHandler(message, 400));
       }
-      const session = await redis.get(String(decoded.id));
-      if (!session) {
-        return next(
-          new ErrorHandler("Please login for access this resources!", 400)
-        );
+
+      const user = await userModel.findById(decoded.id);
+      if (!user) {
+        return next(new ErrorHandler(message, 400));
       }
-      const user = JSON.parse(session);
       const accessToken = jwt.sign(
         { id: user._id },
         process.env.ACCESS_TOKEN as string,
         {
-          expiresIn: "30m",
-        }
-      );
-      const refreshToken = jwt.sign(
-        { id: user._id },
-        process.env.REFRESH_TOKEN as string,
-        {
-          expiresIn: "30m",
+          expiresIn:`${getAccessTokenExpire()}m`,
         }
       );
       res.locals.user = user;
       res.cookie("access_token", accessToken, accessTokenOptions);
-      res.cookie("refresh_token", refreshToken, refreshTokenOptions);
       await redis.set(String(user._id), JSON.stringify(user), "EX", 240);
       res.status(200).json({
         success: "success",

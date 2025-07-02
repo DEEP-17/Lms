@@ -11,8 +11,8 @@ const layoutApi = apiSlice.injectEndpoints({
       }),
     }),
     getHeroData: builder.query({
-      query: (type) => ({
-        url: `get-layout/${type}`,
+      query: () => ({
+        url: `get-layout/layout`,
         method: "GET",
         credentials: "include" as const,
       }),

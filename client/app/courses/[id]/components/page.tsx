@@ -2,7 +2,8 @@
 
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
-import { useGetCourseContentQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
+import Loader from '@/app/components/Loader/Loader';
+import { useGetCourseContentQuery, useGetSingleCourseQuery,useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import Lottie from 'lottie-react';
 import { BookOpen, ChevronRight, Clock, Download, MessageCircle, Play } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -16,7 +17,8 @@ const CourseComponentsPage: FC = () => {
    const router = useRouter();
    const courseId = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
 
-   const { data: session } = useSession();
+   const { data: session ,status: sessionStatus} = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
    const { data: courseData, isLoading: courseLoading, isError } = useGetSingleCourseQuery(courseId ?? '', { skip: !courseId });
    const { data: contentData, isLoading: contentLoading } = useGetCourseContentQuery(courseId ?? '', { skip: !courseId });
 
@@ -27,7 +29,7 @@ const CourseComponentsPage: FC = () => {
    // Handle authentication redirect in useEffect
    useEffect(() => {
       const handleAuthRedirect = async () => {
-         if (!session?.user) {
+         if (!session?.user && !userData) {
             toast.error('Please purchase course to view.');
             router.push('/');
          }
@@ -51,20 +53,17 @@ const CourseComponentsPage: FC = () => {
          .then(setAnimationData);
    }, []);
 
+   useEffect(() => { 
+      if (sessionStatus === 'unauthenticated' && !userData) {
+         toast.error('You must be logged in to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router, userData]);
+
    // Show loading while checking authentication
-   if (!session?.user) {
+   if (sessionStatus === 'loading' || isUserLoading) {
       return (
-         <>
-            <Header activeItem={1} route="/courses" />
-            <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 py-24">
-               <div className="max-w-6xl mx-auto px-4">
-                  <div className="flex items-center justify-center h-64">
-                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-                  </div>
-               </div>
-            </div>
-            <Footer />
-         </>
+         <Loader/>
       );
    }
 

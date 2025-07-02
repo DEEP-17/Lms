@@ -21,26 +21,26 @@ function getEnvOrThrow(key: string): string {
 
 export const getAccessTokenSecret = () => getEnvOrThrow("ACCESS_TOKEN");
 export const getRefreshTokenSecret = () => getEnvOrThrow("REFRESH_TOKEN");
-console.log(process.env.ACCESS_TOKEN_EXPIRE);
-console.log(process.env.REFRESH_TOKEN_EXPIRE);
+// Access token expiry in minutes (e.g., 15)
 export const getAccessTokenExpire = () =>
-  parseInt(process.env.ACCESS_TOKEN_EXPIRE || "3", 10);
+  parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10);
+// Refresh token expiry in days (e.g., 7)
 export const getRefreshTokenExpire = () =>
-  parseInt(process.env.REFRESH_TOKEN_EXPIRE || "3", 10);
+  parseInt(process.env.REFRESH_TOKEN_EXPIRE || "7", 10);
 
-export const accessTokenExpire = getAccessTokenExpire();
-export const refreshTokenExpire = getRefreshTokenExpire();
-//set cookie options
+export const accessTokenExpire = getAccessTokenExpire(); // in minutes
+export const refreshTokenExpire = getRefreshTokenExpire(); // in days
+// Set cookie options
 export const accessTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + accessTokenExpire * 60 * 1000),
-  maxAge: accessTokenExpire * 60 * 1000,
+  expires: new Date(Date.now() + accessTokenExpire * 60 * 1000), // minutes to ms
+  maxAge: accessTokenExpire * 60 * 1000, // minutes to ms
   httpOnly: true,
   sameSite: "lax",
   secure: process.env.NODE_ENV === "production",
 };
 export const refreshTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + refreshTokenExpire * 60 * 1000),
-  maxAge: refreshTokenExpire * 60 * 1000,
+  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000), // days to ms
+  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000, // days to ms
   httpOnly: true,
   sameSite: "lax",
   secure: process.env.NODE_ENV === "production",

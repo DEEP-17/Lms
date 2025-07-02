@@ -1,12 +1,12 @@
 "use client";
 import DashboardHeader from "@/app/components/Admin/dashboard/DashboardHeader";
 import AdminSidebar from "@/app/components/Admin/sidebar/AdminSidebar";
+import Loader from "@/app/components/Loader/Loader";
 import AdminProtected from "@/app/hooks/adminProtected";
-import { ContactQuery, useAnswerContactMutation, useGetAllContactsQuery } from '@/redux/features/api/apiSlice';
-import { Button } from '@mui/material';
+import { ContactQuery, useAnswerContactMutation, useGetAllContactsQuery, useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
@@ -20,14 +20,22 @@ const QueriesPage = () => {
    const [msgModalContent, setMsgModalContent] = useState<string | null>(null);
    const [success, setSuccess] = useState(false);
    const { status: sessionStatus } = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
+   console.log(userData?.user?._id);
    const router = useRouter();
 
    const handleSidebarToggle = (collapsed: boolean) => setIsSidebarCollapsed(collapsed);
 
-   const { data, isLoading, refetch } = useGetAllContactsQuery();
+   const { data, isLoading, refetch } = useGetAllContactsQuery(userData?.user?._id, { skip: !userData?.user });
    const queries = data?.contacts || [];
    const [showAnswerModal, setShowAnswerModal] = useState(false);
    const [answerModalContent, setAnswerModalContent] = useState<{ name: string; question: string; answer: string } | null>(null);
+
+   useEffect(() => {
+      if (userData) {
+         refetch();
+      }
+   }, [userData, refetch]);
 
    const handleReply = (query: ContactQuery) => {
       setSelected(query);
@@ -35,6 +43,7 @@ const QueriesPage = () => {
       setModalOpen(true);
       setSuccess(false);
    };
+
 
    const handleSend = async () => {
       if (!answer.trim() || !selected) return toast.error("Answer cannot be empty");
@@ -61,22 +70,20 @@ const QueriesPage = () => {
       setShowMsgModal(true);
    };
 
-   React.useEffect(() => {
-      if (sessionStatus === 'unauthenticated') {
+   useEffect(() => {
+      if (sessionStatus === 'unauthenticated' && !userData) {
          toast.error('You must be an admin to access this page.');
          router.replace('/');
       }
-   }, [sessionStatus, router]);
+   }, [sessionStatus, router, userData]);
 
-   if (sessionStatus === 'loading') {
+   if (sessionStatus === 'loading' || isUserLoading) {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader/>
       );
    }
 
-   if (sessionStatus === 'unauthenticated') return null;
+   if (sessionStatus === 'unauthenticated' && !userData) return null;
 
    return (
       <AdminProtected>

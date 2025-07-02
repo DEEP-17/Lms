@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import Contact from "../models/contact.model";
 import sendMail from "../utils/sendMail";
+import User from "../models/user.model";
 
 // User submits a contact form
 export const submitContact = CatchAsyncError(
@@ -22,6 +23,16 @@ export const submitContact = CatchAsyncError(
 // Admin gets all contact queries
 export const getAllContacts = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.body;
+    
+    if (!req.user ) {
+      //fetch user from database
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(403).json({ success: false, message: "Forbidden" });
+      }
+      req.user = user;
+    }
     if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }

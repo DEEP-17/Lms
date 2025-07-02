@@ -2,8 +2,9 @@
 
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
+import Loader from '@/app/components/Loader/Loader';
 import CoursePlayer from '@/app/utils/CoursePlayer';
-import { useAddAnswerMutation, useAddQuestionMutation, useGetCourseContentQuery, useGetSingleCourseQuery } from '@/redux/features/api/apiSlice';
+import { useAddAnswerMutation, useAddQuestionMutation, useGetCourseContentQuery, useGetSingleCourseQuery, useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import Lottie from 'lottie-react';
 import { Calendar, ChevronRight, Clock, Download, ExternalLink, MessageCircle, Play, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -34,8 +35,9 @@ const VideoPlayerPage: FC = () => {
    const componentId = typeof params?.componentId === 'string' ? params.componentId : Array.isArray(params?.componentId) ? params.componentId[0] : undefined;
 
    const { data: session, status: sessionStatus } = useSession();
-   const { data: courseData, isLoading: isCourseLoading } = useGetSingleCourseQuery(courseId ?? '', { skip: !courseId });
-   const { data: contentData, isLoading: isContentLoading } = useGetCourseContentQuery(courseId ?? '', { skip: !courseId });
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
+   const { data: courseData, isLoading: isCourseLoading, refetch: refetchCourse } = useGetSingleCourseQuery(courseId ?? '', { skip: !courseId });
+   const { data: contentData, isLoading: isContentLoading, refetch: refetchContent } = useGetCourseContentQuery(courseId ?? '', { skip: !courseId });
 
    const course = courseData?.course;
    const content = contentData?.content || [];
@@ -50,13 +52,15 @@ const VideoPlayerPage: FC = () => {
    // Handle authentication redirect in useEffect
    useEffect(() => {
       const handleAuthRedirect = async () => {
-         if (!session?.user) {
+         if (!session?.user && !userData) {
             toast.error('Please purchase course to view.');
             router.push('/');
          }
       };
       handleAuthRedirect();
-   }, [session, router]);
+   }, [session, router, userData]);
+
+  
 
    const formatDuration = (seconds: number): string => {
       const hours = Math.floor(seconds / 3600);
@@ -86,16 +90,15 @@ const VideoPlayerPage: FC = () => {
    const isLoading =
       sessionStatus === 'loading' ||
       isCourseLoading ||
-      isContentLoading;
+      isContentLoading ||
+      isUserLoading;
 
    if (isLoading) {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader/>
       );
    }
-
+   
    const handleAddQuestion = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!questionText) return toast.error('Please enter your question.');
@@ -103,7 +106,9 @@ const VideoPlayerPage: FC = () => {
          await addQuestion({ courseId: courseId!, question: questionText, contentId: componentId! }).unwrap();
          setQuestionText('');
          toast.success('Question submitted!');
-         await refetch();
+         await refetchCourse();
+         await refetchContent();
+
       } catch {
          toast.error('Failed to submit question.');
       }
@@ -115,7 +120,8 @@ const VideoPlayerPage: FC = () => {
          await addAnswer({ courseId: courseId!, questionId, answer: answerText[questionId], contentId: componentId! }).unwrap();
          setAnswerText((prev) => ({ ...prev, [questionId]: '' }));
          toast.success('Answer submitted!');
-         await refetch();
+         await refetchCourse();
+         await refetchContent();
       } catch {
          toast.error('Failed to submit answer.');
       }
@@ -300,9 +306,8 @@ const VideoPlayerPage: FC = () => {
                                           onClick={() =>
                                              setOpenReplies(openReplies === question._id ? null : question._id)
                                           }
-                                          className="ml-11 mb-2 text-accent hover:text-highlight flex items-center gap-1 text-sm font-medium"
+                                          className="mx-10 mb-2 flex items-center gap-2 px-2 py-1 bg-white dark:bg-slate-900 border border-cyan-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-cyan-50 dark:hover:bg-slate-800 text-cyan-700 dark:text-cyan-300 font-xs transition cursor-pointer text-sm"
                                        >
-                                          <FaReply className="w-4 h-4" />
                                           {openReplies === question._id ? "Hide Replies" : "View Replies"}
                                        </button>
                                     )}

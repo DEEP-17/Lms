@@ -1,5 +1,4 @@
 import { useEditKnowledgeGuaranteeMutation, useGetKnowledgeGuaranteeDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import { Image as ImageIcon, Loader2, Save, Upload } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -11,9 +10,8 @@ interface KnowledgeGuaranteeData {
   image: string | { public_id: string; url: string };
 }
 
-type Props = {}
 
-const EditKnowledgeGuarantee: FC<Props> = () => {
+const EditKnowledgeGuarantee: FC = () => {
   const [knowledgeGuarantee, setKnowledgeGuarantee] = useState<KnowledgeGuaranteeData>({
     title: '',
     description: '',

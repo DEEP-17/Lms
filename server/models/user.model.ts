@@ -21,6 +21,10 @@ export interface IUser extends Document {
   role: string;
   isVerified: boolean;
   courses: Array<{ courseId: string }>;
+  forgotPasswordToken?: string;
+  forgotPasswordTokenExpire?: Date;
+  verifyToken?: string;
+  verifyTokenExpire?: Date;
   comparePassword: (password: string) => Promise<boolean>;
   signAccessToken: () => string;
   signRefreshToken: () => string;
@@ -73,6 +77,10 @@ const userSchema: Schema<IUser> = new Schema(
         courseId: String,
       },
     ],
+    forgotPasswordToken: String,
+    forgotPasswordTokenExpire: Date,
+    verifyToken: String,
+    verifyTokenExpire: Date,
   },
   { timestamps: true }
 );
@@ -87,13 +95,13 @@ userSchema.pre<IUser>("save", async function (next) {
 //signing access token
 userSchema.methods.signAccessToken = function () {
   return jwt.sign({ id: this._id }, getAccessTokenSecret(), {
-    expiresIn: `${getAccessTokenExpire()}m`,
+    expiresIn: `${getAccessTokenExpire()}m`, // minutes
   });
 };
 //signing refresh token
 userSchema.methods.signRefreshToken = function () {
   return jwt.sign({ id: this._id }, getRefreshTokenSecret(), {
-    expiresIn: `${getRefreshTokenExpire()}m`,
+    expiresIn: `${getRefreshTokenExpire()}d`, // days
   });
 };
 //comparing password

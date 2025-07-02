@@ -308,13 +308,6 @@ export const getCourseByUser = CatchAsyncError(
   }
 );
 
-//add question in course
-interface IAddQustion {
-  courseId: string;
-  question: string;
-  contentId: string;
-}
-
 export const addQuestionInCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -351,8 +344,8 @@ export const addQuestionInCourse = CatchAsyncError(
       });
       await course.save();
       try {
-        await redis.del("allCourses");
         await redis.del(courseId);
+        await redis.set(String(courseId), JSON.stringify(course), "EX", 240);
       } catch (err) {
         console.error("Redis error (addQuestionInCourse):", err);
       }
@@ -365,14 +358,6 @@ export const addQuestionInCourse = CatchAsyncError(
     }
   }
 );
-
-//add answer in course question
-interface IAddAnswer {
-  courseId: string;
-  questionId: string;
-  answer: string;
-  contentId: string;
-}
 
 export const addAnswer = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -435,9 +420,9 @@ export const addAnswer = CatchAsyncError(
           return next(new ErrorHandler(error.message, 500));
         }
       }
-      try {
-        await redis.del("allCourses");
-        await redis.del(courseId);
+        try {
+          await redis.del(courseId);
+        await redis.set(String(courseId), JSON.stringify(course), "EX", 240);
       } catch (err) {
         console.error("Redis error (addAnswer):", err);
       }
@@ -452,12 +437,6 @@ export const addAnswer = CatchAsyncError(
 );
 
 //add review in course
-interface IAddReviewData {
-  review: string;
-  courseId: string;
-  rating: number;
-  userId: string;
-}
 
 export const addReview = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -496,8 +475,8 @@ export const addReview = CatchAsyncError(
       course.ratings = avg / course.reviews.length;
       await course.save();
       try {
-        await redis.del("allCourses");
         await redis.del(courseId);
+        await redis.set(String(courseId), JSON.stringify(course), "EX", 240);
       } catch (err) {
         console.error("Redis error (addReview):", err);
       }
@@ -513,11 +492,6 @@ export const addReview = CatchAsyncError(
 
 //add reply to review
 
-interface IAddReviewData {
-  courseId: string;
-  reviewId: string;
-  comment: string;
-}
 
 export const addReplyToReview = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -546,8 +520,8 @@ export const addReplyToReview = CatchAsyncError(
       review.commentReplies?.push(replyObject);
       await course.save();
       try {
-        await redis.del("allCourses");
         await redis.del(courseId);
+        await redis.set(String(courseId), JSON.stringify(course), "EX", 240);
       } catch (err) {
         console.error("Redis error (addReplyToReview):", err);
       }
@@ -573,6 +547,7 @@ export const deleteCourse = CatchAsyncError(
       await course.deleteOne({ id });
       try {
         await redis.del("allCourses");
+        await redis.del(String(id));
       } catch (err) {
         console.error("Redis error (deleteCourse):", err);
       }

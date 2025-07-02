@@ -496,12 +496,13 @@ export const contactApi = apiSlice.injectEndpoints({
     }),
     getAllContacts: builder.query<
       { success: boolean; contacts: ContactQuery[] },
-      void
+      string
     >({
-      query: () => ({
+      query: (id) => ({
         url: "/contacts",
-        method: "GET",
+        method: "POST",
         credentials: "include" as const,
+        body: { id },
       }),
     }),
     answerContact: builder.mutation<

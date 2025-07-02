@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/contact", submitContact);
 
 // Admin gets all contact queries
-router.get("/contacts", isAuthenticated, authorizeRoles("admin"), getAllContacts);
+router.post("/contacts", isAuthenticated, authorizeRoles("admin"), getAllContacts);
 
 // Admin answers a query
 router.post(

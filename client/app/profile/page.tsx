@@ -1,24 +1,27 @@
 'use client'
 import Protected from '@/app/hooks/useProtected'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import React, { FC } from 'react'
-import { toast } from 'react-hot-toast'
+import React, { FC, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import Header from '../components/Header'
 import Profile from '../components/Profile/Profile'
 import Heading from '../utils/Heading'
+import { useLoadUserQuery } from '@/redux/features/api/apiSlice'
+import Loader from '../components/Loader/Loader'
 
-type Props = {}
-const page: FC<Props> = (props) => {
+const page: FC = () => {
   const [open, setOpen] = React.useState(false);
-  const [activeItem] = React.useState(5);
+  const [activeItem] = React.useState(-1);
   const [route, setRoute] = React.useState("Login");
-  const { user } = useSelector((state: any) => state.auth.user);
+  const { user } = useSelector((state: any) => state.auth);
+  const { data: userData , isLoading } = useLoadUserQuery(undefined);
   const router = useRouter();
 
-  if (!user) return null;
+  useEffect(() => {
+    if (!userData && !user && !isLoading) return router.push('/');
+  }, [userData,router]);
 
+  if (isLoading) return <Loader/>
   return (
     <div>
       <Protected>
@@ -30,11 +33,11 @@ const page: FC<Props> = (props) => {
         <Header
           open={open}
           setOpen={setOpen}
-          activeItem={-1}
+          activeItem={activeItem}
           setRoute={setRoute}
           route={route}
         />
-        <Profile user={user} />
+        <Profile user={user?user:userData} />
       </Protected>
     </div>
   )

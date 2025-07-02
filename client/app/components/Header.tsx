@@ -1,6 +1,5 @@
 'use client';
-import { useLogOutQuery, useSocialAuthMutation } from "@/redux/features/auth/authApi";
-import { Button } from '@mui/material';
+import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,9 +32,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
     const { user } = useSelector((state: { auth: { user: User | null } }) => state.auth);
     const { data } = useSession();
     const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
-    const [logout, setLogout] = useState(false);
     const pathname = usePathname();
-    useLogOutQuery(undefined, { skip: !logout ? true : false });
 
     useEffect(() => {
         setIsMounted(true);
@@ -54,9 +51,6 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         }
         if (data === null && isSuccess) {
             toast.success("Social login successful!");
-        }
-        if (data === null) {
-            setLogout(true);
         }
         if (error) {
             if ("data" in error) {

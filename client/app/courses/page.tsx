@@ -1,8 +1,9 @@
 'use client'
-import { useGetAllCoursesQuery, useGetEnrolledCoursesQuery } from '@/redux/features/api/apiSlice';
+import { useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
 import Lottie from 'lottie-react';
 import { CheckCircle, Play } from 'lucide-react';
+import Loader from '../components/Loader/Loader';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,9 +12,11 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import useAuth from '../hooks/useAuth';
 import { FaSearch } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const CoursesPage: React.FC = () => {
    const { data: session, status: sessionStatus } = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
    const { data: allCoursesData, isLoading: isAllCoursesLoading } = useGetAllCoursesQuery();
    const courses = allCoursesData?.courses || [];
    const searchParams = useSearchParams();
@@ -27,7 +30,7 @@ const CoursesPage: React.FC = () => {
 
    // Get enrolled courses for badges
    const { data: enrolledCoursesData } = useGetEnrolledCoursesQuery(undefined, {
-      skip: !session?.user
+      skip: !session?.user && !userData
    });
    const enrolledCourses = enrolledCoursesData?.courses || [];
    const enrolledCourseIds = enrolledCourses
@@ -43,10 +46,11 @@ const CoursesPage: React.FC = () => {
    }, []);
 
    useEffect(() => {
-      if (!isLoggedIn) {
-         router.replace('/'); // or '/login' if you want to redirect to login
+      if (!isLoggedIn && !userData) {
+         toast.error('You must be logged in to access this page.');
+         router.replace('/');
       }
-   }, [isLoggedIn, router]);
+   }, [isLoggedIn, router, userData]);
 
    // Filter courses by search
    const filteredCourses = useMemo(() => {
@@ -130,6 +134,9 @@ const CoursesPage: React.FC = () => {
          return pages;
       };
 
+      if (isUserLoading) {
+         return <Loader />;
+      }
       return (
          <div className="flex justify-center items-center gap-2 lg:gap-3 mt-16">
             {/* Previous button */}

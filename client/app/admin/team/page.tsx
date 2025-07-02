@@ -1,18 +1,21 @@
 'use client'
 import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
+import Loader from '@/app/components/Loader/Loader';
 import AdminProtected from '@/app/hooks/adminProtected';
 import Heading from '@/app/utils/Heading';
+import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
 import { User } from '@/types/user';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 const ManageTeamPage = () => {
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
    const { status: sessionStatus } = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
    const router = useRouter();
    const handleSidebarToggle = (collapsed: boolean) => {
       setIsSidebarCollapsed(collapsed);
@@ -21,22 +24,20 @@ const ManageTeamPage = () => {
    const users = (data && 'users' in data ? data.users : []) as User[];
    const admins = users.filter((u: User) => u.role === 'admin');
 
-   React.useEffect(() => {
-      if (sessionStatus === 'unauthenticated') {
+   useEffect(() => {
+      if (sessionStatus === 'unauthenticated' && !userData) {
          toast.error('You must be an admin to access this page.');
          router.replace('/');
       }
-   }, [sessionStatus, router]);
+   }, [sessionStatus, router, userData]);
 
-   if (sessionStatus === 'loading') {
+   if (sessionStatus === 'loading' || isUserLoading) {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader/>
       );
    }
 
-   if (sessionStatus === 'unauthenticated') return null;
+   if (sessionStatus === 'unauthenticated' && !userData) return null;
 
    return (
       <AdminProtected>

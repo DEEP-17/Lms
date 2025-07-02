@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const Hero: React.FC = () => {
-  const { data } = useGetHeroDataQuery("Banner", {
+  const { data } = useGetHeroDataQuery({
     refetchOnMountOrArgChange: true
   });
   const router = useRouter();

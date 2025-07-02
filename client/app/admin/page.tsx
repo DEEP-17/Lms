@@ -9,10 +9,13 @@ import DashboardSummary from '../components/Admin/dashboard/DashboardSummary';
 import AdminSidebar from '../components/Admin/sidebar/AdminSidebar';
 import AdminProtected from "../hooks/adminProtected";
 import Heading from "../utils/Heading";
+import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
+import { Loader } from 'lucide-react';
 
 const AdminLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { status: sessionStatus } = useSession();
+  const { data: userData, isLoading } = useLoadUserQuery(undefined);
   const router = useRouter();
 
   const handleSidebarToggle = (collapsed: boolean) => {
@@ -21,11 +24,11 @@ const AdminLayout = () => {
   const pathname = usePathname() || '';
 
   React.useEffect(() => {
-    if (sessionStatus === 'unauthenticated') {
+    if (sessionStatus === 'unauthenticated' && !userData) {
       toast.error('You must be an admin to access this page.');
       router.replace('/');
     }
-  }, [sessionStatus, router]);
+  }, [sessionStatus, router, userData]);
 
   // Map path to sidebar item id
   const getActiveItemId = (path: string) => {
@@ -48,14 +51,12 @@ const AdminLayout = () => {
   const activeItem = getActiveItemId(pathname);
 
   // Show loader until admin user is loaded
-  if (sessionStatus === 'loading') {
+  if (sessionStatus === 'loading' || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-      </div>
+      <Loader/>
     );
   }
-  if (sessionStatus === 'unauthenticated') return null;
+  if (sessionStatus === 'unauthenticated' && !userData) return null;
 
   return (
     <div className="admin-layout overflow-hidden">

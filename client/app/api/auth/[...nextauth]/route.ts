@@ -27,8 +27,8 @@ const handler = NextAuth({
   providers,
   session: {
     strategy: "jwt",
-    maxAge:  30 * 60,
-    updateAge: 30 * 60,
+    maxAge: 15 * 60,
+    updateAge: 7.5 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET || process.env.SECRET,
   debug: process.env.NODE_ENV === "development",

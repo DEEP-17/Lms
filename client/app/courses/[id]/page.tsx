@@ -2,7 +2,7 @@
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import CoursePlayer from '@/app/utils/CoursePlayer';
-import { useAddAnswerMutation, useAddQuestionMutation, useAddReplyToReviewMutation, useAddReviewMutation, useCreatePaymentMutation, useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useGetSingleCourseQuery, useGetStripePublishableKeyQuery } from '@/redux/features/api/apiSlice';
+import {useAddReplyToReviewMutation, useAddReviewMutation, useCreatePaymentMutation, useGetAllCoursesQuery, useGetEnrolledCoursesQuery, useGetSingleCourseQuery, useGetStripePublishableKeyQuery, useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { CourseFormData } from '@/types/course';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
@@ -16,6 +16,8 @@ import { toast } from 'react-hot-toast';
 import { FaPlus, FaRegStar, FaReply, FaStar } from 'react-icons/fa';
 import { IoCloseOutline } from 'react-icons/io5';
 import CheckoutForm from './CheckoutForm';
+import Loader from '@/app/components/Loader/Loader';
+import router from 'next/router';
 
 
 // Extend CourseFormData to match API response
@@ -49,21 +51,22 @@ interface Review {
    user?: { name?: string; avatar?: { url?: string } };
    rating: number;
    comment: string;
-   replies?: ReviewReply[];
+   commentReplies?: ReviewReply[];
 }
 
 const CourseDetailPage: React.FC = () => {
    const params = useParams();
    const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
-   const { data, isLoading: isCourseLoading } = useGetSingleCourseQuery(id ?? '', { skip: !id });
+   const { data, isLoading: isCourseLoading, refetch: refetchCourse } = useGetSingleCourseQuery(id ?? '', { skip: !id });
    const course: CourseDetail | undefined = data?.course as CourseDetail | undefined;
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
    const [activeTab, setActiveTab] = useState('overview');
 
    // Check if user is enrolled
    const { data: session, status: sessionStatus } = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
    const { data: enrolledCoursesData, isLoading: isEnrolledLoading } = useGetEnrolledCoursesQuery(undefined, {
-      skip: !session?.user
+      skip: !session?.user && !userData
    });
    const enrolledCourses = enrolledCoursesData?.courses || [];
    const isEnrolled = enrolledCourses.some((enrolledCourse: CourseFormData) => enrolledCourse._id === id);
@@ -90,6 +93,13 @@ const CourseDetailPage: React.FC = () => {
          setStripePromise(loadStripe(config.publishableKey));
       }
    }, [config]);
+
+   useEffect(() => {
+      if (sessionStatus === 'unauthenticated' && !userData) {
+         toast.error('You must be logged in to access this page.');
+         router.replace('/');
+      }
+   }, [sessionStatus, router, userData]);
 
    const handleOrder = async () => {
       if (!course) return;
@@ -136,6 +146,7 @@ const CourseDetailPage: React.FC = () => {
          setReviewText('');
          setReviewRating(5);
          toast.success('Review submitted!');
+         await refetchCourse();
       } catch {
          toast.error('Failed to submit review.');
       }
@@ -147,6 +158,7 @@ const CourseDetailPage: React.FC = () => {
          await addReplyToReview({ courseId: id!, reviewId, comment: replyText[reviewId] }).unwrap();
          setReplyText((prev) => ({ ...prev, [reviewId]: '' }));
          toast.success('Reply added!');
+         await refetchCourse();
       } catch {
          toast.error('Failed to add reply.');
       }
@@ -158,13 +170,11 @@ const CourseDetailPage: React.FC = () => {
       sessionStatus === 'loading' ||
       isEnrolledLoading ||
       isAllCoursesLoading ||
-      isConfigLoading;
+      isConfigLoading || isUserLoading;
 
    if (isLoading) {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader/>
       );
    }
    if (!course) {
@@ -569,9 +579,9 @@ const CourseDetailPage: React.FC = () => {
                                              </button>
                                           )}
                                           {/* Replies */}
-                                          {Array.isArray(review.replies) && review.replies.length > 0 && (
+                                          {Array.isArray(review.commentReplies) && review.commentReplies.length > 0 && (
                                              <div className="ml-6 pl-4 border-l-2 border-cyan-100 dark:border-slate-800 space-y-2">
-                                                {review.replies.map((reply, idx) => (
+                                                {review.commentReplies.map((reply, idx) => (
                                                    <div key={reply._id || idx} className="flex items-start gap-2">
                                                       <img src={reply.user?.avatar?.url || '/avatar.jpg'} alt={reply.user?.name || 'User'} className="w-8 h-8 rounded-full object-cover border border-cyan-100 dark:border-slate-700" />
                                                       <div>

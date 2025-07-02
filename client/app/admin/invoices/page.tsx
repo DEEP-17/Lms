@@ -1,9 +1,10 @@
 'use client'
 import DashboardHeader from '@/app/components/Admin/dashboard/DashboardHeader';
 import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
+import Loader from '@/app/components/Loader/Loader';
 import AdminProtected from '@/app/hooks/adminProtected';
 import Heading from '@/app/utils/Heading';
-import { useGetAllCoursesQuery, useGetAllOrdersQuery } from '@/redux/features/api/apiSlice';
+import { useGetAllCoursesQuery, useGetAllOrdersQuery, useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
 import { CourseFormData } from '@/types/course';
 import { Order } from '@/types/order';
@@ -16,6 +17,7 @@ import { toast } from 'react-hot-toast';
 const InvoicesPage = () => {
    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
    const { status: sessionStatus } = useSession();
+   const { data: userData, isLoading: isUserLoading } = useLoadUserQuery(undefined);
    const router = useRouter();
    const handleSidebarToggle = (collapsed: boolean) => {
       setIsSidebarCollapsed(collapsed);
@@ -40,21 +42,19 @@ const InvoicesPage = () => {
    };
 
    useEffect(() => {
-      if (sessionStatus === 'unauthenticated') {
+      if (sessionStatus === 'unauthenticated' && !userData) {
          toast.error('You must be an admin to access this page.');
          router.replace('/');
       }
-   }, [sessionStatus, router]);
+   }, [sessionStatus, router, userData]);
 
-   if (sessionStatus === 'loading') {
+   if (sessionStatus === 'loading' || isLoading || isUserLoading) {
       return (
-         <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
-         </div>
+         <Loader />
       );
    }
 
-   if (sessionStatus === 'unauthenticated') return null;
+   if (sessionStatus === 'unauthenticated' && !userData) return null;
 
    return (
       <AdminProtected>
