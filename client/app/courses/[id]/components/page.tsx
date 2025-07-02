@@ -24,7 +24,7 @@ const CourseComponentsPage: FC = () => {
 
    const course = courseData?.course;
    const content = contentData?.content || [];
-   const [animationData, setAnimationData] = useState<any>(null);
+   const [animationData, setAnimationData] = useState<object|null>(null);
 
    // Handle authentication redirect in useEffect
    useEffect(() => {

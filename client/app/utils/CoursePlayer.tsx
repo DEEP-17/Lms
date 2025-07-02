@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { FileTerminal } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 
 type Props = {

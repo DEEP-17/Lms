@@ -1,6 +1,5 @@
 import { CourseFormData, StepValidation } from '@/types/course';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Button } from '@mui/material';
 import React, { FC } from 'react';
 
 export type TitleItem = { title: string };

@@ -6,19 +6,7 @@ import ChangePassword from './ChangePassword';
 import EnrolledCourses from './EnrolledCourses';
 import ProfileInfo from './ProfileInfo';
 import SideBarProfile from './SideBarProfile';
-import { cookies } from 'next/headers';
-
-interface User {
-   _id: string;
-   name: string;
-   email: string;
-   avatar: {
-      public_id: string;
-      url: string;
-   };
-   role: string;
-   courses?: Array<{ _id: string }>;
-}
+import { User } from '@/types/user';
 
 type Props = {
    user: User;
@@ -35,7 +23,7 @@ const Profile: FC<Props> = ({ user }) => {
       setLogout(true);
       await signOut({ callbackUrl: '/' });
       // delete refresh token from cookies
-      (await cookies()).delete('refresh_token');
+      document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       toast.success('Logged out successfully');
    };
 

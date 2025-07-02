@@ -2,6 +2,11 @@ import { useGetWhyTrustUsDataQuery } from '@/redux/features/Layout/layoutApi';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { FaBoxOpen } from 'react-icons/fa';
+interface Features {
+   title: string;
+   icon?: string;
+}
+
 
 export default function WhyTrustUs() {
    const { data, isLoading, error } = useGetWhyTrustUsDataQuery(undefined, {
@@ -20,7 +25,7 @@ export default function WhyTrustUs() {
    ];
 
    const whyTrustUsData = data?.layout?.whyTrustUs;
-   const features = whyTrustUsData?.features?.map(f => f.title) || defaultFeatures;
+   const features = whyTrustUsData?.features?.map((f:Features) => f.title) || defaultFeatures;
 
    if (isLoading) {
       return (
@@ -82,7 +87,7 @@ export default function WhyTrustUs() {
                   {whyTrustUsData?.description || 'Our programs aim to elevate people, empowering individuals seeking career advancement, deepening skills, and enhanced productivity. We offer a range of IT, business, and personal development courses trusted and recommended worldwide.'}
                </p>
                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  {features.map((f, i) => (
+                  {features.map((f:string, i:number) => (
                      <li key={i} className="flex items-center gap-3 text-primary font-medium">
                         <span className="text-xl">✔</span>
                         <span className="text-gray-900 dark:text-gray-200">{f}</span>

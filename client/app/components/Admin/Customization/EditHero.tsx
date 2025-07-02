@@ -1,5 +1,5 @@
 import { useEditHeroMutation, useGetLayoutDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
+
 import Lottie from 'lottie-react';
 import { Play, Save, Search } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
@@ -45,8 +45,8 @@ const EditHero: FC = () => {
         subTitle
       }).unwrap();
       toast.success('Hero section updated successfully!');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update hero section');
+    } catch {
+      toast.error('Failed to update hero section');
     }
   };
 

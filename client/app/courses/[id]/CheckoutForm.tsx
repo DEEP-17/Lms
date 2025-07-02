@@ -20,7 +20,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ courseId }) => {
    const [isLoading, setIsLoading] = useState(false);
    const [createOrder, { data: orderData, error }] = useCreateOrderMutation();
    const { data } = useLoadUserQuery(undefined);
-   const [open, setOpen] = useState(false);
 
    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();

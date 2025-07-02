@@ -1,9 +1,10 @@
-import { useGetNewsletterSubscribersQuery, useSendNewsletterEmailMutation } from '@/redux/features/api/apiSlice';
+
 import { useEditNewsletterMutation, useGetNewsletterDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
+
 import { Save } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import Loader from '../../Loader/Loader';
 
 interface NewsletterData {
    title: string;
@@ -12,9 +13,7 @@ interface NewsletterData {
    visitorCount: string;
 }
 
-type Props = {}
-
-const EditNewsletter: FC<Props> = () => {
+const EditNewsletter: FC = () => {
    const [newsletter, setNewsletter] = useState<NewsletterData>({
       title: '',
       description: '',
@@ -27,17 +26,11 @@ const EditNewsletter: FC<Props> = () => {
    });
    const [editNewsletter, { isLoading: isUpdating }] = useEditNewsletterMutation();
 
-   const { data: subscribersData, isLoading: loadingSubs } = useGetNewsletterSubscribersQuery();
-   const [sendNewsletterEmail, { isLoading }] = useSendNewsletterEmailMutation();
-
-   const [subject, setSubject] = useState('');
-   const [message, setMessage] = useState('');
-   const [selected, setSelected] = useState<string[]>([]);
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [success, setSuccess] = useState<string | null>(null);
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-   const subscribers = subscribersData?.subscribers || [];
-
+   
    useEffect(() => {
       if (data?.layout?.newsletter) {
          setNewsletter(data.layout.newsletter);
@@ -61,66 +54,16 @@ const EditNewsletter: FC<Props> = () => {
             visitorCount: newsletter.visitorCount
          }).unwrap();
          toast.success('Newsletter section updated successfully!');
-      } catch (error: any) {
-         toast.error(error?.data?.message || 'Failed to update newsletter section');
+      } catch {
+         toast.error('Failed to update newsletter section');
       }
-   };
-
-   const handleSend = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setSuccess(null);
-      setErrorMsg(null);
-      try {
-         const result = await sendNewsletterEmail({
-            subject,
-            message,
-            emails: selected.length ? selected : subscribers.map(s => s.email),
-         }).unwrap();
-         if (result.success) {
-            setSuccess('Email(s) sent successfully!');
-            setSubject('');
-            setMessage('');
-            setSelected([]);
-            toast.success('Email(s) sent successfully!');
-         } else {
-            setErrorMsg(result.message || 'Failed to send email.');
-            toast.error(result.message || 'Failed to send email.');
-         }
-      } catch (err: unknown) {
-         if (
-            typeof err === 'object' &&
-            err !== null &&
-            'data' in err &&
-            typeof (err as { data?: { message?: string } }).data?.message === 'string'
-         ) {
-            setErrorMsg((err as { data: { message: string } }).data.message);
-            toast.error((err as { data: { message: string } }).data.message);
-         } else {
-            setErrorMsg('Failed to send email.');
-            toast.error('Failed to send email.');
-         }
-      }
-   };
-
-   const toggleSelect = (email: string) => {
-      setSelected(sel => sel.includes(email) ? sel.filter(e => e !== email) : [...sel, email]);
-   };
+};
 
    const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
-   if (isLoadingData) {
+   if (isLoadingData || isUpdating) {
       return (
-         <div className="w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-xl border border-gray-200/50 dark:border-slate-700/50">
-            <div className="animate-pulse">
-               <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded mb-4"></div>
-               <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded mb-8"></div>
-               <div className="space-y-6">
-                  <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded"></div>
-                  <div className="h-32 bg-gray-200 dark:bg-slate-700 rounded"></div>
-                  <div className="h-12 bg-gray-200 dark:bg-slate-700 rounded"></div>
-               </div>
-            </div>
-         </div>
+         <Loader/>
       );
    }
 

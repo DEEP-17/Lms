@@ -5,14 +5,16 @@ import { AiOutlineLogout } from 'react-icons/ai';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { SiCoursera } from 'react-icons/si';
+import { User } from '@/types/user';
 type Props =
    {
-      user: any;
+      user: User;
       active: number;
       avatar: string | null;
       setActive: (active: number) => void;
-      logOutHandler: any;
+      logOutHandler: ()=> Promise<void>;
    }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHandler }) => {
    return (
       <div className='w-full flex flex-col gap-2 sm:gap-3'>

@@ -1,12 +1,10 @@
 'use client'
 import { useUpdatePasswordMutation } from '@/redux/features/user/userApi';
-import { Button } from '@mui/material';
 import { Eye, EyeOff } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaLock } from 'react-icons/fa';
-type Props = {}
-const ChangePassword: FC<Props> = (props) => {
+const ChangePassword: FC = () => {
    const [oldPassword, setOldPassword] = useState('');
    const [newPassword, setNewPassword] = useState('');
    const [confirmPassword, setConfirmPassword] = useState('');

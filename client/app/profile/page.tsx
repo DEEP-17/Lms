@@ -13,7 +13,14 @@ const page: FC = () => {
   const [open, setOpen] = React.useState(false);
   const [activeItem] = React.useState(-1);
   const [route, setRoute] = React.useState("Login");
-  const { user } = useSelector((state: any) => state.auth);
+  interface RootState {
+    auth: {
+      user: {
+        name?: string;
+      };
+    };
+  }
+  const { user } = useSelector((state: RootState) => state.auth);
   const { data: userData , isLoading } = useLoadUserQuery(undefined);
   const router = useRouter();
 

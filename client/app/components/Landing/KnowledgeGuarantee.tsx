@@ -1,5 +1,4 @@
 import { useGetKnowledgeGuaranteeDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { FaArrowRight } from 'react-icons/fa';

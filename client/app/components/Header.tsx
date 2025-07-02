@@ -25,14 +25,13 @@ type Props = {
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
-    console.log(activeItem);
     const [active, setActive] = useState(false);
     const [openSidebar, setOpenSidebar] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const { user } = useSelector((state: { auth: { user: User | null } }) => state.auth);
     const { data } = useSession();
     const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
-    const pathname = usePathname();
+    const pathname:string|null = usePathname();
 
     useEffect(() => {
         setIsMounted(true);
@@ -127,7 +126,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
 
                         {/* Centered Nav */}
                         <nav className="hidden md:flex items-center justify-center gap-8 h-full relative w-full">
-                            <NavItems isMobile={false} onNavClick={handleNavClick} pathname={pathname} />
+                            <NavItems isMobile={false} onNavClick={handleNavClick} pathname={pathname?pathname:''} />
                         </nav>
 
                         {/* Desktop Right Side */}
@@ -178,7 +177,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                 >
                     <aside className="fixed top-0 right-0 w-[80%] sm:w-[70%] max-w-[350px] h-full bg-white dark:bg-slate-800 p-6 space-y-4">
                         <nav className="flex flex-col space-y-4">
-                            <NavItems activeItem={activeItem} isMobile={true} onNavClick={handleNavClick} pathname={pathname} />
+                            <NavItems isMobile={true} onNavClick={handleNavClick} pathname={pathname?pathname:''} />
 
                             <HiOutlineUserCircle
                                 size={26}

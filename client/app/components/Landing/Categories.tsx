@@ -1,6 +1,11 @@
 import { useGetCategoriesDataQuery } from '@/redux/features/Layout/layoutApi';
 import React from 'react';
 
+interface Category {
+   icon: string;
+   title: string;
+   count: number;
+}
 export default function Categories() {
    const { data, isLoading, error } = useGetCategoriesDataQuery(undefined, {
       refetchOnMountOrArgChange: true
@@ -53,7 +58,7 @@ export default function Categories() {
                Explore by categories
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-               {categories.map((cat, i) => (
+               {categories.map((cat: Category, i: number) => (
                   <div
                      key={i}
                      className="group bg-card dark:bg-slate-800 rounded-2xl shadow-md p-6 flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 min-h-[160px]"

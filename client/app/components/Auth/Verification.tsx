@@ -1,5 +1,5 @@
 import { useActivationMutation } from '@/redux/features/auth/authApi';
-import { Button } from '@mui/material';
+
 import React, { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { VscWorkspaceTrusted } from 'react-icons/vsc';
@@ -15,7 +15,12 @@ type VerifyNumber = {
     "3": string;
 };
 const Verification: FC<Props> = ({ setRoute }) => {
-    const token = useSelector((state: any) => state.auth.token);
+    interface RootState {
+        auth: {
+            token: string;
+        };
+    }
+    const token = useSelector((state: RootState) => state.auth.token);
     const [activation, { isSuccess, error }] = useActivationMutation();
     const [invalidError, setInvalidError] = useState<boolean>(false);
 

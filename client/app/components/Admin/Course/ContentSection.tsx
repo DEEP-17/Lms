@@ -1,6 +1,5 @@
 'use client';
 import { ContentSectionData, VideoComponent } from '@/types/course';
-import { Button } from '@mui/material';
 import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 import SectionHeader from './SectionHeader';
@@ -15,7 +14,7 @@ interface Props {
 const ContentSection: React.FC<Props> = ({ section, onUpdate, onDelete }) => {
    const [isExpanded, setIsExpanded] = useState(true);
 
-   const updateField = (field: keyof ContentSectionData, value: any) => {
+   const updateField = <K extends keyof ContentSectionData>(field: K, value: ContentSectionData[K]) => {
       onUpdate({ ...section, [field]: value });
    };
 

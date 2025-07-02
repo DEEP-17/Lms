@@ -1,9 +1,8 @@
 import { useEditTestimonialsMutation, useGetTestimonialsDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Image as ImageIcon, Plus, Save, Star, Trash2, Upload } from 'lucide-react';
+import { Image as ImageIcon, Plus, Save, Star, Trash2 } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { Button } from '@mui/material';
 interface Testimonial {
    name: string;
    text: string;
@@ -12,9 +11,8 @@ interface Testimonial {
    date: string;
 }
 
-type Props = {}
 
-const EditTestimonials: FC<Props> = () => {
+const EditTestimonials: FC = () => {
    const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
    const { data, isLoading: isLoadingData } = useGetTestimonialsDataQuery(undefined, {
@@ -78,8 +76,8 @@ const EditTestimonials: FC<Props> = () => {
             testimonials: testimonials
          }).unwrap();
          toast.success('Testimonials updated successfully!');
-      } catch (error: any) {
-         toast.error(error?.data?.message || 'Failed to update testimonials');
+      } catch {
+         toast.error('Failed to update testimonials');
       }
    };
 

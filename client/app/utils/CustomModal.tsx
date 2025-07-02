@@ -4,7 +4,7 @@ type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   activeItem: unknown;
-  component: any;
+  component: React.ElementType;
   setRoute?: (route: string) => void;
 }
 

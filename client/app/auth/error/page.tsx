@@ -1,13 +1,13 @@
 'use client'
-
+import React from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 export default function AuthError() {
    const searchParams = useSearchParams();
-   const error = searchParams.get('error');
+   const error = searchParams?.get('error');
 
-   const getErrorMessage = (error: string | null) => {
+   const getErrorMessage = (error: string | null| undefined) => {
       switch (error) {
          case 'Configuration':
             return 'There is a problem with the server configuration.';

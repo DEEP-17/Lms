@@ -26,7 +26,7 @@ const InvoicesPage = () => {
    const orders = data?.orders || [];
    const { data: usersData } = useGetAllUsersQuery();
    const { data: coursesData } = useGetAllCoursesQuery();
-   const users: User[] = usersData?.users || [];
+   const users = (usersData && 'users' in usersData ? usersData.users : []) as User[];
    const courses: CourseFormData[] = Array.isArray(coursesData?.courses)
       ? coursesData.courses
       : Array.isArray(coursesData)

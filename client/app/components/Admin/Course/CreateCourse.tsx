@@ -11,6 +11,15 @@ import CourseInformation from './CourseInformation';
 import CourseOptions from './CourseOptions';
 import CoursePreview from './CoursePreview';
 
+interface CourseData{
+  _id?: string;
+  title?: string;
+  videoUrl?: string;
+  description?: string;
+  videoSection?: string;
+  links?: { _id?: string; title?: string; url?: string }[];
+}
+
 interface CreateCourseProps {
   isEditMode?: boolean;
   courseId?: string;
@@ -50,7 +59,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
 
   useEffect(() => {
     if (isEditMode && initialCourseData) {
-      const transformCourseData = (courseData: Array<any>) => courseData.map((item: any, index: number) => ({
+      const transformCourseData = (courseData: Array<CourseData>) => courseData.map((item: CourseData, index: number) => ({
         id: item._id || `section-${index + 1}`,
         title: item.title || item.videoSection || '',
         components: [{
@@ -58,7 +67,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
           videoTitle: item.title || '',
           videoUrl: item.videoUrl || '',
           videoDescription: item.description || '',
-          links: item.links?.map((link: any, idx: number) => ({ id: link._id || `link-${idx + 1}`, title: link.title || '', url: link.url || '' })) || [{ id: '1', title: '', url: '' }]
+          links: item.links?.map((link: { _id?: string; title?: string; url?: string }, idx: number) => ({ id: link._id || `link-${idx + 1}`, title: link.title || '', url: link.url || '' })) || [{ id: '1', title: '', url: '' }]
         }]
       }));
 
@@ -162,7 +171,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
         toast.success('Course updated successfully!');
         onSuccess?.();
         onRefetch?.();
-      } catch (err) {
+      }catch {
         toast.error('Failed to update course');
       }
     } else {
@@ -171,7 +180,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({
         toast.success('Course created successfully!');
         onSuccess?.();
         onRefetch?.();
-      } catch (err) {
+      } catch {
         toast.error('Failed to create course');
       }
     }

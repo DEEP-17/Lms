@@ -1,6 +1,5 @@
 "use client"
 import { useGetFaqDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';

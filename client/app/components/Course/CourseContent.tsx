@@ -1,9 +1,8 @@
 'use client';
 
 import { useGetCourseContentQuery } from '@/redux/features/api/apiSlice';
-import { CheckCircle, Clock, Download, MessageCircle, Play } from 'lucide-react';
+import { Clock, Download, MessageCircle, Play } from 'lucide-react';
 import React, { FC, useState } from 'react';
-import toast from 'react-hot-toast';
 
 interface CourseContentProps {
    courseId: string;

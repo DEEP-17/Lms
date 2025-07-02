@@ -1,5 +1,5 @@
 import { useEditCategoriesMutation, useGetCategoriesDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
+
 import { Plus, Save, Trash2 } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -10,11 +10,8 @@ interface Category {
    count: number;
 }
 
-type Props = {}
-
-const EditCategories: FC<Props> = () => {
+const EditCategories: FC = () => {
    const [categories, setCategories] = useState<Category[]>([]);
-   const [dragging, setDragging] = useState(false);
 
    const { data, isLoading: isLoadingData } = useGetCategoriesDataQuery(undefined, {
       refetchOnMountOrArgChange: true
@@ -60,8 +57,8 @@ const EditCategories: FC<Props> = () => {
             categories: categories
          }).unwrap();
          toast.success('Categories updated successfully!');
-      } catch (error: any) {
-         toast.error(error?.data?.message || 'Failed to update categories');
+      } catch{
+         toast.error('Failed to update categories');
       }
    };
 
@@ -107,7 +104,7 @@ const EditCategories: FC<Props> = () => {
 
                {categories.length === 0 && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                     No categories added yet. Click "Add Category" to get started.
+                     No categories added yet. Click &quot;Add Category&quot; to get started.
                   </div>
                )}
 

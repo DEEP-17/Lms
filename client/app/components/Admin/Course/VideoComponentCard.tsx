@@ -17,7 +17,7 @@ const VideoComponentCard: React.FC<Props> = ({
 }) => {
    const [isExpanded, setIsExpanded] = useState(true);
 
-   const updateField = (field: keyof VideoComponent, value: any) => {
+   const updateField = <K extends keyof VideoComponent>(field: K, value: VideoComponent[K]) => {
       onUpdate({ ...component, [field]: value });
    };
 

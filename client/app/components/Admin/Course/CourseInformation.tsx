@@ -24,7 +24,7 @@ const CourseInformation: FC<Props> = ({
     validation
 }) => {
     const [dragging, setDragging] = useState(false);
-    const [animationData, setAnimationData] = useState<any>(null);
+    const [animationData, setAnimationData] = useState<object | null>(null);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (onNext) {
@@ -39,7 +39,9 @@ const CourseInformation: FC<Props> = ({
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setCourse({ ...course, thumbnail: reader.result });
+                if (typeof reader.result === 'string' || reader.result === null) {
+                    setCourse({ ...course, thumbnail: reader.result });
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -62,7 +64,9 @@ const CourseInformation: FC<Props> = ({
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setCourse({ ...course, thumbnail: reader.result });
+                if (typeof reader.result === 'string' || reader.result === null) {
+                    setCourse({ ...course, thumbnail: reader.result });
+                }
             };
             reader.readAsDataURL(file);
         }

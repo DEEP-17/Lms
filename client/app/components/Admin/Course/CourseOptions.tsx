@@ -1,7 +1,6 @@
 'use client';
 
 import { CourseStepStatus } from '@/types/course';
-import { Button } from '@mui/material';
 import { CheckCircle, ChevronLeft, ChevronRight, Eye, FileText, Lock, PlayCircle, Save, Settings } from 'lucide-react';
 import React, { FC, useState } from 'react';
 

@@ -18,11 +18,12 @@ const EditKnowledgeGuarantee: FC = () => {
     buttonText: '',
     image: ''
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>('');
   const [dragging, setDragging] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-
+  
   const { data, isLoading: isLoadingData } = useGetKnowledgeGuaranteeDataQuery(undefined, {
     refetchOnMountOrArgChange: true
   });
@@ -137,8 +138,8 @@ const EditKnowledgeGuarantee: FC = () => {
         image: knowledgeGuarantee.image
       }).unwrap();
       toast.success('Knowledge Guarantee section updated successfully!');
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update Knowledge Guarantee section');
+    } catch{
+      toast.error('Failed to update Knowledge Guarantee section');
     }
   };
 

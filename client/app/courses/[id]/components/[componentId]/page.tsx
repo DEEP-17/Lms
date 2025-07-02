@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import { FaPlus, FaReply } from 'react-icons/fa';
 import { IoCloseOutline } from 'react-icons/io5';
 
-// Define types for question and reply
+
 interface QuestionReply {
    _id: string;
    user?: { name?: string; email?: string };
@@ -26,6 +26,18 @@ interface Question {
    user?: { name?: string; email?: string };
    question: string;
    questionReplies?: QuestionReply[];
+}
+
+interface Link{
+   _id?: string;
+   title?: string;
+   url: string;
+}
+
+interface Content{
+   _id: string;
+   title?: string;
+   videoLength?: number;
 }
 
 const VideoPlayerPage: FC = () => {
@@ -41,12 +53,13 @@ const VideoPlayerPage: FC = () => {
 
    const course = courseData?.course;
    const content = contentData?.content || [];
-   const [animationData, setAnimationData] = useState<any>(null);
+   const [animationData, setAnimationData] = useState<object|null>(null);
 
    // Find the specific component/video
-   const currentComponent = content.find((item: any) =>
-      item._id === componentId ||
-      (typeof componentId === 'string' && !isNaN(parseInt(componentId)) && parseInt(componentId) === content.indexOf(item))
+   const currentComponent = content.find(
+      (item, idx) =>
+         item._id === componentId ||
+         (typeof componentId === 'string' && !isNaN(parseInt(componentId)) && parseInt(componentId) === idx)
    );
 
    // Handle authentication redirect in useEffect
@@ -208,7 +221,7 @@ const VideoPlayerPage: FC = () => {
                               Resources
                            </h3>
                            <div className="space-y-3">
-                              {currentComponent.links.map((link: any, index: number) => (
+                              {currentComponent.links.map((link: Link, index: number) => (
                                  <a
                                     key={link._id || index}
                                     href={link.url}
@@ -472,7 +485,7 @@ const VideoPlayerPage: FC = () => {
                            Course Navigation
                         </h3>
                         <div className="space-y-2">
-                           {content.map((item: any, index: number) => (
+                           {content.map((item:Content, index: number) => (
                               <button
                                  key={item._id || index}
                                  onClick={() => router.push(`/courses/${courseId}/components/${item._id || index}`)}

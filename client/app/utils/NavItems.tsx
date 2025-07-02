@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import { FaBook, FaEnvelope, FaHome, FaInfoCircle, FaListAlt, FaPhoneAlt, FaQuestionCircle, FaQuoteRight, FaShieldAlt, FaUserShield } from 'react-icons/fa';

@@ -19,7 +19,7 @@ import {
   Users
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { cookies } from 'next/headers';
+
 import { usePathname, useRouter } from 'next/navigation';
 import { default as React, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -326,7 +326,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const logOutHandler = async () => {
     setLogout(true);
     await signOut({ callbackUrl: '/' });
-    (await cookies()).delete('refresh_token');
+    //Remove cookie named "refresh_token"
+    document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   };
 
   return (
@@ -373,7 +374,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               {/* Section Header */}
               {!isCollapsed && (
                 <div
-                  className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors duration-200 flex items-center justify-between group cursor-pointer"
+                  className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors duration-200 flex items-center justify-between group"
                   onClick={() => toggleSection(section.title)}
                 >
                   <span className="truncate">{section.title}</span>

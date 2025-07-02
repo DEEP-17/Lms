@@ -15,7 +15,7 @@ type Props = {
 
 const CoursePreview: FC<Props> = ({ course, onEdit, onSubmit, onPrevious, isEditMode = false }) => {
    const [selectedVideo, setSelectedVideo] = useState<{ videoUrl: string; title: string } | null>(null);
-   const [animationData, setAnimationData] = useState<any>(null);
+   const [animationData, setAnimationData] = useState<object|null>(null);
 
    useEffect(() => {
       fetch('/animation.json')

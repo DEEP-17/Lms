@@ -1,7 +1,12 @@
 import { useGetTestimonialsDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
-
+interface Testimonial {
+   name: string;
+   text: string;
+   rating: number;
+   avatar: string;
+   date: string;
+}
 export default function Testimonials() {
    const [current, setCurrent] = useState(0);
    const VISIBLE_COUNT = 3;
@@ -129,7 +134,7 @@ export default function Testimonials() {
                      transform: `translateX(-${safeCurrent * fullCardWidth}px)`
                   }}
                >
-                  {testimonials.map((testimonial, index) => (
+                  {testimonials.map((testimonial:Testimonial, index:number) => (
                      <div
                         key={index}
                         className="flex-shrink-0"
@@ -185,7 +190,7 @@ export default function Testimonials() {
 
                {/* Avatar row */}
                <div className="flex gap-2 items-center justify-center mt-6">
-                  {testimonials.slice(0, 5).map((t, i) => (
+                  {testimonials.slice(0, 5).map((t:Testimonial, i:number) => (
                      <img
                         key={i}
                         src={t.avatar}

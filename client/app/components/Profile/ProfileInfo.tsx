@@ -7,9 +7,9 @@ import Image from 'next/image';
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { RiCloseCircleFill } from 'react-icons/ri';
-
+import {User} from '@/types/user';
 type Props = {
-   user: any;
+   user: User;
    avatar: string | null;
 };
 

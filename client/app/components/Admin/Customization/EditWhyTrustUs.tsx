@@ -1,5 +1,4 @@
 import { useEditWhyTrustUsMutation, useGetWhyTrustUsDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
 import { Image as ImageIcon, Plus, Save, Trash2, Upload } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,15 +15,15 @@ interface WhyTrustUsData {
    features: Feature[];
 }
 
-type Props = {}
 
-const EditWhyTrustUs: FC<Props> = () => {
+const EditWhyTrustUs: FC = () => {
    const [whyTrustUs, setWhyTrustUs] = useState<WhyTrustUsData>({
       title: '',
       description: '',
       image: '',
       features: []
    });
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [imageFile, setImageFile] = useState<File | null>(null);
    const [dragging, setDragging] = useState(false);
 
@@ -131,8 +130,8 @@ const EditWhyTrustUs: FC<Props> = () => {
             features: whyTrustUs.features
          }).unwrap();
          toast.success('Why Trust Us section updated successfully!');
-      } catch (error: any) {
-         toast.error(error?.data?.message || 'Failed to update Why Trust Us section');
+      } catch {
+         toast.error('Failed to update Why Trust Us section');
       }
    };
 
@@ -264,7 +263,7 @@ const EditWhyTrustUs: FC<Props> = () => {
 
                {whyTrustUs.features.length === 0 && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                     No features added yet. Click "Add Feature" to get started.
+                     No features added yet. Click &quot;Add Feature&quot; to get started.
                   </div>
                )}
 

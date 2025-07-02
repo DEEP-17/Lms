@@ -1,5 +1,5 @@
 import { useEditFaqMutation, useGetFaqDataQuery } from '@/redux/features/Layout/layoutApi';
-import { Button } from '@mui/material';
+
 import { Plus, Save, Trash2 } from 'lucide-react';
 import React, { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -9,9 +9,8 @@ interface FaqItem {
    answer: string;
 }
 
-type Props = {}
 
-const EditFAQ: FC<Props> = () => {
+const EditFAQ: FC = () => {
    const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
 
    const { data, isLoading: isLoadingData } = useGetFaqDataQuery(undefined, {
@@ -58,8 +57,8 @@ const EditFAQ: FC<Props> = () => {
             faq: faqItems
          }).unwrap();
          toast.success('FAQ section updated successfully!');
-      } catch (error: any) {
-         toast.error(error?.data?.message || 'Failed to update FAQ section');
+      } catch{
+         toast.error('Failed to update FAQ section');
       }
    };
 
@@ -105,7 +104,7 @@ const EditFAQ: FC<Props> = () => {
 
                {faqItems.length === 0 && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                     No FAQ items added yet. Click "Add FAQ Item" to get started.
+                     No FAQ items added yet. Click &quot;Add FAQ Item&quot; to get started.
                   </div>
                )}
 

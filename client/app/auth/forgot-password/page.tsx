@@ -20,8 +20,8 @@ export default function ForgotPasswordPage() {
          await forgotPassword({ email }).unwrap();
          setMessage("If your email exists, a reset link has been sent.");
          setTimeout(() => router.push("/"), 2000);
-      } catch (err: any) {
-         setError(err?.data?.message || "Something went wrong");
+      } catch {
+         setError("Something went wrong in sending reset link.");
       }
    };
 

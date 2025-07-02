@@ -5,9 +5,7 @@ import Heading from '@/app/utils/Heading';
 import React, { useState } from 'react';
 import CreateCourse from "../../../components/Admin/Course/CreateCourse";
 
-type Props = {}
-
-const page = (props: Props) => {
+const page = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const handleSidebarToggle = (collapsed: boolean) => {

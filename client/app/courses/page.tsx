@@ -11,7 +11,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { FaSearch } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 
 const CoursesPage: React.FC = () => {
    const { data: session, status: sessionStatus } = useSession();
@@ -24,6 +23,7 @@ const CoursesPage: React.FC = () => {
    const initialPage = parseInt(searchParams?.get('page') || '1');
    const [search, setSearch] = React.useState(initialSearch);
    const [currentPage, setCurrentPage] = React.useState(initialPage);
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [redirecting, setRedirecting] = useState(false);
    const coursesPerPage = 9; // 3x3 grid
 
@@ -36,7 +36,7 @@ const CoursesPage: React.FC = () => {
       .filter((course: CourseFormData) => course._id)
       .map((course: CourseFormData) => course._id!);
 
-   const [animationData, setAnimationData] = useState<any>(null);
+   const [animationData, setAnimationData] = useState<object|null>(null);
 
    useEffect(() => {
       fetch('/animation.json')

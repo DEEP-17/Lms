@@ -108,7 +108,7 @@ const CourseDetailPage: React.FC = () => {
          const amount = Math.round(Number(course.price) * 100); // Stripe expects cents
          const result = await createPaymentIntent({ amount }).unwrap();
          setClientSecret(result.clientSecret);
-      } catch (error: any) {
+      } catch {
          toast.error('Failed to initialize payment. Please try again.');
          setOpen(false);
       }
@@ -131,7 +131,7 @@ const CourseDetailPage: React.FC = () => {
 
    }
 
-   const [animationData, setAnimationData] = useState<any>(null);
+   const [animationData, setAnimationData] = useState<object|null>(null);
    useEffect(() => {
       fetch('/animation.json')
          .then((res) => res.json())

@@ -34,8 +34,8 @@ export default function ResetPasswordPage() {
          await resetPassword({ token, email, password }).unwrap();
          setMessage("Password reset successful. You can now sign in.");
          setTimeout(() => router.push("/"), 2000);
-      } catch (err: any) {
-         setError(err?.data?.message || "Something went wrong");
+      } catch {
+         setError("Something went wrong while resetting password.");
       }
    };
 

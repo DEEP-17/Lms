@@ -1,6 +1,7 @@
 import { useGetAllCoursesQuery, useGetAllOrdersQuery, useGetCourseAnalyticsQuery, useGetOrderAnalyticsQuery, useGetUserAnalyticsQuery } from '@/redux/features/api/apiSlice';
 import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
 import React from 'react';
+import { User } from '@/types/user';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const cardData = [
@@ -36,7 +37,7 @@ const cardData = [
 const DashboardSummary: React.FC = () => {
    // Fetch summary data
    const { data: usersData, isLoading: usersLoading, isError: usersError } = useGetAllUsersQuery();
-   const users = usersData && 'users' in usersData ? usersData.users : Array.isArray(usersData) ? usersData : [];
+   const users = (usersData && 'users' in usersData ? usersData.users : []) as User[];
    const { data: orders, isLoading: ordersLoading, isError: ordersError } = useGetAllOrdersQuery();
    const { data: courses, isLoading: coursesLoading, isError: coursesError } = useGetAllCoursesQuery();
 

@@ -5,7 +5,6 @@ import AdminSidebar from '@/app/components/Admin/sidebar/AdminSidebar';
 import AdminProtected from '@/app/hooks/adminProtected';
 import Heading from '@/app/utils/Heading';
 import { useGetNewsletterSubscribersQuery, useSendNewsletterEmailMutation } from '@/redux/features/api/apiSlice';
-import { Button } from '@mui/material';
 import { Mail, Send, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';

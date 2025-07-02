@@ -1,4 +1,4 @@
-import { BookOpen, Facebook, Instagram, Linkedin, Link as LucideLink, Twitter } from "lucide-react";
+import { BookOpen, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Link from "next/link"; // Fix: use next/link for navigation
 import React from "react";
 
